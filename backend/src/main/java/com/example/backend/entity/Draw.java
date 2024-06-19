@@ -12,16 +12,19 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-public class FeedBookmark {
+public class Draw {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long styleSavedId;
+    private Long drawId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    private boolean luckyStatus;
+
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "userId")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feedId")
-    private StyleFeed styleFeed;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "luckyId")
+    private LuckyDraw luckyDraw;
 }

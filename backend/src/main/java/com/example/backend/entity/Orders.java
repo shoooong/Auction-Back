@@ -12,11 +12,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Order {
+public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bidId", nullable = false)
+    private Bid bid;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyerId", nullable = false)
+    private User buyer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sellerId")
+    private Bid seller;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -28,15 +40,9 @@ public class Order {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal orderMoney;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userCouponId")
     private UserCoupon userCouponId;
-
-    // 구매자 판매자 id필요
 
     public enum OrderStatus {
         PERCENT, FIXED

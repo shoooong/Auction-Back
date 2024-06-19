@@ -17,7 +17,7 @@ import java.time.LocalDate;
 public class InquiryResponse {
 
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long responseId;
 
     @Column(nullable = false)

@@ -14,25 +14,22 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
-public class Inquiry {
+public class LuckyAlarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long inquiryId;
-
-    @Column(nullable = false, length = 50)
-    private String inquiryTitle;
+    private Long luckyAlarmId;
 
     @Column(nullable = false)
-    private LocalDate inquiryDate;
+    private String luckyTitle;
 
-    @Column(nullable = true)
-    private LocalDate modDate;
+    @Column(nullable = false)
+    private LocalDate luckyRegDate;
 
-    @Column(nullable = false, length = 50)
-    private String inquiryContent;
+    @Column(nullable = false)
+    private String luckyContent;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    @OneToOne
+    @JoinColumn(name = "luckyId")
+    private LuckyDraw luckyDraw;
 }
