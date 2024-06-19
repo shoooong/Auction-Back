@@ -40,4 +40,10 @@ public class LuckyDraw {
 
     @Column(nullable = false)
     private Integer luckyPeople;
+
+
+
+
+
+
 }
