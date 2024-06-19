@@ -14,7 +14,7 @@ import lombok.ToString;
 @Entity
 public class FeedBookmark {
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long styleSavedId;
 
     @ManyToOne(fetch = FetchType.LAZY)

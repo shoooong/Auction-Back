@@ -7,33 +7,24 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
-public class InquiryResponse {
+public class Draw {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long responseId;
+    private Long drawId;
 
-    @Column(nullable = false)
-    private LocalDate registerDate;
-
-    @Column(nullable = false)
-    private String response;
+    private boolean luckyStatus;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(nullable = false, name = "userId")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "inquiryId")
-    private Inquiry inquiry;
-
-
-
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "luckyId")
+    private LuckyDraw luckyDraw;
 }

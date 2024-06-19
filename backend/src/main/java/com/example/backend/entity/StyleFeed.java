@@ -15,7 +15,7 @@ import lombok.ToString;
 public class StyleFeed {
 
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedId;
 
     @Column(nullable = false, length = 50)

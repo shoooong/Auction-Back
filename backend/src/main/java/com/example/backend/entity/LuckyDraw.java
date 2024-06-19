@@ -8,30 +8,42 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
-public class Announcement {
+public class LuckyDraw {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long announcementId;
+    private Long luckyId;
 
     @Column(nullable = false, length = 50)
-    private String announceTitle;
+    private String luckyName;
+
+    @Column(length = 50)
+    private String luckySize;
+
+    @Column(nullable = false, length = 255)
+    private String luckyImage;
 
     @Column(nullable = false)
-    private LocalDateTime registerDate;
+    private LocalDate luckyStartDate;
 
     @Column(nullable = false)
-    private String announceContent;
+    private LocalDate luckyEndDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
+    @Column(nullable = false)
+    private LocalDate luckyDate;
+
+    @Column(nullable = false)
+    private Integer luckyPeople;
+
+
+
+
+
 
 }
