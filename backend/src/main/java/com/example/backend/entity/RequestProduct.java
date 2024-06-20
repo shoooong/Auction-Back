@@ -56,6 +56,6 @@ public class RequestProduct {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "categoryId")
+    @JoinColumn(name = "categoryId")
     private Category category;
 }

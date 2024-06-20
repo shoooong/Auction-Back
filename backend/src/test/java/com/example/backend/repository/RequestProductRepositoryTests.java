@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.entity.Category;
 import com.example.backend.entity.RequestProduct;
 import com.example.backend.entity.User;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +22,9 @@ public class RequestProductRepositoryTests {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
 
     //더미데이터로 미등록 요청 상품 등록
     @Test
@@ -37,14 +41,20 @@ public class RequestProductRepositoryTests {
         userRepository.save(sue);
 //        Long sId = sue.getUserId();
 
+
         // 현재 날짜를 가져오기
         LocalDate currentDate = LocalDate.now();
+
+        // 카테고리 가져오기
+        Optional<Category> getCategory = categoryRepository.findById(1L);
+        Category category = getCategory.get();
+
+
         for (int i = 0 ; i <= 100 ; i ++){
-
-
             System.out.println("Current Date: " + currentDate);
             RequestProduct requestProduct = RequestProduct.builder()
                     .user(sue)
+                    .category(category)
                     .requestTitle("title" + i)
                     .requestDate(currentDate)
                     .requestProductName("productName"+i)
@@ -60,11 +70,11 @@ public class RequestProductRepositoryTests {
         }
     }
 
-    //미등록 요청 상품 조회
-//    @Test
-//    public void ReadAll(){
-//        Optional<RequestProduct> requestProduct = requestProductRepository.findAll();
-//
-//
-//    }
+    @Test
+    public void deleteRequestProduct(){
+        requestProductRepository.deleteAll();
+    }
+
+
+
 }

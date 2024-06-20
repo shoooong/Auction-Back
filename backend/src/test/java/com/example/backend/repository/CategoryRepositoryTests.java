@@ -42,12 +42,6 @@ public class CategoryRepositoryTests {
 
     }
 
-    @Test
-    public void deleteCategory(){
-
-        categoryRepository.deleteAll();
-
-    }
 
 
 }
