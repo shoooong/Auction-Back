@@ -14,9 +14,9 @@ import java.math.BigDecimal;
 public class SizePrice {
 
     @Id
-    private Long sizeId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long sizePriceId;
 
-    @MapsId
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sizeId", nullable = false)
     private Size size;
