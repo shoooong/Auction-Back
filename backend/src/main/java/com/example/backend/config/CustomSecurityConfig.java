@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import com.example.backend.security.filter.JWTCheckFilter;
 import com.example.backend.security.handler.CustomLoginFailHandler;
 import com.example.backend.security.handler.CustomLoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,6 +51,9 @@ public class CustomSecurityConfig {
             config.successHandler(new CustomLoginSuccessHandler());
             config.failureHandler(new CustomLoginFailHandler());
         });
+
+        // JWT 체크
+        http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
