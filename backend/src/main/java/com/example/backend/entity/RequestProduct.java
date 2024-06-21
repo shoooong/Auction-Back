@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Entity
 public class RequestProduct {
 
+    //미등록 상품 요청
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
@@ -53,4 +54,8 @@ public class RequestProduct {
     @ManyToOne
     @JoinColumn(nullable = false, name = "userId")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId")
+    private Category category;
 }
