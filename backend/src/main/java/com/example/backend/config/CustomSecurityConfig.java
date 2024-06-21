@@ -1,6 +1,7 @@
 package com.example.backend.config;
 
 import com.example.backend.security.filter.JWTCheckFilter;
+import com.example.backend.security.handler.CustomAccessDeniedHandler;
 import com.example.backend.security.handler.CustomLoginFailHandler;
 import com.example.backend.security.handler.CustomLoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,11 @@ public class CustomSecurityConfig {
 
         // JWT 체크
         http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        // 접근 제한 시 CustomAccessDeniedHandler 사용
+        http.exceptionHandling(config -> {
+            config.accessDeniedHandler(new CustomAccessDeniedHandler());
+        });
 
         return http.build();
     }
