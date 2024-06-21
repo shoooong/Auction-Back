@@ -47,7 +47,7 @@ class BackendApplicationTests {
 
         StyleFeed styleFeed = StyleFeed.builder()
                 .feedTitle("타이틀")
-                .feedPhoto("abc")
+                .feedPhoto("abc1")
                 .likeCount(1)
                 .build();
 
