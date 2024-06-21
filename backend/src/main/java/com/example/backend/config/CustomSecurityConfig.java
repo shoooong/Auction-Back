@@ -1,5 +1,7 @@
 package com.example.backend.config;
 
+import com.example.backend.security.handler.CustomLoginFailHandler;
+import com.example.backend.security.handler.CustomLoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +46,8 @@ public class CustomSecurityConfig {
 
         http.formLogin(config -> {
             config.loginProcessingUrl("/user/login");
+            config.successHandler(new CustomLoginSuccessHandler());
+            config.failureHandler(new CustomLoginFailHandler());
         });
 
         return http.build();
