@@ -35,4 +35,9 @@ public class Inquiry {
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
+
+    public void change(String inquiryTitle, String inquiryContent) {
+        this.inquiryContent = inquiryContent;
+        this.inquiryTitle = inquiryTitle;
+    }
 }

@@ -34,4 +34,10 @@ public class Announcement {
     @JoinColumn(name = "userId")
     private User user;
 
+    public void change(String announceTitle, String announceContent) {
+
+        this.announceTitle = announceTitle;
+        this.announceContent = announceContent;
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.example.backend.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +30,8 @@ public class StyleFeed {
     @JoinColumn(name = "userId")
     private User user;
 
+    public void change(String feedTitle, String feedPhoto) {
+        this.feedTitle = feedTitle;
+        this.feedPhoto = feedPhoto;
+    }
 }
