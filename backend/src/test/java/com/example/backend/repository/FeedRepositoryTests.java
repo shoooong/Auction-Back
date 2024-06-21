@@ -5,6 +5,7 @@ import com.example.backend.repository.Announcement.AnnouncementRepository;
 import com.example.backend.repository.FeedBookmark.FeedBookmarkRepository;
 import com.example.backend.repository.Inquiry.InquiryRepository;
 import com.example.backend.repository.StyleFeed.StyleFeedRepository;
+import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.example.backend.security;
 
 import com.example.backend.dto.UserDTO;
 import com.example.backend.entity.User;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UserDetails;
