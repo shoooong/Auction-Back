@@ -3,7 +3,6 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 
 @Entity
 @Getter
@@ -22,7 +21,8 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(nullable = false)
+    @Builder.Default
     private int grade = 0;
 
     @Column(length = 50)
@@ -34,9 +34,13 @@ public class User {
     @Column(length = 255)
     private String profileImg;
 
+    // 디폴트 false = 회원, true = 관리자
     @Column(nullable = false)
     private boolean role;
 
     @Column(length = 100)
     private String defaultAddr;
+
+    private boolean social;
+
 }
