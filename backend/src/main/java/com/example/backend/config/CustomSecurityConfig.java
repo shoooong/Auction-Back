@@ -42,6 +42,10 @@ public class CustomSecurityConfig {
 
         http.csrf(config -> config.disable());
 
+        http.formLogin(config -> {
+            config.loginProcessingUrl("/user/login");
+        });
+
         return http.build();
     }
 
