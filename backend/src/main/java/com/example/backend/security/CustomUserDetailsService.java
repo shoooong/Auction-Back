@@ -1,6 +1,6 @@
 package com.example.backend.security;
 
-import com.example.backend.dto.UserDTO;
+import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.User;
 import com.example.backend.repository.User.UserRepository;
 import lombok.RequiredArgsConstructor;

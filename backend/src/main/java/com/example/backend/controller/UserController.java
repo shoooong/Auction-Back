@@ -2,7 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.Jwt.util.CustomJWTException;
 import com.example.backend.Jwt.util.JWTUtil;
-import com.example.backend.dto.UserDTO;
+import com.example.backend.dto.user.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
