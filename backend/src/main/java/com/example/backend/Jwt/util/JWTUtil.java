@@ -76,7 +76,36 @@ public class JWTUtil {
             throw new CustomJWTException("Error");
         }
 
-        log.info("JWT: {}", claims);
+        log.info("JWT claims: {}", claims);
         return claims;
+    }
+
+    /**
+     * 토큰 잔여 유효시간 검사
+     */
+    public static boolean checkTime(Integer exp) {
+
+        java.util.Date expDate = new java.util.Date((long) exp * 1000);
+
+        long gap = expDate.getTime() - System.currentTimeMillis();
+
+        long leftMin = gap / (1000 * 60);
+
+        return leftMin < 60;
+    }
+
+    /**
+     * 토큰 유효성 검사 (만료 여부)
+     */
+    public static boolean checkExpiredToken(String token) {
+        try {
+            validateToken(token);
+        } catch (CustomJWTException e) {
+            if (e.getMessage().equals("Expired")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

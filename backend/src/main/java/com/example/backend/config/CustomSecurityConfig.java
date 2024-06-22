@@ -61,6 +61,12 @@ public class CustomSecurityConfig {
             config.accessDeniedHandler(new CustomAccessDeniedHandler());
         });
 
+
+        // 시큐리티 전체 비활성화
+//        http.csrf().disable()
+//                .cors().and()
+//                .authorizeRequests().anyRequest().permitAll();
+
         return http.build();
     }
 

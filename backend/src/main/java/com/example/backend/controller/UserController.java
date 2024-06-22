@@ -1,33 +1,65 @@
 package com.example.backend.controller;
 
+import com.example.backend.Jwt.util.CustomJWTException;
+import com.example.backend.Jwt.util.JWTUtil;
 import com.example.backend.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 
-@RequestMapping("/user")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 @Log4j2
-@Controller
 public class UserController {
-//    private final CustomUserDetailsService customUserDetailsService;
-//    private final AuthenticationManager authenticationManager;
-//    private final JWTUtil jwtUtil;
-//    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDTO userDTO) {
+
+        // TODO: email, password 확인을 위해 작성, 추후에 삭제할 것
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
-
         log.info("Login request: email={}, password={}", email, password);
 
         return (ResponseEntity<?>) ResponseEntity.ok();
+    }
+
+    @PostMapping("/refresh")
+    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
+
+        // 1. accessToken이 없거나 잘못된 JWT인 경우, 예외 메시지 발생
+        if (refreshToken == null) {
+            throw new CustomJWTException("NULL_REFRESH_TOKEN");
+        }
+
+        if (authHeader == null || authHeader.length() < 7) {
+            throw new CustomJWTException("INVALID_REFRESH_TOKEN") ;
+        }
+
+        String accessToken = authHeader.substring(7);
+        log.info("Received access token: " + accessToken);
+
+        // 2. accessToken의 유효기간 남은 경우, 전달된 토큰들을 그대로 전송
+        if (!JWTUtil.checkExpiredToken(accessToken)) {
+            log.info("Access token is still valid.");
+            return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
+        }
+
+        // refreshToken 검증
+        Map<String, Object> claims = JWTUtil.validateToken(refreshToken);
+
+        log.info("refresh ... claims: " + claims );
+
+        // 3. accessToken이 만료, refreshToken은 만료되지 않은 경우, 새로운 accessToken만 생성하여 전송
+        String newAccessToken = JWTUtil.generateToken(claims, 10);
+
+        String newRefreshToken = JWTUtil.checkTime((Integer)claims.get("exp")) == true ?
+                JWTUtil.generateToken(claims, 60 * 24) : refreshToken;
+
+        return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
     }
 
 }
