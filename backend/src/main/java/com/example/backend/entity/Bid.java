@@ -38,12 +38,13 @@ public class Bid {
     @Column(nullable = false)
     private LocalDateTime bidEndDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "userId")
+//    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sizeId")
+    @ToString.Exclude
     private Size size;
 
     public enum BidKind {
