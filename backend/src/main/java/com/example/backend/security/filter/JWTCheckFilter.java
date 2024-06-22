@@ -35,9 +35,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         log.info("check uri............" + path);
 
-        // 2) /user/ 로그인 호출 경로 제외
-        // TODO: 로그인 호출 경로 재설정
-        if (path.startsWith("/user/")) {
+        // 2) /user/ 로그인과 회원가입 호출 경로 제외
+        // TODO: CustomSecurityConfig와 중복 설정, 추후에 하나 삭제할 것
+        if (path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
             return true;
         }
 
