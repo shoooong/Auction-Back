@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -34,10 +35,12 @@ public class ProductsTests {
     private BidRepository bidRepository;
 
     @Test
+    @Commit
     @Transactional
     void productsInsertAndSearchTest() {
         for (int i = 1; i <= 5; i++) {
             Category category = Category.builder()
+                    .categoryType("패션")
                     .categoryName("신발")
                     .build();
             category = categoryRepository.save(category);

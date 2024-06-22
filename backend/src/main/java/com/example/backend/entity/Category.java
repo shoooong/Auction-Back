@@ -16,9 +16,8 @@ public class Category {
     private Long categoryId;
 
     @Column(length = 20, nullable = false)
-    private String categoryName;
+    private String categoryType;
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
+    @Column(length = 20, nullable = false)
+    private String categoryName;
 }
