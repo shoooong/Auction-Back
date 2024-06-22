@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import com.example.backend.Jwt.util.CustomJWTException;
 import com.example.backend.Jwt.util.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.dto.user.UserRegisterDTO;
+import com.example.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ import java.util.Map;
 @Log4j2
 public class UserController {
 
+    private final UserService userService;
+
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDTO userDTO) {
 
@@ -27,6 +32,27 @@ public class UserController {
         return (ResponseEntity<?>) ResponseEntity.ok();
     }
 
+
+    // 일반회원 회원가입
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {
+
+        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhone());
+        userService.registerUser(userRegisterDTO, false);
+        return ResponseEntity.ok("User registered successfully");
+    }
+
+    // 관리자 회원가입
+    @PostMapping("register/admin")
+    public ResponseEntity<?> registerAdmin(@RequestBody UserRegisterDTO userRegisterDTO) {
+
+        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhone());
+        userService.registerUser(userRegisterDTO, true);
+        return ResponseEntity.ok("Admin registered successfully");
+    }
+
+
+    // refreshToken 재발행
     @PostMapping("/refresh")
     public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
 
