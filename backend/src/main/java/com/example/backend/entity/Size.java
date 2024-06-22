@@ -22,6 +22,7 @@ public class Size {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId")
+    @ToString.Exclude
     private Products product;
 
 }

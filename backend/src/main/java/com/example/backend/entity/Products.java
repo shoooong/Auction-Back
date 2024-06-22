@@ -42,5 +42,6 @@ public class Products {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
+    @ToString.Exclude
     private Category category;
 }

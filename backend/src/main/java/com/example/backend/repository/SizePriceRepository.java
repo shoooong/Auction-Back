@@ -1,0 +1,11 @@
+package com.example.backend.repository;
+
+import com.example.backend.entity.Size;
+import com.example.backend.entity.SizePrice;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface SizePriceRepository extends JpaRepository<SizePrice, Long> {
+    List<SizePrice> findBySize(Size size);
+}

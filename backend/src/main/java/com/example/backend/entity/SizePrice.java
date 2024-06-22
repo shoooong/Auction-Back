@@ -19,6 +19,7 @@ public class SizePrice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sizeId", nullable = false)
+    @ToString.Exclude
     private Size size;
 
     @Column(nullable = false, precision = 10, scale = 2)
