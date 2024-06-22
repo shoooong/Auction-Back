@@ -1,7 +1,7 @@
 package com.example.backend.security.handler;
 
 import com.example.backend.Jwt.util.JWTUtil;
-import com.example.backend.dto.UserDTO;
+import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
