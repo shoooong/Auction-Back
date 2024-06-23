@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ProductSearch {
     void updateProducts(Long productId, String categoryName);
-    List<Products> selectProductInfo(String categoryType);
+    List<Products> selectProductInfo(String categoryName);
 }

@@ -40,43 +40,43 @@ public class ProductsTests {
     void productsInsertAndSearchTest() {
         for (int i = 1; i <= 5; i++) {
             Category category = Category.builder()
-                    .categoryType("패션")
-                    .categoryName("신발")
+                    .categoryType("의류")
+                    .categoryName("하의")
                     .build();
             category = categoryRepository.save(category);
 
             Products product = Products.builder()
                     .productPhoto("Photo" + i + "번째")
-                    .productBrand("아디다스")
-                    .productName("가젤")
-                    .modelNum("pink-151")
-                    .originalPrice(new BigDecimal("149000"))
+                    .productBrand("자라")
+                    .productName("슬랙스")
+                    .modelNum("sla-42")
+                    .originalPrice(new BigDecimal("59900"))
                     .productLike(0)
-                    .createdAt(LocalDateTime.now().plusDays(20))
+                    .createdAt(LocalDateTime.now().plusDays(6))
                     .category(category)
                     .build();
             product = productsRepository.save(product);
 
             Size size = Size.builder()
                     .product(product)
-                    .productSize("240")
+                    .productSize("L")
                     .build();
             size = sizeRepository.save(size);
 
             SizePrice sizePrice = SizePrice.builder()
                     .size(size)
-                    .sellPrice(new BigDecimal("168000.21"))
-                    .quantity(6)
+                    .sellPrice(new BigDecimal("51000.00"))
+                    .quantity(12)
                     .build();
             sizePrice = sizePriceRepository.save(sizePrice);
 
             Bid bid = Bid.builder()
                     .size(size)
                     .bidKind(Bid.BidKind.BUY)
-                    .bidPrice(155000)
-                    .bidStartDate(LocalDateTime.now().plusDays(2))
-                    .bidModifyDate(LocalDateTime.now().plusDays(4))
-                    .bidEndDate(LocalDateTime.now().plusDays(9))
+                    .bidPrice(49200)
+                    .bidStartDate(LocalDateTime.now().plusDays(1))
+                    .bidModifyDate(LocalDateTime.now().plusDays(2))
+                    .bidEndDate(LocalDateTime.now().plusDays(5))
                     .bidStatus(Bid.BidStatus.PROGRESS)
                     .build();
             bid = bidRepository.save(bid);
@@ -123,9 +123,9 @@ public class ProductsTests {
     @Test
     @Transactional
     void filterProductsByCategory() {
-        List<Products> products = productsRepository.selectProductInfo("의류");
+        List<Products> products = productsRepository.selectProductInfo("패션");
         for (Products product : products) {
-            log.info("Category '의류' Product Info: {}", product);
+            log.info("Category '패션' Product Info: {}", product);
             List<Size> sizes = sizeRepository.findByProduct(product);
             for (Size size : sizes) {
                 List<SizePrice> sizePrices = sizePriceRepository.findBySize(size);

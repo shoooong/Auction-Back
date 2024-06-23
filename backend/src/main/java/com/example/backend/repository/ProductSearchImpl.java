@@ -1,12 +1,7 @@
 package com.example.backend.repository;
 
-import com.example.backend.entity.Category;
-import com.example.backend.entity.Products;
-import com.example.backend.entity.QCategory;
-import com.example.backend.entity.QProducts;
-import com.querydsl.core.QueryFactory;
+import com.example.backend.entity.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -24,22 +19,22 @@ public class ProductSearchImpl implements ProductSearch {
 
     @Override
     @Transactional
-    public void updateProducts(Long productId, String categoryName) {
-
-
-    }
-
-    @Override
-    @Transactional
-    public List<Products> selectProductInfo(String categoryType) {
+    public List<Products> selectProductInfo(String categoryName) {
         QProducts products = QProducts.products;
         QCategory category = QCategory.category;
 
         return queryFactory.selectFrom(products)
                 .join(products.category, category).fetchJoin()
-                .where(category.categoryName.eq(categoryType))
+                .where(category.categoryName.eq(categoryName))
                 .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void updateProducts(Long productId, String categoryName) {
 
 
     }
+
+
 }
