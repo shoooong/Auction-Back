@@ -2,10 +2,7 @@ package com.example.backend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +10,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @ToString
 @Entity
 public class RequestProduct {
@@ -58,4 +56,9 @@ public class RequestProduct {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId")
     private Category category;
+
+
+    public void changeApproval(boolean approval) {
+        this.approval = approval;
+    }
 }
