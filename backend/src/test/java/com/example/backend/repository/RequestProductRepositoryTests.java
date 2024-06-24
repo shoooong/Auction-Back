@@ -3,6 +3,8 @@ package com.example.backend.repository;
 import com.example.backend.entity.Category;
 import com.example.backend.entity.RequestProduct;
 import com.example.backend.entity.User;
+import com.example.backend.repository.Category.CategoryRepository;
+import com.example.backend.repository.RequestProduct.RequestProductRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

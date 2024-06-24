@@ -1,6 +1,11 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.*;
+import com.example.backend.repository.Bid.BidRepository;
+import com.example.backend.repository.Category.CategoryRepository;
+import com.example.backend.repository.Product.ProductsRepository;
+import com.example.backend.repository.Size.SizeRepository;
+import com.example.backend.repository.Size.SizePriceRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -116,14 +121,14 @@ public class ProductsTests {
     @Test
     @Transactional
     void updateProductInfo() {
-        productsRepository.updateProducts(13L, "폴로");
+        productsRepository.updateProducts(13L, "하의");
         log.info("Product updated successfully.");
     }
 
     @Test
     @Transactional
     void filterProductsByCategory() {
-        List<Products> products = productsRepository.selectProductInfo("패션");
+        List<Products> products = productsRepository.selectProductInfo("하의");
         for (Products product : products) {
             log.info("Category '패션' Product Info: {}", product);
             List<Size> sizes = sizeRepository.findByProduct(product);

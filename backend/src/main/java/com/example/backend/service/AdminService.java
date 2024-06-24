@@ -2,8 +2,11 @@ package com.example.backend.service;
 
 import com.example.backend.dto.requestProduct.RequestProductRespDto;
 import com.example.backend.entity.*;
-import com.example.backend.repository.*;
-import com.example.backend.repository.User.UserRepository;
+import com.example.backend.repository.Category.CategoryRepository;
+import com.example.backend.repository.Product.ProductsRepository;
+import com.example.backend.repository.RequestProduct.RequestProductRepository;
+import com.example.backend.repository.Size.SizeRepository;
+import com.example.backend.repository.Size.SizePriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

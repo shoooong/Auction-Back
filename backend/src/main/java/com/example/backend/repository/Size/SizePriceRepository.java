@@ -1,4 +1,4 @@
-package com.example.backend.repository;
+package com.example.backend.repository.Size;
 
 import com.example.backend.entity.Size;
 import com.example.backend.entity.SizePrice;
