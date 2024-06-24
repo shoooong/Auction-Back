@@ -31,8 +31,7 @@ public class RequestProduct {
 
     private boolean approval;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal requestPrice;
+    private String modelNum;
 
     @Column(nullable = false, length = 50)
     private String brand;
