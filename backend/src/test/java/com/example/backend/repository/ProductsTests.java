@@ -43,51 +43,50 @@ public class ProductsTests {
     @Commit
     @Transactional
     void productsInsertAndSearchTest() {
-        for (int i = 1; i <= 5; i++) {
+
             Category category = Category.builder()
                     .categoryType("의류")
-                    .categoryName("하의")
+                    .categoryName("상의")
                     .build();
             category = categoryRepository.save(category);
 
             Products product = Products.builder()
-                    .productPhoto("Photo" + i + "번째")
-                    .productBrand("자라")
-                    .productName("슬랙스")
-                    .modelNum("sla-42")
-                    .originalPrice(new BigDecimal("59900"))
+                    .productPhoto("Photo test")
+                    .productBrand("폴로")
+                    .productName("고급진 향기가 나는 향수")
+                    .modelNum("smell_good-02")
+                    .originalPrice(new BigDecimal("79000"))
                     .productLike(0)
-                    .createdAt(LocalDateTime.now().plusDays(6))
                     .category(category)
                     .build();
             product = productsRepository.save(product);
 
             Size size = Size.builder()
                     .product(product)
-                    .productSize("L")
+                    .productSize("M")
                     .build();
             size = sizeRepository.save(size);
 
             SizePrice sizePrice = SizePrice.builder()
                     .size(size)
-                    .sellPrice(new BigDecimal("51000.00"))
-                    .quantity(12)
+                    .sellPrice(new BigDecimal("88000"))
+                    .quantity(100)
                     .build();
             sizePrice = sizePriceRepository.save(sizePrice);
 
             Bid bid = Bid.builder()
                     .size(size)
                     .bidKind(Bid.BidKind.BUY)
-                    .bidPrice(49200)
+                    .bidPrice(67500)
                     .bidStartDate(LocalDateTime.now().plusDays(1))
                     .bidModifyDate(LocalDateTime.now().plusDays(2))
-                    .bidEndDate(LocalDateTime.now().plusDays(5))
+                    .bidEndDate(LocalDateTime.now().plusDays(6))
                     .bidStatus(Bid.BidStatus.PROGRESS)
                     .build();
             bid = bidRepository.save(bid);
 
             System.out.println("Products, Sizes, SizePrices, and Bids inserted successfully.");
-        }
+
     }
 
     @Test
