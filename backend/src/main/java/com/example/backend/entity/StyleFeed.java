@@ -1,16 +1,17 @@
 package com.example.backend.entity;
 
-import com.example.backend.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Entity
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Entity
 public class StyleFeed {
 
     @Id
@@ -25,6 +26,9 @@ public class StyleFeed {
 
     @Column(nullable = false)
     private int likeCount;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "userId")

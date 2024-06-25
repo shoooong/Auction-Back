@@ -1,6 +1,8 @@
 package com.example.backend.controller.feed;
 
+import com.example.backend.dto.feed.FeedBookmarkDTO;
 import com.example.backend.dto.feed.StyleFeedDTO;
+import com.example.backend.entity.FeedBookmark;
 import com.example.backend.entity.StyleFeed;
 import com.example.backend.service.StyleFeedService;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,24 @@ public class StyleFeedController {
     private StyleFeedService styleFeedService;
 
     @GetMapping("/feedList")
-    public List<StyleFeedDTO> getAllStyleFeeds() {
-        List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeeds();
+    public List<StyleFeedDTO> getAllStyleFeedList() {
+        List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedList();
         log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
         return styleFeeds;
+    }
+
+    @GetMapping("/feedRanking")
+    public List<StyleFeedDTO> getAllStyleFeedRanking() {
+        List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedRanking();
+        log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
+        return styleFeeds;
+    }
+
+    @GetMapping("/{feedId}")
+    public StyleFeedDTO getStyleFeedById() {
+        StyleFeedDTO styleFeedDTO = styleFeedService.getStyleFeedById(18L);
+        log.info("피드 상세 조회: {}", styleFeedDTO);
+        return styleFeedDTO;
     }
 
     @PostMapping("/feed")
@@ -31,5 +47,20 @@ public class StyleFeedController {
     public void createStyleFeed(@RequestBody StyleFeedDTO styleFeedDTO) {
         StyleFeed createdStyleFeed = styleFeedService.createStyleFeed(styleFeedDTO);
         log.info("새로운 피드 생성: {}", createdStyleFeed);
+    }
+
+    @GetMapping("/saveFeed")
+    public List<FeedBookmarkDTO> getAllFeedBookmarks() {
+        List<FeedBookmarkDTO> feedBookmarks = styleFeedService.getAllFeedBookmarks();
+        log.info("성공: {} 개의 북마크 가져옴", feedBookmarks.size());
+        return feedBookmarks;
+    }
+
+    @PostMapping("/bookmark")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FeedBookmarkDTO createFeedBookmark(@RequestBody FeedBookmarkDTO feedBookmarkDTO) {
+        FeedBookmarkDTO createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
+        log.info("새로운 북마크 생성: {}", createdFeedBookmark);
+        return createdFeedBookmark;
     }
 }
