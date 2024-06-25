@@ -1,11 +1,11 @@
 package com.example.backend.entity;
 
+import com.example.backend.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class StyleFeed {
     @Column(nullable = false, length = 50)
     private String feedTitle;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 50)
     private String feedPhoto;
 
     @Column(nullable = false)
