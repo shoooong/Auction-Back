@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+
 public class RequestProductRespDto {
 
 
@@ -68,7 +70,6 @@ public class RequestProductRespDto {
             this.requestProductName = requestProduct.getRequestProductName();
             this.brand = requestProduct.getBrand();
             this.openPrice = requestProduct.getOpenPrice();
-            this.requestPrice = requestProduct.getRequestPrice();
             this.requestProductSize = requestProduct.getRequestProductSize();
             this.requestProductColor = requestProduct.getRequestProductColor();
             this.requestProductImage = requestProduct.getRequestProductImage();
@@ -85,8 +86,6 @@ public class RequestProductRespDto {
 
         private String requestProductImage;
 
-        private BigDecimal requestPrice;
-
         private String brand;
 
         private BigDecimal openPrice;
@@ -97,17 +96,19 @@ public class RequestProductRespDto {
 
         private String requestProductColor;
 
+        private String modelNum;
+
         private Category category;
 
         public ReqProductSaveRespDto(RequestProduct requestProduct) {
             this.requestId = requestProduct.getRequestId();
             this.requestTitle = requestProduct.getRequestTitle();
             this.requestProductImage = requestProduct.getRequestProductImage();
-            this.requestPrice = requestProduct.getRequestPrice();
             this.brand = requestProduct.getBrand();
             this.openPrice = requestProduct.getOpenPrice();
             this.requestProductName = requestProduct.getRequestProductName();
             this.requestProductSize = requestProduct.getRequestProductSize();
+            this.modelNum = requestProduct.getModelNum();
             this.requestProductColor = requestProduct.getRequestProductColor();
             this.category = requestProduct.getCategory();
         }
