@@ -48,31 +48,31 @@ public class AdminService {
         //요청승인 변경 approval = true;
         approvalProduct.changeApproval(true);
         boolean register = approvalProduct.isApproval();
+
+        System.out.println(register);
+
         requestProductRepository.save(approvalProduct);
 
         if (register) {
 
             Category category = categoryRepository.findById(approvalProduct.getCategory().getCategoryId()).orElseThrow();
 
-            //RequestProduct에 modelNum 없음
-            Products products = Products.builder()
+            Products product = Products.builder()
                     .productPhoto(approvalProduct.getRequestProductImage())
-                    .productBrand(approvalProduct.getRequestProductImage())
+                    .productBrand(approvalProduct.getBrand())
                     .productName(approvalProduct.getRequestProductName())
+                    .modelNum(approvalProduct.getModelNum())
                     .originalPrice(approvalProduct.getOpenPrice())
                     .category(category)
                     .build();
-            productsRepository.save(products);
+            productsRepository.save(product);
 
             Size size = Size.builder()
                     .productSize(approvalProduct.getRequestProductSize())
+                    .product(product)
                     .build();
             sizeRepository.save(size);
-            SizePrice sizePrice = SizePrice.builder()
-                    .size(size)
-                    .sellPrice(approvalProduct.getRequestPrice())
-                    .build();
-            sizePriceRepository.save(sizePrice);
+
         }
 
         //상품 등록

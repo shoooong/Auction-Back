@@ -34,19 +34,23 @@ public class RequestProductRepositoryTests {
     public void insertRequestProduct(){
 
         //test user = sue 생성
-        User sue = User.builder()
-                .nickname("sue")
-                .grade(0)
-                .email("sue@gmail.com")
-                .password("1234")
-                .build();
+//        User sue = User.builder()
+//                .nickname("sue")
+//                .grade(0)
+//                .email("sue@gmail.com")
+//                .password("1234")
+//                .build();
 
-        userRepository.save(sue);
+//        userRepository.save(sue);
 //        Long sId = sue.getUserId();
 
 
         // 현재 날짜를 가져오기
         LocalDate currentDate = LocalDate.now();
+
+        //User 가져오기
+        Optional<User> result = userRepository.findByEmail("admin1@naver.com");
+        User testUser = result.orElseThrow();
 
         // 카테고리 가져오기
         Optional<Category> getCategory = categoryRepository.findById(1L);
@@ -56,7 +60,7 @@ public class RequestProductRepositoryTests {
         for (int i = 0 ; i <= 100 ; i ++){
             System.out.println("Current Date: " + currentDate);
             RequestProduct requestProduct = RequestProduct.builder()
-                    .user(sue)
+                    .user(testUser)
                     .category(category)
                     .requestTitle("title" + i)
                     .requestDate(currentDate)
@@ -65,7 +69,7 @@ public class RequestProductRepositoryTests {
                     .requestProductColor("color"+ i)
                     .requestProductImage("image" + i)
                     .approval(false)
-                    .requestPrice(BigDecimal.valueOf(10000 + i))
+                    .modelNum("request modelnum" + i)
                     .brand("brand"+ i)
                     .openPrice(BigDecimal.valueOf(20000 + i))
                     .build();
