@@ -15,9 +15,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
 
-    @Column(length = 20, nullable = false)
+    // 카테고리 대분류
+    @Column(length = 50, nullable = false)
     private String categoryType;
 
+    // 카테고리 소분류
     @Column(length = 20, nullable = false)
     private String categoryName;
 }
