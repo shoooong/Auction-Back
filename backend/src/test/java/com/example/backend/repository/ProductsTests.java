@@ -1,5 +1,7 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.product.ProductRequestDTO;
+import com.example.backend.dto.product.ProductResponseDTO;
 import com.example.backend.entity.*;
 import com.example.backend.repository.Bid.BidRepository;
 import com.example.backend.repository.Category.CategoryRepository;
@@ -45,17 +47,17 @@ public class ProductsTests {
     void productsInsertAndSearchTest() {
 
             Category category = Category.builder()
-                    .categoryType("의류")
-                    .categoryName("상의")
+                    .categoryType("라이프")
+                    .categoryName("식탁")
                     .build();
             category = categoryRepository.save(category);
 
             Products product = Products.builder()
-                    .productPhoto("Photo test")
-                    .productBrand("폴로")
-                    .productName("고급진 향기가 나는 향수")
-                    .modelNum("smell_good-02")
-                    .originalPrice(new BigDecimal("79000"))
+                    .productPhoto("식탁 test")
+                    .productBrand("카사미아")
+                    .productName("대리석 식탁")
+                    .modelNum("hungry-07")
+                    .originalPrice(new BigDecimal("820000"))
                     .productLike(0)
                     .category(category)
                     .build();
@@ -63,13 +65,13 @@ public class ProductsTests {
 
             Size size = Size.builder()
                     .product(product)
-                    .productSize("M")
+                    .productSize("L")
                     .build();
             size = sizeRepository.save(size);
 
             SizePrice sizePrice = SizePrice.builder()
                     .size(size)
-                    .sellPrice(new BigDecimal("88000"))
+                    .sellPrice(new BigDecimal("450000"))
                     .quantity(100)
                     .build();
             sizePrice = sizePriceRepository.save(sizePrice);
@@ -77,7 +79,7 @@ public class ProductsTests {
             Bid bid = Bid.builder()
                     .size(size)
                     .bidKind(Bid.BidKind.BUY)
-                    .bidPrice(67500)
+                    .bidPrice(450000)
                     .bidStartDate(LocalDateTime.now().plusDays(1))
                     .bidModifyDate(LocalDateTime.now().plusDays(2))
                     .bidEndDate(LocalDateTime.now().plusDays(6))
@@ -117,17 +119,17 @@ public class ProductsTests {
         log.info("Product deleted successfully.");
     }
 
-    @Test
-    @Transactional
-    void updateProductInfo() {
-        productsRepository.updateProducts(13L, "하의");
-        log.info("Product updated successfully.");
-    }
+//    @Test
+//    @Transactional
+//    void updateProductInfo() {
+//        productsRepository.updateProducts(13L, "하의");
+//        log.info("Product updated successfully.");
+//    }
 
     @Test
     @Transactional
     void filterProductsByCategory() {
-        List<Products> products = productsRepository.selectProductInfo("하의");
+        List<Products> products = productsRepository.allProductInfo("하의");
         for (Products product : products) {
             log.info("Category '패션' Product Info: {}", product);
             List<Size> sizes = sizeRepository.findByProduct(product);
@@ -138,5 +140,14 @@ public class ProductsTests {
                 log.info("Products Info: {}, || Size: {}, SizePrice: {}, Bid: {}", product, size, sizePrices, bids);
             }
         }
+    }
+
+    @Test
+    @Transactional
+    public void testDetailProductInfo() {
+
+        Products products = productsRepository.detailProductInfo("IAB-10");
+
+        log.info("Products Info: {}", products);
     }
 }

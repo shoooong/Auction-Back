@@ -30,30 +30,30 @@ public class ProductServiceImpl implements ProductService {
     private final BidRepository bidRepository;
     private final ModelMapper modelMapper;
 
-    // Test 용, DTO 변환 안했을 경우
+    // JPA 사용 버전
     @Override
-    public List<Products> selectProductById(String categoryType) {
+    public List<ProductResponseDTO> detailProductSelect(String modelNum) {
+        log.info("Query Execution Started for modelNum : {}", modelNum);
+        List<Products> result = productsRepository.findByModelNum(modelNum);
+        log.info("Query Execution Completed: modelNum Size: {}", result.size());
 
-        List<Products> products = productsRepository.selectProductInfo(categoryType);
-        log.info("Service 영역에서 Repository 로부터 받아온 값 확인 : {}", products);
+        return result.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 
-        for (Products product : products) {
-            log.info("Category {}, Product Info: {}", categoryType ,product);
-            List<Size> sizes = sizeRepository.findByProduct(product);
-            for (Size size : sizes) {
-                List<SizePrice> sizePrices = sizePriceRepository.findBySize(size);
-                List<Bid> bids = bidRepository.findBySize(size);
-
-                log.info("Products Info: {}, || Size: {}, SizePrice: {}, Bid: {}", product, size, sizePrices, bids);
-            }
-        }
-        return products;
+    // QueryDSL 사용 버전
+    @Override
+    public ProductResponseDTO detailProductInfo(String modelNum) {
+        Products product = productsRepository.detailProductInfo(modelNum);
+        log.info("Product found: {}", product);
+        return convertToDTO(product);
     }
 
     @Override
-    public List<ProductResponseDTO> selectCategoryName(String categoryName) {
+    public List<ProductResponseDTO> selectCategoryValue(String categoryValue) {
 
-        List<Products> products = productsRepository.selectProductInfo(categoryName);
+        List<Products> products = productsRepository.allProductInfo(categoryValue);
 
         return products.stream()
                 .map(this::convertToDTO)

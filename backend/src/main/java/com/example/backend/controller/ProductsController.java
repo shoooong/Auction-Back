@@ -16,9 +16,17 @@ public class ProductsController {
     private final ProductService productService;
 
     @GetMapping("/products")
-    public List<ProductResponseDTO> products(@RequestParam(name = "categoryName", required = false, defaultValue = "하의") String categoryName) {
-        List<ProductResponseDTO> products = productService.selectCategoryName(categoryName);
+    public List<ProductResponseDTO> products(@RequestParam(name = "categoryName", required = false, defaultValue = "하의") String categoryValue) {
+        List<ProductResponseDTO> products = productService.selectCategoryValue(categoryValue);
         log.info("상품 정보 : {}", products);
+        return products;
+    }
+
+    @GetMapping("/products/details/{modelNum}")
+    public ProductResponseDTO productDetailSelect(@PathVariable  String modelNum) {
+        log.info("Received request for product details with ID: {}", modelNum);
+        ProductResponseDTO products = productService.detailProductInfo(modelNum);
+        log.info("상품 상세 정보 : {}", products);
         return products;
     }
 

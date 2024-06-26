@@ -16,21 +16,10 @@ import java.util.List;
 public class ProductRequestDTO {
 
     private Long productId;
-
-    private String productPhoto;
-
     private String productBrand;
-
     private String productName;
-
     private String modelNum;
-
-    private BigDecimal originalPrice;
-
-    private int productLike;
-
-    private LocalDateTime createdAt;
-
     private String categoryType;
+    private List<SizeDTO> sizes;
 
 }

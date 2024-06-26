@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.product.ProductRequestDTO;
 import com.example.backend.dto.product.ProductResponseDTO;
 import com.example.backend.entity.Products;
 
@@ -7,7 +8,9 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<Products> selectProductById(String categoryType);
+    List<ProductResponseDTO> detailProductSelect(String modelNum);
 
-    List<ProductResponseDTO> selectCategoryName(String categoryName);
+    ProductResponseDTO detailProductInfo(String modelNum);
+
+    List<ProductResponseDTO> selectCategoryValue(String categoryValue);
 }
