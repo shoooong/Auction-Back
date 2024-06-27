@@ -29,7 +29,7 @@ public class UserController {
         String password = userDTO.getPassword();
         log.info("Login request: email={}, password={}", email, password);
 
-        return (ResponseEntity<?>) ResponseEntity.ok();
+        return ResponseEntity.ok().build();
     }
 
     // 카카오 소셜 로그인
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     // 관리자 회원가입
-    @PostMapping("register/admin")
+    @PostMapping("/register/admin")
     public ResponseEntity<?> registerAdmin(@RequestBody UserRegisterDTO userRegisterDTO) {
 
         log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhone());
@@ -78,6 +78,7 @@ public class UserController {
 
 
     // refreshToken 재발행
+    // TODO: 시간별 재발행 여부 test
     @PostMapping("/refresh")
     public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
 

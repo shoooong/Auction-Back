@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.User;
 import com.example.backend.repository.User.UserRepository;
@@ -153,5 +154,20 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         return user;
+    }
+
+    /**
+     * 회원 정보 수정
+     */
+    @Override
+    public void modifyUser(UserModifyDTO userModifyDTO) {
+        Optional<User> optUser = userRepository.findByEmail(userModifyDTO.getEmail());
+
+        User user = optUser.orElseThrow();
+
+        user.changePw(passwordEncoder.encode(userModifyDTO.getPassword()));
+        user.changeNickname(userModifyDTO.getNickname());
+
+        userRepository.save(user);
     }
 }

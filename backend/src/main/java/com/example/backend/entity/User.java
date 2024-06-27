@@ -43,4 +43,12 @@ public class User extends BaseEntity {
 
     // 디폴트 false = 일반회원, true = 소셜회원
     private boolean social;
+
+
+    public void changePw(String password) {
+        this.password = password;
+    }
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.User;
 import jakarta.transaction.Transactional;
@@ -33,4 +34,6 @@ public interface UserService {
    String makeTempPassword();
 
    User makeSocialUser(List<String> socialAccountList);
+
+   void modifyUser(UserModifyDTO userModifyDTO);
 }
