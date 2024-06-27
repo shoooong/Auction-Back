@@ -1,21 +1,20 @@
 package com.example.backend.repository.Product;
 
-import com.example.backend.dto.product.ProductRequestDTO;
-import com.example.backend.dto.product.ProductResponseDTO;
+import com.example.backend.dto.product.PriceResponseDTO;
 import com.example.backend.entity.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+
+import static com.example.backend.entity.Bid.BidKind.BUY;
+import static com.example.backend.entity.Bid.BidKind.SELL;
 
 @Repository
 @AllArgsConstructor
@@ -24,8 +23,6 @@ import java.util.Optional;
 public class ProductSearchImpl implements ProductSearch {
 
     private final JPAQueryFactory queryFactory;
-    private final EntityManager entityManager;
-    private final ModelMapper modelMapper;
 
     private static final QProducts products = QProducts.products;
     private static final QCategory category = QCategory.category;
@@ -33,14 +30,14 @@ public class ProductSearchImpl implements ProductSearch {
     private static final QSizePrice sizePrice = QSizePrice.sizePrice;
     private static final QBid bid = QBid.bid;
 
+    // Sub Query : 구매/판매 희망가 조회, SubBid 는 별명
+    private static final QSizePrice subSizePrice = new QSizePrice("subSizePrice");
+    private static final QBid subBid = new QBid("subBid");
+
     @Override
     @Transactional
     // categoryName 에 대한 소분류 전체 보기
     public List<Products> allProductInfo(String categoryName) {
-
-        // Sub Query : 구매/판매 희망가 조회, SubBid 는 별명
-        QSizePrice subSizePrice = new QSizePrice("subSizePrice");
-        QBid subBid = new QBid("subBid");
 
         JPAQuery<BigDecimal> lowPrice = queryFactory.select(subSizePrice.sellPrice.min())
                 .from(subSizePrice)
@@ -48,12 +45,11 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(size.product, products)
                 .leftJoin(subBid).on(subBid.size.eq(size))
                 .where(sizePrice.size.product.modelNum.eq(products.modelNum)
-                        .and(subBid.bidKind.eq(Bid.BidKind.BUY)));
+                        .and(subBid.bidKind.eq(BUY)));
 
         BooleanBuilder whereSplit = new BooleanBuilder();
         whereSplit.and(category.categoryName.eq(categoryName))
                 .and(sizePrice.sellPrice.eq(lowPrice));
-
 
         // Main 부분
         return queryFactory.selectFrom(products)
@@ -70,30 +66,38 @@ public class ProductSearchImpl implements ProductSearch {
                 .fetch();
     }
 
-    @Override
-    @Transactional
-    public Products detailProductInfo(String modelNum) {
-        log.info("Query Execution Started for modelNum : {}", modelNum);
-        return queryFactory.selectFrom(products)
-                .leftJoin(products.category, category).fetchJoin()
-                .leftJoin(size).on(size.product.eq(products)).fetchJoin()
-                .leftJoin(sizePrice).on(sizePrice.size.eq(size)).fetchJoin()
-                .leftJoin(bid).on(bid.size.eq(size)).fetchJoin()
-                .where(products.modelNum.eq(modelNum))
-                .fetchFirst(); // 단 하나의 정보만 가져오기
-
-    }
-
     // modelNum = "사용자가 접속한 상품 번호",  bidKind = BUY,
     @Override
-    public Products searchProductPrice(ProductRequestDTO productRequestDTO) {
-        log.info("Query Execution Started for modelNum : {}", productRequestDTO.getModelNum());
-//        return queryFactory.selectFrom(products)
-//                .leftJoin(size).on(size.product.eq(products)).fetchJoin()
-//                .leftJoin(sizePrice).on(sizePrice.size.eq(size)).fetchJoin()
-//                .leftJoin(bid).on(bid.size.eq(size)).fetchJoin()
-//                .where(products.modelNum.eq(productRequestDTO.getModelNum()))
-//                .fetch();
-        return null;
+    public PriceResponseDTO searchProductPrice(String modelNum) {
+        log.info("Query Execution Started for modelNum : {}", modelNum);
+
+        // 최저가 서브쿼리
+        JPAQuery<BigDecimal> lowPrice = queryFactory.select(subSizePrice.sellPrice.min())
+                .from(subSizePrice)
+                .leftJoin(subSizePrice.size, size)
+                .leftJoin(size.product, products)
+                .leftJoin(subBid).on(subBid.size.eq(size))
+                .where(products.modelNum.eq(modelNum)
+                        .and(subBid.bidKind.eq(BUY)));
+
+        // 최고가 서브쿼리
+        JPAQuery<BigDecimal> topPrice = queryFactory.select(subSizePrice.sellPrice.max())
+                .from(subSizePrice)
+                .leftJoin(subSizePrice.size, size)
+                .leftJoin(size.product, products)
+                .leftJoin(subBid).on(subBid.size.eq(size))
+                .where(products.modelNum.eq(modelNum)
+                        .and(subBid.bidKind.eq(SELL)));
+
+        BigDecimal highestPrice = topPrice.fetchOne();
+        BigDecimal lowestPrice = lowPrice.fetchOne();
+        log.info("Highest Price: {}", highestPrice);
+
+        PriceResponseDTO responseDTO = PriceResponseDTO.builder()
+                .expectBuyPrice(lowestPrice)
+                .expectSellPrice(highestPrice)
+                .build();
+
+        return responseDTO;
     }
 }

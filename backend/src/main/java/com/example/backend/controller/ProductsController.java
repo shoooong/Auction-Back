@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.product.ProductResponseDTO;
+import com.example.backend.dto.product.*;
 import com.example.backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,26 +15,41 @@ public class ProductsController {
 
     private final ProductService productService;
 
-    @GetMapping("/products")
-    public List<ProductResponseDTO> products(@RequestParam(name = "categoryName", required = false, defaultValue = "하의") String categoryValue) {
-        List<ProductResponseDTO> products = productService.selectCategoryValue(categoryValue);
+    // 상품(카테고리 소분류) 불러오기
+    @GetMapping("/products/{categoryName}")
+    public List<ProductResponseDTO> products(@PathVariable String categoryName) {
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setCategoryName(categoryName);
+        List<ProductResponseDTO> products = productService.selectCategoryValue(categoryDTO);
         log.info("상품 정보 : {}", products);
         return products;
     }
 
+    // 해당 상품(상세) 기본 정보 가져오기
     @GetMapping("/products/details/{modelNum}")
-    public ProductResponseDTO productDetailSelect(@PathVariable  String modelNum) {
-        log.info("Received request for product details with ID: {}", modelNum);
-        ProductResponseDTO products = productService.detailProductInfo(modelNum);
-        log.info("상품 상세 정보 : {}", products);
+    public OnlyProductResponseDTO productDetailSelect(@PathVariable String modelNum) {
+        // 상품 기본 정보 가져오기
+        OnlyProductRequestDTO onlyProductRequestDTO = new OnlyProductRequestDTO();
+        onlyProductRequestDTO.setModelNum(modelNum);
+        OnlyProductResponseDTO products = productService.detailProductSelect(onlyProductRequestDTO);
+
+        // 해당 상품 구매, 판매 가격 가져오기
+        PriceResponseDTO priceResponseDTO = productService.selectProductPrice(onlyProductRequestDTO);
+        products.setExpectBuyPrice(priceResponseDTO.getExpectBuyPrice());
+        products.setExpectSellPrice(priceResponseDTO.getExpectSellPrice());
+
         return products;
     }
 
-//    @GetMapping("/products")
-//    public List<Products> products2(@RequestParam(name = "categoryType", required = false, defaultValue = "패션") String categoryType) {
-//        List<Products> products = productService.selectCategoryType(categoryType);
-//        log.info("상품 정보 : {}", products);
-//        log.info("----------------------------------");
+//    @GetMapping("/products/details/{modelNum}/{bidKind}")
+//    public List<ProductResponseDTO> productPriceSelect(@PathVariable String modelNum, @PathVariable Enum bidKind) {
+//
+//        PriceRequestDTO priceRequestDTO = new PriceRequestDTO();
+//        priceRequestDTO.setModelNum(modelNum);
+//        priceRequestDTO.setPriceType(bidKind);
+//        log.info("Received request for product details with ID: {} {}", modelNum, bidKind);
+//        List<ProductResponseDTO> products = productService.selectProductPrice(priceRequestDTO);
+//        log.info("상품 상세 정보 : {}", products);
 //        return products;
 //    }
 }

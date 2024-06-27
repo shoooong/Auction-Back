@@ -6,20 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRequestDTO {
+public class OnlyProductResponseDTO {
 
     private Long productId;
     private String productBrand;
     private String productName;
     private String modelNum;
+    private BigDecimal originalPrice;
+    private int productLike;
+    private String categoryName;
     private String categoryType;
-    private List<SizeDTO> sizes;
 
+    private BigDecimal expectBuyPrice;
+    private BigDecimal expectSellPrice;
 }

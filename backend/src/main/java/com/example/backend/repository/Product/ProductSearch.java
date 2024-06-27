@@ -1,14 +1,14 @@
 package com.example.backend.repository.Product;
 
-import com.example.backend.dto.product.ProductRequestDTO;
+import com.example.backend.dto.product.PriceResponseDTO;
 import com.example.backend.entity.Products;
 
 import java.util.List;
 
 public interface ProductSearch {
-    List<Products> allProductInfo(String categoryValue);
 
-    Products detailProductInfo(String modelNum);
+    // 소분류 상품 전체 보기
+    List<Products> allProductInfo(String categoryName);
 
-    Products searchProductPrice(ProductRequestDTO productRequestDTO);
+    PriceResponseDTO searchProductPrice(String modelNum);
 }

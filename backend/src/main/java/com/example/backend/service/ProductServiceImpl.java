@@ -1,10 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.product.*;
-import com.example.backend.entity.Bid;
 import com.example.backend.entity.Products;
-import com.example.backend.entity.Size;
-import com.example.backend.entity.SizePrice;
 import com.example.backend.repository.Bid.BidRepository;
 import com.example.backend.repository.Product.ProductsRepository;
 import com.example.backend.repository.Size.SizePriceRepository;
@@ -31,36 +28,38 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
 
     // JPA 사용 버전
+    // 상품 상세 조회(기본 정보)
     @Override
-    public List<ProductResponseDTO> detailProductSelect(String modelNum) {
-        log.info("Query Execution Started for modelNum : {}", modelNum);
-        List<Products> result = productsRepository.findByModelNum(modelNum);
-        log.info("Query Execution Completed: modelNum Size: {}", result.size());
+    public OnlyProductResponseDTO detailProductSelect(OnlyProductRequestDTO onlyProductRequestDTO) {
 
-        return result.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        log.info("Query Execution Started for modelNum : {}", onlyProductRequestDTO.getModelNum());
+        Products products = productsRepository.findFirstByModelNum(onlyProductRequestDTO.getModelNum());
+        log.info("Query Execution Completed Info : {}", products);
+
+        return modelMapper.map(products, OnlyProductResponseDTO.class);
     }
 
-    // QueryDSL 사용 버전
+    // 해당 상품에 대한 구매 / 판매 가격 가져오기
     @Override
-    public ProductResponseDTO detailProductInfo(String modelNum) {
-        Products product = productsRepository.detailProductInfo(modelNum);
-        log.info("Product found: {}", product);
-        return convertToDTO(product);
+    public PriceResponseDTO selectProductPrice(OnlyProductRequestDTO onlyProductRequestDTO) {
+        log.info("상품 조회하고 가격까지 조회하러 왔습니다~ : {}", onlyProductRequestDTO.getModelNum());
+        PriceResponseDTO products = productsRepository.searchProductPrice(onlyProductRequestDTO.getModelNum());
+        log.info("해당 상품에 대한 가격 반환까지 완료되었습니다~ : {}", products);
+
+        return modelMapper.map(products, PriceResponseDTO.class);
     }
 
+    // categoryName 에 따른 소분류 조회
     @Override
-    public List<ProductResponseDTO> selectCategoryValue(String categoryValue) {
+    public List<ProductResponseDTO> selectCategoryValue(CategoryDTO categoryDTO) {
 
-        List<Products> products = productsRepository.allProductInfo(categoryValue);
-
+        List<Products> products = productsRepository.allProductInfo(categoryDTO.getCategoryName());
         return products.stream()
-                .map(this::convertToDTO)
+                .map(this::convertProductToDTO)
                 .collect(Collectors.toList());
     }
 
-    private ProductResponseDTO convertToDTO(Products product) {
+    private ProductResponseDTO convertProductToDTO(Products product) {
 
         // 해당 product 값들을 DTO로 변환
         ProductResponseDTO productDTO = modelMapper.map(product, ProductResponseDTO.class);

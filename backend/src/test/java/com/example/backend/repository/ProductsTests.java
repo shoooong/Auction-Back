@@ -1,7 +1,5 @@
 package com.example.backend.repository;
 
-import com.example.backend.dto.product.ProductRequestDTO;
-import com.example.backend.dto.product.ProductResponseDTO;
 import com.example.backend.entity.*;
 import com.example.backend.repository.Bid.BidRepository;
 import com.example.backend.repository.Category.CategoryRepository;
@@ -46,48 +44,48 @@ public class ProductsTests {
     @Transactional
     void productsInsertAndSearchTest() {
 
-            Category category = Category.builder()
-                    .categoryType("라이프")
-                    .categoryName("식탁")
-                    .build();
-            category = categoryRepository.save(category);
+        Category category = Category.builder()
+                .categoryType("의류")
+                .categoryName("하의")
+                .build();
+        category = categoryRepository.save(category);
 
-            Products product = Products.builder()
-                    .productPhoto("식탁 test")
-                    .productBrand("카사미아")
-                    .productName("대리석 식탁")
-                    .modelNum("hungry-07")
-                    .originalPrice(new BigDecimal("820000"))
-                    .productLike(0)
-                    .category(category)
-                    .build();
-            product = productsRepository.save(product);
+        Products product = Products.builder()
+                .productPhoto("사진")
+                .productBrand("나이키")
+                .productName("반바지")
+                .modelNum("2222")
+                .originalPrice(new BigDecimal("32000"))
+                .productLike(0)
+                .category(category)
+                .build();
+        product = productsRepository.save(product);
 
-            Size size = Size.builder()
-                    .product(product)
-                    .productSize("L")
-                    .build();
-            size = sizeRepository.save(size);
+        Size size = Size.builder()
+                .product(product)
+                .productSize("M")
+                .build();
+        size = sizeRepository.save(size);
 
-            SizePrice sizePrice = SizePrice.builder()
-                    .size(size)
-                    .sellPrice(new BigDecimal("450000"))
-                    .quantity(100)
-                    .build();
-            sizePrice = sizePriceRepository.save(sizePrice);
+        SizePrice sizePrice = SizePrice.builder()
+                .size(size)
+                .sellPrice(new BigDecimal("15000"))
+                .quantity(100)
+                .build();
+        sizePrice = sizePriceRepository.save(sizePrice);
 
-            Bid bid = Bid.builder()
-                    .size(size)
-                    .bidKind(Bid.BidKind.BUY)
-                    .bidPrice(450000)
-                    .bidStartDate(LocalDateTime.now().plusDays(1))
-                    .bidModifyDate(LocalDateTime.now().plusDays(2))
-                    .bidEndDate(LocalDateTime.now().plusDays(6))
-                    .bidStatus(Bid.BidStatus.PROGRESS)
-                    .build();
-            bid = bidRepository.save(bid);
+        Bid bid = Bid.builder()
+                .size(size)
+                .bidKind(Bid.BidKind.SELL)
+                .bidPrice(27000)
+                .bidStartDate(LocalDateTime.now().plusDays(1))
+                .bidModifyDate(LocalDateTime.now().plusDays(2))
+                .bidEndDate(LocalDateTime.now().plusDays(6))
+                .bidStatus(Bid.BidStatus.PROGRESS)
+                .build();
+        bid = bidRepository.save(bid);
 
-            System.out.println("Products, Sizes, SizePrices, and Bids inserted successfully.");
+        System.out.println("Products, Sizes, SizePrices, and Bids inserted successfully.");
 
     }
 
@@ -146,7 +144,7 @@ public class ProductsTests {
     @Transactional
     public void testDetailProductInfo() {
 
-        Products products = productsRepository.detailProductInfo("IAB-10");
+        Products products = productsRepository.findFirstByModelNum("IAB-10");
 
         log.info("Products Info: {}", products);
     }
