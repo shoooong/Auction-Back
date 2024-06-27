@@ -16,6 +16,12 @@ public interface StyleFeedService {
 
     StyleFeed createStyleFeed(StyleFeedDTO styleFeedDTO);
 
+    StyleFeedDTO updateStyleFeed(Long feedId, StyleFeedDTO styleFeedDTO);
+
+    void deleteStyleFeed(Long feedId);
+
+    void deleteFeedBookmark(Long styleSaveId);
+
     List<FeedBookmarkDTO> getAllFeedBookmarks();
 
     FeedBookmarkDTO createFeedBookmark(FeedBookmarkDTO feedBookmarkDTO);

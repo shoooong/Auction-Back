@@ -21,6 +21,7 @@ public class StyleFeedController {
     @Autowired
     private StyleFeedService styleFeedService;
 
+    // 최신순으로 피드 조회
     @GetMapping("/feedList")
     public List<StyleFeedDTO> getAllStyleFeedList() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedList();
@@ -28,6 +29,7 @@ public class StyleFeedController {
         return styleFeeds;
     }
 
+    // 좋아요 순으로 피드 조회
     @GetMapping("/feedRanking")
     public List<StyleFeedDTO> getAllStyleFeedRanking() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedRanking();
@@ -35,6 +37,7 @@ public class StyleFeedController {
         return styleFeeds;
     }
 
+    // 피드 상세 조회
     @GetMapping("/{feedId}")
     public StyleFeedDTO getStyleFeedById() {
         StyleFeedDTO styleFeedDTO = styleFeedService.getStyleFeedById(18L);
@@ -42,6 +45,7 @@ public class StyleFeedController {
         return styleFeedDTO;
     }
 
+    // 피드 등록
     @PostMapping("/feed")
     @ResponseStatus(HttpStatus.CREATED)
     public void createStyleFeed(@RequestBody StyleFeedDTO styleFeedDTO) {
@@ -49,6 +53,19 @@ public class StyleFeedController {
         log.info("새로운 피드 생성: {}", createdStyleFeed);
     }
 
+    // 피드 수정
+    @PutMapping("/{id}")
+    public StyleFeedDTO updateStyleFeed(@PathVariable Long id, @RequestBody StyleFeedDTO styleFeedDTO) {
+        return styleFeedService.updateStyleFeed(id, styleFeedDTO);
+    }
+
+    // 피드 삭제
+    @DeleteMapping("/{id}")
+    public void deleteStyleFeed(@PathVariable Long id) {
+        styleFeedService.deleteStyleFeed(id);
+    }
+
+    // 관심피드 조회
     @GetMapping("/saveFeed")
     public List<FeedBookmarkDTO> getAllFeedBookmarks() {
         List<FeedBookmarkDTO> feedBookmarks = styleFeedService.getAllFeedBookmarks();
@@ -56,6 +73,7 @@ public class StyleFeedController {
         return feedBookmarks;
     }
 
+    // 관심피드 저장
     @PostMapping("/bookmark")
     @ResponseStatus(HttpStatus.CREATED)
     public FeedBookmarkDTO createFeedBookmark(@RequestBody FeedBookmarkDTO feedBookmarkDTO) {

@@ -23,11 +23,4 @@ public class FeedBookmark {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feedId")
     private StyleFeed styleFeed;
-
-    public void setUser(User newUser) {
-    }
-
-    public void setStyleFeed(StyleFeed newStyleFeed) {
-
-    }
 }
