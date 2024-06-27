@@ -63,7 +63,7 @@ public class RequestProductRepositoryTests {
                     .user(testUser)
                     .category(category)
                     .requestTitle("title" + i)
-                    .requestDate(currentDate)
+//                    .requestDate(currentDate)
                     .requestProductName("productName"+i)
                     .requestProductSize("size"+i)
                     .requestProductColor("color"+ i)

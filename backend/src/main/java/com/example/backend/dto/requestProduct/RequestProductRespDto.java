@@ -36,14 +36,14 @@ public class RequestProductRespDto {
             private Long requestId;
             private String requestTitle;
             private String requestProductName;
-            private LocalDate requestDate;
+//            private LocalDate requestDate;
             private boolean approval;
 
             public RequestProductDto(RequestProduct requestProduct) {
                 this.requestId = requestProduct.getRequestId();
                 this.requestTitle = requestProduct.getRequestTitle();
                 this.requestProductName = requestProduct.getRequestProductName();
-                this.requestDate = requestProduct.getRequestDate();
+//                this.requestDate = requestProduct.getRequestDate();
                 this.approval = requestProduct.isApproval();
             }
         }

@@ -60,6 +60,9 @@ dependencies {
     // 임의로 추가
     implementation 'org.modelmapper:modelmapper:3.1.0'
 
+    // OAuth
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 }
 
 // Querydsl 설정부
