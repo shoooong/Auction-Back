@@ -32,6 +32,31 @@ public class UserController {
         return (ResponseEntity<?>) ResponseEntity.ok();
     }
 
+    // 카카오 소셜 로그인
+    @GetMapping("/kakao")
+    public Map<String, Object> getUserFromKakao(@RequestHeader("Authorization") String authHeader) {
+        log.info("authHeader={}", authHeader);
+
+        String accessToken = authHeader.substring(7);
+
+        log.info("accessToken={}", accessToken);
+
+        UserDTO userDTO = userService.getKakaoMember(accessToken);
+
+        Map<String, Object> claims = userDTO.getClaims();
+
+        String kakaoAccessToken = JWTUtil.generateToken(claims, 10);         // 10분
+        String kakaoRefreshToken = JWTUtil.generateToken(claims, 60*24);     // 1일
+
+        log.info("kakaoAccessToken : " + kakaoAccessToken);
+        log.info("kakaoRefreshToken : " + kakaoRefreshToken);
+
+        claims.put("accessToken", kakaoAccessToken);
+        claims.put("refreshToken", kakaoRefreshToken);
+
+        return claims;
+    }
+
 
     // 일반회원 회원가입
     @PostMapping("/register")
