@@ -15,7 +15,8 @@ public class StyleFeedDTO {
     private String feedTitle;
     private String feedPhoto;
     private int likeCount;
-    private LocalDateTime createdAt;
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
     private Long userId;
 
     public StyleFeedDTO(Long feedId, String feedTitle, String feedPhoto, int likeCount, Long userId) {

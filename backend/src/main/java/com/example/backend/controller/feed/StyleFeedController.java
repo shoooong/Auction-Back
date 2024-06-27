@@ -25,7 +25,7 @@ public class StyleFeedController {
     @GetMapping("/feedList")
     public List<StyleFeedDTO> getAllStyleFeedList() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedList();
-        log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
+        log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 
@@ -33,7 +33,7 @@ public class StyleFeedController {
     @GetMapping("/feedRanking")
     public List<StyleFeedDTO> getAllStyleFeedRanking() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedRanking();
-        log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
+        log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 

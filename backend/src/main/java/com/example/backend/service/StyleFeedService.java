@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.feed.FeedBookmarkDTO;
 import com.example.backend.dto.feed.StyleFeedDTO;
 import com.example.backend.entity.StyleFeed;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,9 +19,8 @@ public interface StyleFeedService {
 
     StyleFeedDTO updateStyleFeed(Long feedId, StyleFeedDTO styleFeedDTO);
 
-    void deleteStyleFeed(Long feedId);
+    void deleteStyleFeed(final long feedId);
 
-    void deleteFeedBookmark(Long styleSaveId);
 
     List<FeedBookmarkDTO> getAllFeedBookmarks();
 
