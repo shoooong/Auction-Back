@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
-public class RequestProduct {
+public class RequestProduct extends BaseEntity {
 
     //미등록 상품 요청
     @Id
@@ -22,9 +22,6 @@ public class RequestProduct {
 
     @Column(nullable = false, length = 100)
     private String requestTitle;
-
-    @Column(nullable = false)
-    private LocalDate requestDate;
 
     @Column(nullable = false, length = 50)
     private String requestProductImage;

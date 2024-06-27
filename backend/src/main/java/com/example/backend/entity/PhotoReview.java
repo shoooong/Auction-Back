@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class PhotoReview {
+public class PhotoReview extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +27,6 @@ public class PhotoReview {
     @Column(nullable = false, length = 50)
     @Builder.Default
     private int reviewLike = 0;
-
-    @Column(nullable = false)
-    private LocalDateTime registerDate;
-
-    private LocalDateTime modifyDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
