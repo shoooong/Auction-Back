@@ -1,33 +1,36 @@
 package com.example.backend.service;
 
+
+import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.User;
-import com.example.backend.repository.User.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
+import java.util.List;
+import java.util.Optional;
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+@Transactional
+public interface UserService {
 
-    public void registerUser(UserRegisterDTO userRegisterDTO, boolean isAdmin) {
-        if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
+   void registerUser(UserRegisterDTO userRegisterDTO, boolean isAdmin);
 
-        // TODO: 이후 주소 api 호출 기능 구현되면, 회원가입 시 기본 배송지 입력 받도록 추가
-        User user = User.builder()
-                .email(userRegisterDTO.getEmail())
-                .password(passwordEncoder.encode(userRegisterDTO.getPassword()))
-                .nickname(userRegisterDTO.getNickname())
-                .phone(userRegisterDTO.getPhone())
-                .role(isAdmin)
-                .build();
+   UserDTO getKakaoMember(String accessToken);
 
-        userRepository.save(user);
-    }
+   default UserDTO entityToDTO(User user) {
+      UserDTO userDTO = new UserDTO(
+               user.getEmail(),
+               user.getPassword(),
+               user.getGrade(),
+               user.getNickname(),
+               user.getPhone(),
+               user.getDefaultAddr(),
+               user.isSocial(),
+               user.isRole());
+
+      return userDTO;
+   }
+
+   String makeTempPassword();
+
+   User makeSocialUser(List<String> socialAccountList);
 }

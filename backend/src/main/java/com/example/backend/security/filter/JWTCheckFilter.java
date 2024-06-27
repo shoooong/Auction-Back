@@ -37,7 +37,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         // 2) /user/ 로그인과 회원가입 호출 경로 제외
         // TODO: CustomSecurityConfig와 중복 설정, 추후에 하나 삭제할 것
-        if (path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
+        if (path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
             return true;
         }
 
@@ -53,12 +53,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         log.info("------------------JWTCheckFilter...-----------------");
 
         String authHeaderStr = request.getHeader("Authorization");
-
+        log.info("authHeaderStr: {}", authHeaderStr);
         try {
             String accessToken = authHeaderStr.substring(7);
             Map<String, Object> claims = JWTUtil.validateToken(accessToken);
 
-            log.info("JWT claims: " + claims);
+            log.info("JWT claims: {}", claims);
 
             /**
              * 접근 권한별 처리를 위한 인증 컨텍스트 설정

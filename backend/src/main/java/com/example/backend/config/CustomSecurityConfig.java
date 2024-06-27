@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 @Configuration
 @Log4j2
+//@EnableWebSecurity
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
     @Bean
@@ -48,9 +49,14 @@ public class CustomSecurityConfig {
         http.csrf(config -> config.disable());
 
         http.formLogin(config -> {
-            config.loginProcessingUrl("/user/login");
+            config.loginPage("/user/login");
             config.successHandler(new CustomLoginSuccessHandler());
             config.failureHandler(new CustomLoginFailHandler());
+        });
+
+        http.oauth2Login(config -> {
+            config.loginPage("/oauth/authorize");
+            config.successHandler(new CustomLoginSuccessHandler());
         });
 
         // JWT 체크
@@ -63,7 +69,7 @@ public class CustomSecurityConfig {
 
         // 특정 경로에 대해 인증 없이 접근 가능하도록 설정
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/user/login","/user/register", "/user/register/admin").permitAll();
+            auth.requestMatchers("/user/kakao","/user/login","/user/register", "/user/register/admin").permitAll();
             auth.anyRequest().authenticated();
         });
 
