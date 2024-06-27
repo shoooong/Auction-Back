@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -41,6 +41,6 @@ public class User {
     @Column(length = 100)
     private String defaultAddr;
 
+    // 디폴트 false = 일반회원, true = 소셜회원
     private boolean social;
-
 }

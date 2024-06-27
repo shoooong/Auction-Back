@@ -43,7 +43,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedPhoto(),
                         styleFeed.getLikeCount(),
-                        styleFeed.getCreatedAt(),
                         styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
                 ))
                 .collect(Collectors.toList());
@@ -60,7 +59,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedPhoto(),
                         styleFeed.getLikeCount(),
-                        styleFeed.getCreatedAt(),
                         styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
                 ))
                 .collect(Collectors.toList());
@@ -76,7 +74,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 styleFeed.getFeedTitle(),
                 styleFeed.getFeedPhoto(),
                 styleFeed.getLikeCount(),
-                styleFeed.getCreatedAt(),
                 styleFeed.getUser().getUserId()
         );
     }
@@ -90,7 +87,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         styleFeed.setFeedPhoto(styleFeedDTO.getFeedPhoto());
         styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
         styleFeed.setUser(user);
-        styleFeed.setCreatedAt(LocalDateTime.now()); // 현재 시각 설정
 
         StyleFeed savedStyleFeed = styleFeedRepository.save(styleFeed);
         return savedStyleFeed;

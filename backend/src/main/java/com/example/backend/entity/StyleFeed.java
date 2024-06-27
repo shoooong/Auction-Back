@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class StyleFeed {
+public class StyleFeed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +27,7 @@ public class StyleFeed {
     @Column(nullable = false)
     private int likeCount;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
 

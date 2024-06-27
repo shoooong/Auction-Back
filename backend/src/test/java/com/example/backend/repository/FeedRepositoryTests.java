@@ -138,7 +138,6 @@ public class FeedRepositoryTests {
     public void testInsertAnnouncement(){
 
         Announcement announcement = Announcement.builder()
-                .registerDate(LocalDateTime.now())
                 .announceTitle("집에 갈래")
                 .announceContent("집 보내줘")
                 .build();
@@ -182,8 +181,6 @@ public class FeedRepositoryTests {
         Inquiry inquiry = Inquiry.builder()
                 .inquiryTitle("공지")
                 .inquiryContent("점심 뭐 먹을가")
-                .inquiryDate(LocalDate.now())
-                .modDate(LocalDate.now())
                 .user(user)
                 .build();
 

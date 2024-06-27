@@ -14,14 +14,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
-public class InquiryResponse {
+public class InquiryResponse extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long responseId;
-
-    @Column(nullable = false)
-    private LocalDate registerDate;
 
     @Column(nullable = false)
     private String response;

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
-public class Inquiry {
+public class Inquiry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,12 +22,6 @@ public class Inquiry {
 
     @Column(nullable = false, length = 50)
     private String inquiryTitle;
-
-    @Column(nullable = false)
-    private LocalDate inquiryDate;
-
-    @Column(nullable = true)
-    private LocalDate modDate;
 
     @Column(nullable = false, length = 50)
     private String inquiryContent;

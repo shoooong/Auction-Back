@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 @Entity
-public class Announcement {
+public class Announcement extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +23,6 @@ public class Announcement {
 
     @Column(nullable = false, length = 50)
     private String announceTitle;
-
-    @Column(nullable = false)
-    private LocalDateTime registerDate;
 
     @Column(nullable = false)
     private String announceContent;
