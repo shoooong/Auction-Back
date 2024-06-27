@@ -11,9 +11,7 @@ import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +32,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     @Override
     public List<StyleFeedDTO> getAllStyleFeedList() {
-        List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByCreatedAtDesc();
+        List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByCreateDateDesc();
         log.info("Found {} StyleFeeds", styleFeeds.size());
 
         return styleFeeds.stream()
@@ -114,7 +112,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 updatedFeed.getFeedTitle(),
                 updatedFeed.getFeedPhoto(),
                 updatedFeed.getLikeCount(),
-                updatedFeed.getCreatedAt(),
                 updatedFeed.getUser().getUserId()
         );
     }
