@@ -11,11 +11,10 @@ import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.backend.entity.QStyleFeed.styleFeed;
 
 @Service
 @Log4j2
@@ -41,6 +40,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedPhoto(),
                         styleFeed.getLikeCount(),
+                        styleFeed.getCreateDate(),
+                        styleFeed.getModifyDate(),
                         styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
                 ))
                 .collect(Collectors.toList());
@@ -64,7 +65,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     @Override
     public StyleFeedDTO getStyleFeedById(Long feedId) {
-        StyleFeed styleFeed = (StyleFeed) styleFeedRepository.findByFeedId(feedId)
+        StyleFeed styleFeed = styleFeedRepository.findByFeedId(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
         return new StyleFeedDTO(
@@ -76,6 +77,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
+    // 피드 등록
     public StyleFeed createStyleFeed(StyleFeedDTO styleFeedDTO) {
         User user = userRepository.findById(styleFeedDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -117,18 +119,12 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     }
 
     @Override
-    public void deleteStyleFeed(Long feedId) {
-        final List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByStyleFeed(styleFeed);
+    @Transactional
+    public void deleteStyleFeed(final long feedId) {
+        final List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByStyleFeed_FeedId(feedId);
         feedBookmarkRepository.deleteAll(feedBookmarks);
         styleFeedRepository.deleteById(feedId);
     }
-
-    @Override
-    public void deleteFeedBookmark(Long styleSaveId){
-
-    }
-
-
 
     @Override
     public List<FeedBookmarkDTO> getAllFeedBookmarks() {
@@ -164,5 +160,4 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 savedFeedBookmark.getStyleFeed().getFeedId()
         );
     }
-
 }

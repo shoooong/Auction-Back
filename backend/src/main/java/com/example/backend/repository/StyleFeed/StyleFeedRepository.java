@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface StyleFeedRepository extends JpaRepository<StyleFeed, Long> {
     List<StyleFeed> findAllByOrderByLikeCountDesc();
-
     List<StyleFeed> findAllByOrderByCreateDateDesc();
-
-    Optional<Object> findByFeedId(Long feedId);
+    Optional<StyleFeed> findByFeedId(Long feedId);
 }
