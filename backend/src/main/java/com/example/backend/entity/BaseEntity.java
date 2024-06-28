@@ -22,5 +22,6 @@ public abstract class BaseEntity {
 
     // 데이터가 수정될 때 시간 저장 (업데이트)
     @LastModifiedDate
+    @Column(insertable = false)
     private LocalDateTime modifyDate;
 }
