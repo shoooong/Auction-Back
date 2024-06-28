@@ -59,11 +59,10 @@ public class StyleFeedController {
         return styleFeedService.updateStyleFeed(feedId, styleFeedDTO);
     }
 
-
-
-    @DeleteMapping("saveStyle/{styleSavedId}")
-    public void deleteFeedBookmark(@PathVariable Long styleSavedId) {
-        styleFeedService.deleteFeedBookmark(styleSavedId);
+    // 피드 삭제
+    @DeleteMapping("style/{feedId}")
+    public void deleteStyleFeed(@PathVariable Long feedId) {
+        styleFeedService.deleteStyleFeed(feedId);
     }
 
     // 관심피드 조회
@@ -83,9 +82,9 @@ public class StyleFeedController {
         return createdFeedBookmark;
     }
 
-    // 피드 삭제
-    @DeleteMapping("style/{feedId}")
-    public void deleteStyleFeed(@PathVariable Long feedId) {
-        styleFeedService.deleteStyleFeed(feedId);
+    // 관심피드 삭제
+    @DeleteMapping("saveStyle/{styleSavedId}")
+    public void deleteFeedBookmark(@PathVariable Long styleSavedId) {
+        styleFeedService.deleteFeedBookmark(styleSavedId);
     }
 }
