@@ -25,7 +25,7 @@ public class StyleFeedController {
     @GetMapping("/feedList")
     public List<StyleFeedDTO> getAllStyleFeedList() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedList();
-        log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
+        log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 
@@ -33,7 +33,7 @@ public class StyleFeedController {
     @GetMapping("/feedRanking")
     public List<StyleFeedDTO> getAllStyleFeedRanking() {
         List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedRanking();
-        log.info("성공: {} 개의 피드 가져옴", styleFeeds.size());
+        log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 
@@ -54,15 +54,15 @@ public class StyleFeedController {
     }
 
     // 피드 수정
-    @PutMapping("/{id}")
-    public StyleFeedDTO updateStyleFeed(@PathVariable Long id, @RequestBody StyleFeedDTO styleFeedDTO) {
-        return styleFeedService.updateStyleFeed(id, styleFeedDTO);
+    @PutMapping("modify/{feedId}")
+    public StyleFeedDTO updateStyleFeed(@PathVariable Long feedId, @RequestBody StyleFeedDTO styleFeedDTO) {
+        return styleFeedService.updateStyleFeed(feedId, styleFeedDTO);
     }
 
     // 피드 삭제
-    @DeleteMapping("/{id}")
-    public void deleteStyleFeed(@PathVariable Long id) {
-        styleFeedService.deleteStyleFeed(id);
+    @DeleteMapping("style/{feedId}")
+    public void deleteStyleFeed(@PathVariable Long feedId) {
+        styleFeedService.deleteStyleFeed(feedId);
     }
 
     // 관심피드 조회
@@ -80,5 +80,10 @@ public class StyleFeedController {
         FeedBookmarkDTO createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
         log.info("새로운 북마크 생성: {}", createdFeedBookmark);
         return createdFeedBookmark;
+    }
+    // 관심피드 삭제
+    @DeleteMapping("saveStyle/{styleSavedId}")
+    public void deleteFeedBookmark(@PathVariable Long styleSavedId) {
+        styleFeedService.deleteFeedBookmark(styleSavedId);
     }
 }

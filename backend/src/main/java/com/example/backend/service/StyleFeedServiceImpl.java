@@ -11,11 +11,10 @@ import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.backend.entity.QStyleFeed.styleFeed;
 
 @Service
 @Log4j2
@@ -30,6 +29,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     @Autowired
     private FeedBookmarkRepository feedBookmarkRepository;
 
+    // 최신 등록순으로 피드 조회
     @Override
     public List<StyleFeedDTO> getAllStyleFeedList() {
         List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByCreateDateDesc();
@@ -41,11 +41,14 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedPhoto(),
                         styleFeed.getLikeCount(),
+                        styleFeed.getCreateDate(),
+                        styleFeed.getModifyDate(),
                         styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
                 ))
                 .collect(Collectors.toList());
     }
 
+    // 좋아요 순으로 피드 조회
     @Override
     public List<StyleFeedDTO> getAllStyleFeedRanking() {
         List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByLikeCountDesc();
@@ -57,14 +60,17 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedPhoto(),
                         styleFeed.getLikeCount(),
+                        styleFeed.getCreateDate(),
+                        styleFeed.getModifyDate(),
                         styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
                 ))
                 .collect(Collectors.toList());
     }
 
+    // 피드 상세 조회
     @Override
     public StyleFeedDTO getStyleFeedById(Long feedId) {
-        StyleFeed styleFeed = (StyleFeed) styleFeedRepository.findByFeedId(feedId)
+        StyleFeed styleFeed = styleFeedRepository.findByFeedId(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
         return new StyleFeedDTO(
@@ -76,6 +82,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
+    // 피드 등록
     public StyleFeed createStyleFeed(StyleFeedDTO styleFeedDTO) {
         User user = userRepository.findById(styleFeedDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -90,6 +97,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         return savedStyleFeed;
     }
 
+    // 피드 수정
     @Override
     public StyleFeedDTO updateStyleFeed(Long feedId, StyleFeedDTO styleFeedDTO) {
         StyleFeed styleFeed = styleFeedRepository.findById(feedId)
@@ -116,20 +124,16 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
+    // 피드 삭제
     @Override
-    public void deleteStyleFeed(Long feedId) {
-        final List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByStyleFeed(styleFeed);
+    public void deleteStyleFeed(final long feedId) {
+        final List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByStyleFeed_FeedId(feedId);
         feedBookmarkRepository.deleteAll(feedBookmarks);
         styleFeedRepository.deleteById(feedId);
     }
 
-    @Override
-    public void deleteFeedBookmark(Long styleSaveId){
 
-    }
-
-
-
+    // 관심피드 조회
     @Override
     public List<FeedBookmarkDTO> getAllFeedBookmarks() {
         List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findAll();
@@ -143,6 +147,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 .collect(Collectors.toList());
     }
 
+    // 관심피드 등록
     @Override
     public FeedBookmarkDTO createFeedBookmark(FeedBookmarkDTO feedBookmarkDTO) {
         User user = userRepository.findById(feedBookmarkDTO.getUserId())
@@ -165,4 +170,9 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
+    // 관심피드 삭제
+    @Override
+    public void deleteFeedBookmark(final long styleSavedId) {
+        feedBookmarkRepository.deleteById(styleSavedId);
+    }
 }
