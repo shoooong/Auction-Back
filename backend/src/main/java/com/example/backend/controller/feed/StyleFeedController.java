@@ -81,6 +81,7 @@ public class StyleFeedController {
         log.info("새로운 북마크 생성: {}", createdFeedBookmark);
         return createdFeedBookmark;
     }
+
     // 관심피드 삭제
     @DeleteMapping("saveStyle/{styleSavedId}")
     public void deleteFeedBookmark(@PathVariable Long styleSavedId) {
