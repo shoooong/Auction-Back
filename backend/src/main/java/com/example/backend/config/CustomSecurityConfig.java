@@ -59,7 +59,7 @@ public class CustomSecurityConfig {
             config.successHandler(new CustomLoginSuccessHandler());
         });
 
-        // JWT 체크
+        // JWT 체크 필터 가장 먼저 실행되도록
         http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
         // 접근 제한 시 CustomAccessDeniedHandler 사용

@@ -2,16 +2,14 @@ package com.example.backend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+@Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Entity
 public class Draw {
 
     @Id
