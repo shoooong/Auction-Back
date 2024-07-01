@@ -44,7 +44,7 @@ public class FeedRepositoryTests {
 
         StyleFeed styleFeed = StyleFeed.builder()
                 .feedTitle("타이틀")
-                .feedPhoto("abc1")
+                .feedImage("abc1")
                 .likeCount(1)
                 .build();
 

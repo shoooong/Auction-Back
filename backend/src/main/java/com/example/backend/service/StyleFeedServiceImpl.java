@@ -11,7 +11,6 @@ import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +38,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 .map(styleFeed -> new StyleFeedDTO(
                         styleFeed.getFeedId(),
                         styleFeed.getFeedTitle(),
-                        styleFeed.getFeedPhoto(),
+                        styleFeed.getFeedImage(),
                         styleFeed.getLikeCount(),
                         styleFeed.getCreateDate(),
                         styleFeed.getModifyDate(),
@@ -58,7 +57,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 .map(styleFeed -> new StyleFeedDTO(
                         styleFeed.getFeedId(),
                         styleFeed.getFeedTitle(),
-                        styleFeed.getFeedPhoto(),
+                        styleFeed.getFeedImage(),
                         styleFeed.getLikeCount(),
                         styleFeed.getCreateDate(),
                         styleFeed.getModifyDate(),
@@ -76,7 +75,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         return new StyleFeedDTO(
                 styleFeed.getFeedId(),
                 styleFeed.getFeedTitle(),
-                styleFeed.getFeedPhoto(),
+                styleFeed.getFeedImage(),
                 styleFeed.getLikeCount(),
                 styleFeed.getUser().getUserId()
         );
@@ -89,7 +88,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
         StyleFeed styleFeed = new StyleFeed();
         styleFeed.setFeedTitle(styleFeedDTO.getFeedTitle());
-        styleFeed.setFeedPhoto(styleFeedDTO.getFeedPhoto());
+        styleFeed.setFeedImage(styleFeedDTO.getFeedImage());
         styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
         styleFeed.setUser(user);
 
@@ -106,8 +105,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         if (styleFeedDTO.getFeedTitle() != null) {
             styleFeed.setFeedTitle(styleFeedDTO.getFeedTitle());
         }
-        if (styleFeedDTO.getFeedPhoto() != null) {
-            styleFeed.setFeedPhoto(styleFeedDTO.getFeedPhoto());
+        if (styleFeedDTO.getFeedImage() != null) {
+            styleFeed.setFeedImage(styleFeedDTO.getFeedImage());
         }
         if (styleFeedDTO.getLikeCount() != 0) {
             styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
@@ -118,7 +117,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         return new StyleFeedDTO(
                 updatedFeed.getFeedId(),
                 updatedFeed.getFeedTitle(),
-                updatedFeed.getFeedPhoto(),
+                updatedFeed.getFeedImage(),
                 updatedFeed.getLikeCount(),
                 updatedFeed.getUser().getUserId()
         );
@@ -164,7 +163,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         log.info("새로운 북마크 생성: {}", savedFeedBookmark);
 
         return new FeedBookmarkDTO(
-                savedFeedBookmark.getStyleSavedId(),
+                savedFeedBookmark.getFeedBookmarkId(),
                 savedFeedBookmark.getUser().getUserId(),
                 savedFeedBookmark.getStyleFeed().getFeedId()
         );

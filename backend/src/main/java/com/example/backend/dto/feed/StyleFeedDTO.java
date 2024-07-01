@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class StyleFeedDTO {
     private Long feedId;
     private String feedTitle;
-    private String feedPhoto;
+    private String feedImage;
     private int likeCount;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
