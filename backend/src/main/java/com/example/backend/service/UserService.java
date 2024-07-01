@@ -8,7 +8,6 @@ import com.example.backend.entity.User;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Transactional
 public interface UserService {
@@ -23,17 +22,20 @@ public interface UserService {
                user.getPassword(),
                user.getGrade(),
                user.getNickname(),
-               user.getPhone(),
-               user.getDefaultAddr(),
+               user.getPhoneNum(),
                user.isSocial(),
                user.isRole());
 
       return userDTO;
    }
 
+   List<String> getProfileFromKakaoToken(String accessToken);
+
    String makeTempPassword();
 
    User makeSocialUser(List<String> socialAccountList);
 
    void modifyUser(UserModifyDTO userModifyDTO);
+
+   User validateUserEmail(String email);
 }

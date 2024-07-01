@@ -4,12 +4,12 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Entity
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Account {
 
     @Id
@@ -23,6 +23,6 @@ public class Account {
     private String accountNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 }

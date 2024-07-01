@@ -12,6 +12,6 @@ public class UserModifyDTO {
     private String email;
     private String password;
     private String nickname;
-    private String phone;
-    // TODO: 프로필 사진 변경 추가
+    private String phoneNum;
+    private String profileImg;
 }

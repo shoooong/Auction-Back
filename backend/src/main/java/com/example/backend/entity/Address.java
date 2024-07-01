@@ -1,14 +1,15 @@
 package com.example.backend.entity;
 
+import com.example.backend.dto.user.AddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class Address {
 
     @Id
@@ -21,10 +22,17 @@ public class Address {
     @Column(length = 255, nullable = false)
     private String addressName;
 
+    @Column(nullable = false)
+    private Boolean defaultAddress;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private Boolean defaultAddress;
+
+    public void updateAddress(AddressDTO addressDTO) {
+        this.zoneNo = addressDTO.getZoneNo();
+        this.addressName = addressDTO.getAddressName();
+        this.defaultAddress = addressDTO.isDefaultAddress();
+    }
 }

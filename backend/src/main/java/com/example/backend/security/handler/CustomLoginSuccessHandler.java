@@ -26,7 +26,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = userDTO.getClaims();
 
-        String accessToken = JWTUtil.generateToken(claims, 10);         // 10분
+        String accessToken = JWTUtil.generateToken(claims, 30);         // 30분
         String refreshToken = JWTUtil.generateToken(claims, 60*24);     // 1일
 
         log.info("AccessToken : " + accessToken);

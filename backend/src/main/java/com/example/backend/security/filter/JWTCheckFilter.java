@@ -47,7 +47,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         return false;
     }
 
-    // 모든 요청에 대해서 체크
+    /**
+     * 모든 요청에 대해 체크
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("------------------JWTCheckFilter...-----------------");
@@ -67,12 +69,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             String password = (String) claims.get("password");
             int grade = (int) claims.get("grade");
             String nickname = (String) claims.get("nickname");
-            String phone = (String) claims.get("phone");
-            String defaultAddr = (String) claims.get("defaultAddr");
+            String phoneNum = (String) claims.get("phoneNum");
             Boolean social = (Boolean) claims.get("social");
             Boolean role = (Boolean) claims.get("role");
 
-            UserDTO userDTO = new UserDTO(email, password, grade, nickname, phone, defaultAddr, social.booleanValue(), role);
+            UserDTO userDTO = new UserDTO(email, password, grade, nickname, phoneNum, social, role);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDTO, password, userDTO.getAuthorities());
             log.info("authentication: {}", authentication);

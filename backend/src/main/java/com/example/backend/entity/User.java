@@ -1,15 +1,17 @@
 package com.example.backend.entity;
 
+import com.example.backend.dto.user.UserModifyDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,7 @@ public class User extends BaseEntity {
     private String nickname;
 
     @Column(length = 20)
-    private String phone;
+    private String phoneNum;
 
     @Column(length = 255)
     private String profileImg;
@@ -38,15 +40,16 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean role;
 
-
     // 디폴트 false = 일반회원, true = 소셜회원
+    @Column(nullable = false)
     private boolean social;
 
 
-    public void changePw(String password) {
-        this.password = password;
-    }
-    public void changeNickname(String nickname) {
-        this.nickname = nickname;
+    public void updateUser(UserModifyDTO userModifyDTO, PasswordEncoder passwordEncoder) {
+        this.email = userModifyDTO.getEmail();
+        this.password = passwordEncoder.encode(userModifyDTO.getPassword());
+        this.nickname = userModifyDTO.getNickname();
+        this.phoneNum = userModifyDTO.getPhoneNum();
+        this.profileImg = userModifyDTO.getProfileImg();
     }
 }

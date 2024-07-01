@@ -17,19 +17,18 @@ public class UserDTO extends User {
     private String password;
     private int grade;
     private String nickname;
-    private String phone;
-    private String defaultAddr;
+    private String phoneNum;
     private boolean social;
     private boolean role;
 
-    public UserDTO(String email, String password, int grade, String nickname, String phone, String defaultAddr, boolean social, boolean role) {
+    public UserDTO(String email, String password, int grade, String nickname, String phoneNum, boolean social, boolean role) {
 
-        super(email, password, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));this.email = email;
+        super(email, password, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));
+        this.email = email;
         this.password = password;
         this.grade = grade;
         this.nickname = nickname;
-        this.phone = phone;
-        this.defaultAddr = defaultAddr;
+        this.phoneNum = phoneNum;
         this.social = social;
         this.role = role;
     }
@@ -40,8 +39,7 @@ public class UserDTO extends User {
         claims.put("password", password);
         claims.put("nickname", nickname);
         claims.put("grade", grade);
-        claims.put("phone", phone);
-        claims.put("defaultAddr", defaultAddr);
+        claims.put("phone", phoneNum);
         claims.put("social", social);
         claims.put("role", role);
 
