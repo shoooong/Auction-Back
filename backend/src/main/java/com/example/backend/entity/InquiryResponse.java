@@ -20,15 +20,15 @@ public class InquiryResponse extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long responseId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 300)
     private String response;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "inquiryId")
+    @JoinColumn(name = "inquiryId", nullable = false)
     private Inquiry inquiry;
 
 

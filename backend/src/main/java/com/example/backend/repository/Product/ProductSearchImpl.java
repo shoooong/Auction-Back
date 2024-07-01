@@ -37,7 +37,7 @@ public class ProductSearchImpl implements ProductSearch {
     @Override
     @Transactional
     // categoryName 에 대한 소분류 전체 보기
-    public List<Products> allProductInfo(String categoryName) {
+    public List<Product> allProductInfo(String categoryName) {
 
         JPAQuery<BigDecimal> lowPrice = queryFactory.select(subSizePrice.sellPrice.min())
                 .from(subSizePrice)

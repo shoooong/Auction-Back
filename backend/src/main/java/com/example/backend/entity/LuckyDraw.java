@@ -30,14 +30,14 @@ public class LuckyDraw {
     @Column(nullable = false, length = 255)
     private String luckyImage;
 
-    @Column(nullable = false)
-    private LocalDateTime luckyStartDate;
-
-    @Column(nullable = false)
-    private LocalDateTime luckyEndDate;
-
-    @Column(nullable = false)
-    private LocalDateTime luckyDate;
+//    @Column(nullable = false)
+//    private LocalDateTime luckyStartDate;
+//
+//    @Column(nullable = false)
+//    private LocalDateTime luckyEndDate;
+//
+//    @Column(nullable = false)
+//    private LocalDateTime luckyDate;
 
     @Column(nullable = false)
     private Integer luckyPeople;

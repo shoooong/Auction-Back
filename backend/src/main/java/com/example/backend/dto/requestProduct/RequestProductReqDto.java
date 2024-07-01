@@ -1,6 +1,5 @@
 package com.example.backend.dto.requestProduct;
 
-import com.example.backend.entity.Category;
 import lombok.Getter;
 import lombok.Setter;
 

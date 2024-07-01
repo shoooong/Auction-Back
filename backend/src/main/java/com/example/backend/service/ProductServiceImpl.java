@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.product.*;
-import com.example.backend.entity.Products;
+import com.example.backend.entity.Product;
 import com.example.backend.repository.Bid.BidRepository;
 import com.example.backend.repository.Product.ProductsRepository;
 import com.example.backend.repository.Size.SizePriceRepository;
@@ -33,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
     public OnlyProductResponseDTO detailProductSelect(OnlyProductRequestDTO onlyProductRequestDTO) {
 
         log.info("Query Execution Started for modelNum : {}", onlyProductRequestDTO.getModelNum());
-        Products products = productsRepository.findFirstByModelNum(onlyProductRequestDTO.getModelNum());
+        Product products = productsRepository.findFirstByModelNum(onlyProductRequestDTO.getModelNum());
         log.info("Query Execution Completed Info : {}", products);
 
         return modelMapper.map(products, OnlyProductResponseDTO.class);
@@ -53,13 +53,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDTO> selectCategoryValue(CategoryDTO categoryDTO) {
 
-        List<Products> products = productsRepository.allProductInfo(categoryDTO.getCategoryName());
+        List<Product> products = productsRepository.allProductInfo(categoryDTO.getCategoryName());
         return products.stream()
                 .map(this::convertProductToDTO)
                 .collect(Collectors.toList());
     }
 
-    private ProductResponseDTO convertProductToDTO(Products product) {
+    private ProductResponseDTO convertProductToDTO(Product product) {
 
         // 해당 product 값들을 DTO로 변환
         ProductResponseDTO productDTO = modelMapper.map(product, ProductResponseDTO.class);

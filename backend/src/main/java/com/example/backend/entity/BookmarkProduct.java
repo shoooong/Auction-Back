@@ -3,23 +3,23 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class LikeProducts {
+@Entity
+public class BookmarkProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long bookmarkProductId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId")
-    private Products products;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "productId", nullable = false)
+    private Product products;
 }

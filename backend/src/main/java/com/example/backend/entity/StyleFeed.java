@@ -5,24 +5,24 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Entity
 public class StyleFeed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedId;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 150)
     private String feedTitle;
 
-    @Column(nullable = false, length = 50)
-    private String feedPhoto;
+    @Column(nullable = false, length = 255)
+    private String feedImage;
 
     @Column(nullable = false)
     private int likeCount;
@@ -31,8 +31,8 @@ public class StyleFeed extends BaseEntity {
     @JoinColumn(name = "userId")
     private User user;
 
-    public void change(String feedTitle, String feedPhoto) {
+    public void change(String feedTitle, String feedImage) {
         this.feedTitle = feedTitle;
-        this.feedPhoto = feedPhoto;
+        this.feedImage = feedImage;
     }
 }

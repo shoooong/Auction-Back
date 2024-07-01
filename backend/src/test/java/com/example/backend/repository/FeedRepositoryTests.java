@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Log4j2
@@ -137,9 +135,9 @@ public class FeedRepositoryTests {
     @Test
     public void testInsertAnnouncement(){
 
-        Announcement announcement = Announcement.builder()
-                .announceTitle("집에 갈래")
-                .announceContent("집 보내줘")
+        Notice announcement = Notice.builder()
+                .noticeTitle("집에 갈래")
+                .noticeContent("집 보내줘")
                 .build();
 
         announcementRepository.save(announcement);
@@ -149,8 +147,8 @@ public class FeedRepositoryTests {
     public void testSelectAnnouncement(){
 
         Long announcementId = 1L;
-        Optional<Announcement> result = announcementRepository.findById(announcementId);
-        Announcement announcement1 = result.orElseThrow();
+        Optional<Notice> result = announcementRepository.findById(announcementId);
+        Notice announcement1 = result.orElseThrow();
 
         log.info(announcement1);
     }
@@ -159,8 +157,8 @@ public class FeedRepositoryTests {
     public void testUpdateAnnouncement(){
 
         Long announcementId = 3L;
-        Optional<Announcement> result = announcementRepository.findById(announcementId);
-        Announcement announcement = result.orElseThrow();
+        Optional<Notice> result = announcementRepository.findById(announcementId);
+        Notice announcement = result.orElseThrow();
         announcement.change("안녕하세요", "불향티비입니다.");
 
         announcementRepository.save(announcement);

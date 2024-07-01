@@ -1,6 +1,5 @@
 package com.example.backend.repository.RequestProduct;
 
-import com.example.backend.entity.RequestProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 

@@ -1,34 +1,23 @@
 package com.example.backend.entity;
 
+import com.example.backend.entity.enumData.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Orders {
+@Entity
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bidId", nullable = false)
-    private Bid bid;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyerId", nullable = false)
-    private User buyer;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sellerId")
-    private Bid seller;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,14 +26,16 @@ public class Orders {
     @Column(nullable = false)
     private LocalDateTime orderDate;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal orderMoney;
+    @Column(nullable = false)
+    private Long orderPrice;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userCouponId")
     private UserCoupon userCouponId;
 
-    public enum OrderStatus {
-        PERCENT, FIXED
-    }
+    @ManyToOne
+    @JoinColumn(name = "productId", nullable = false)
+    private Product product;
+
+
 }

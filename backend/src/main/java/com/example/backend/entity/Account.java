@@ -4,12 +4,12 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Entity
 public class Account {
 
     @Id

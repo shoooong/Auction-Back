@@ -1,40 +1,38 @@
 package com.example.backend.entity;
 
+import com.example.backend.entity.enumData.DiscountType;
+import com.example.backend.entity.enumData.SalesStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-
-public class Coupon {
+@Entity
+public class Coupon extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long couponId;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 150)
     private String couponTitle;
 
     @Column(nullable = false)
     private int couponQuantity;
 
     @Column(nullable = false)
-    private int field;
+    private int maxQuantity;
 
     @Column(nullable = false, length = 1000)
     private String couponCode;
 
     @Column(nullable = false)
-    private LocalDate creDate;
-
-    @Column(nullable = false)
-    private int exp;
+    private int expDay;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,8 +41,8 @@ public class Coupon {
     @Column(nullable = false)
     private int amount;
 
-    // Enum Type
-    public enum DiscountType {
-        PERCENT, FIXED
-    }
+    @Enumerated(EnumType.STRING)
+    private SalesStatus salesStatus;
+
+
 }

@@ -1,14 +1,10 @@
 package com.example.backend.repository.Product;
 
-import com.example.backend.entity.Products;
+import com.example.backend.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 
-public interface ProductsRepository extends JpaRepository<Products, Long>, ProductSearch {
+public interface ProductsRepository extends JpaRepository<Product, Long>, ProductSearch {
 
-    Products findFirstByModelNum(String modelNum);
+    Product findFirstByModelNum(String modelNum);
 }

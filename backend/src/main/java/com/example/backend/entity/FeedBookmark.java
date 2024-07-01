@@ -8,19 +8,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Entity
 @Getter
 @Setter
+@Entity
 public class FeedBookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long styleSavedId;
+    private Long feedBookmarkId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feedId")
+    @JoinColumn(name = "feedId", nullable = false)
     private StyleFeed styleFeed;
 }

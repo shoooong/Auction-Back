@@ -14,19 +14,19 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
-public class LuckyAlarm {
+public class LuckyDrawAnnouncement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long luckyAlarmId;
+    private Long luckyAnnouncementId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String luckyTitle;
+//
+//    @Column(nullable = false)
+//    private LocalDate luckyRegDate;
 
-    @Column(nullable = false)
-    private LocalDate luckyRegDate;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String luckyContent;
 
     @OneToOne

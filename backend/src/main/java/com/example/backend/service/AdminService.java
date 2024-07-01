@@ -57,7 +57,7 @@ public class AdminService {
 
             Category category = categoryRepository.findById(approvalProduct.getCategory().getCategoryId()).orElseThrow();
 
-            Products product = Products.builder()
+            Product product = Product.builder()
                     .productPhoto(approvalProduct.getRequestProductImage())
                     .productBrand(approvalProduct.getBrand())
                     .productName(approvalProduct.getRequestProductName())

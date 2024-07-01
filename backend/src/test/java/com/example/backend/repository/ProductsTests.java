@@ -50,7 +50,7 @@ public class ProductsTests {
                 .build();
         category = categoryRepository.save(category);
 
-        Products product = Products.builder()
+        Product product = Product.builder()
                 .productPhoto("사진")
                 .productBrand("나이키")
                 .productName("반바지")
@@ -92,8 +92,8 @@ public class ProductsTests {
     @Test
     @Transactional
     void productsSelectAll() {
-        List<Products> productsList = productsRepository.findAll();
-        for (Products product : productsList) {
+        List<Product> productsList = productsRepository.findAll();
+        for (Product product : productsList) {
             List<Size> sizes = sizeRepository.findByProduct(product);
             for (Size size : sizes) {
                 List<SizePrice> sizePrices = sizePriceRepository.findBySize(size);
@@ -127,8 +127,8 @@ public class ProductsTests {
     @Test
     @Transactional
     void filterProductsByCategory() {
-        List<Products> products = productsRepository.allProductInfo("하의");
-        for (Products product : products) {
+        List<Product> products = productsRepository.allProductInfo("하의");
+        for (Product product : products) {
             log.info("Category '패션' Product Info: {}", product);
             List<Size> sizes = sizeRepository.findByProduct(product);
             for (Size size : sizes) {
@@ -144,7 +144,7 @@ public class ProductsTests {
     @Transactional
     public void testDetailProductInfo() {
 
-        Products products = productsRepository.findFirstByModelNum("IAB-10");
+        Product products = productsRepository.findFirstByModelNum("IAB-10");
 
         log.info("Products Info: {}", products);
     }

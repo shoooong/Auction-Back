@@ -7,31 +7,30 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
-public class Inquiry extends BaseEntity {
+public class Notice extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long inquiryId;
+    private Long noticeId;
 
     @Column(nullable = false, length = 150)
-    private String inquiryTitle;
+    private String noticeTitle;
 
-    @Column(nullable = false, length = 300)
-    private String inquiryContent;
+    @Column(nullable = false, length = 255)
+    private String noticeContent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    public void change(String inquiryTitle, String inquiryContent) {
-        this.inquiryContent = inquiryContent;
-        this.inquiryTitle = inquiryTitle;
+    public void change(String noticeTitle, String noticeContent) {
+        this.noticeTitle = noticeTitle;
+        this.noticeContent = noticeContent;
     }
+
 }

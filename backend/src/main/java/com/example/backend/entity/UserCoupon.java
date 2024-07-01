@@ -6,21 +6,17 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserCoupon {
+@Entity
+public class UserCoupon extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userCouponId;
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDate creDate;
 
     @Column(updatable = false)
     private LocalDate endDate;

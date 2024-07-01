@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
-@Entity
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Entity
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +38,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean role;
 
-    @Column(length = 100)
-    private String defaultAddr;
 
     // 디폴트 false = 일반회원, true = 소셜회원
     private boolean social;
