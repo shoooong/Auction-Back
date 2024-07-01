@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.dto.user.AddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,4 +28,11 @@ public class Address {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
+
+
+    public void updateAddress(AddressDTO addressDTO) {
+        this.zoneNo = addressDTO.getZoneNo();
+        this.addressName = addressDTO.getAddressName();
+        this.defaultAddress = addressDTO.isDefaultAddress();
+    }
 }

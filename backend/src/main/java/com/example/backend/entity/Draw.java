@@ -18,6 +18,7 @@ public class Draw {
     private Long drawId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private LuckyStatus luckyStatus;
 
     @ManyToOne
