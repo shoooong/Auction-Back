@@ -5,12 +5,12 @@ import com.example.backend.entity.enumData.LuckyStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Entity
 public class Draw {
 
     @Id
@@ -21,10 +21,10 @@ public class Draw {
     private LuckyStatus luckyStatus;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "userId")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "luckyId")
+    @JoinColumn(name = "luckyId", nullable = false)
     private LuckyDraw luckyDraw;
 }

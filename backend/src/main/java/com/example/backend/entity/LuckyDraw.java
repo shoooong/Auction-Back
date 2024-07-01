@@ -30,15 +30,19 @@ public class LuckyDraw {
     @Column(nullable = false, length = 255)
     private String luckyImage;
 
-//    @Column(nullable = false)
-//    private LocalDateTime luckyStartDate;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime luckyEndDate;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime luckyDate;
+    // 응모 시작일
+    @Column(nullable = false)
+    private LocalDateTime luckyStartDate;
 
+    // 응모 마감일
+    @Column(nullable = false)
+    private LocalDateTime luckyEndDate;
+
+    // 당첨 발표일
+    @Column(nullable = false)
+    private LocalDateTime luckyDate;
+
+    // 당첨 인원
     @Column(nullable = false)
     private Integer luckyPeople;
 }
