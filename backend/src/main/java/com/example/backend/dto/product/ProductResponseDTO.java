@@ -23,6 +23,4 @@ public class ProductResponseDTO {
     private BigDecimal originalPrice;
     private int productLike;
     private LocalDateTime createdAt;
-    private CategoryDTO category;
-    private List<SizeDTO> sizes;
 }
