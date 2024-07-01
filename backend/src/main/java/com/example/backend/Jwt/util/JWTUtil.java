@@ -10,8 +10,8 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
-@Log4j2
 @Component
+@Log4j2
 public class JWTUtil {
 
     // JWT 서명에 사용될 비밀키

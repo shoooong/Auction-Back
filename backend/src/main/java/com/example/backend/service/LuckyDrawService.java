@@ -28,5 +28,8 @@ public class LuckyDrawService {
                 .orElseThrow(()-> new RuntimeException("Lucky Draw Not Found: " + luckyId));
     }
 
+
+    // TODO: 당첨 발표일 = 응모 마감일 익일 18시로 자동 설정
+
 }
 

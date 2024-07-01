@@ -5,6 +5,7 @@ import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.User;
 import com.example.backend.repository.User.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
                 .email(userRegisterDTO.getEmail())
                 .password(passwordEncoder.encode(userRegisterDTO.getPassword()))
                 .nickname(userRegisterDTO.getNickname())
-                .phone(userRegisterDTO.getPhone())
+                .phoneNum(userRegisterDTO.getPhoneNum())
                 .role(isAdmin)
                 .build();
 
@@ -75,7 +76,8 @@ public class UserServiceImpl implements UserService {
     /**
      * 카카오 소셜 로그인 - accessToken(카카오 OAuth토큰)으로 카카오 email 및 nickname 가져오기
      */
-    private List<String> getProfileFromKakaoToken(String accessToken) {
+    @Override
+    public List<String> getProfileFromKakaoToken(String accessToken) {
 
         String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
 
@@ -156,18 +158,26 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+
     /**
      * 회원 정보 수정
      */
+    @Transactional
     @Override
     public void modifyUser(UserModifyDTO userModifyDTO) {
-        Optional<User> optUser = userRepository.findByEmail(userModifyDTO.getEmail());
+        User user = validateUserEmail(userModifyDTO.getEmail());
 
-        User user = optUser.orElseThrow();
-
-        user.changePw(passwordEncoder.encode(userModifyDTO.getPassword()));
-        user.changeNickname(userModifyDTO.getNickname());
+        user.updateUser(userModifyDTO, passwordEncoder);
 
         userRepository.save(user);
+    }
+
+    /**
+     * 존재하는 회원인지 확인
+     */
+    @Override
+    public User validateUserEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
     }
 }

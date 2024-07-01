@@ -48,8 +48,8 @@ public class UserController {
         String kakaoAccessToken = JWTUtil.generateToken(claims, 10);         // 10분
         String kakaoRefreshToken = JWTUtil.generateToken(claims, 60*24);     // 1일
 
-        log.info("kakaoAccessToken : " + kakaoAccessToken);
-        log.info("kakaoRefreshToken : " + kakaoRefreshToken);
+        log.info("kakaoAccessToken={}", kakaoAccessToken);
+        log.info("kakaoRefreshToken={}", kakaoRefreshToken);
 
         claims.put("accessToken", kakaoAccessToken);
         claims.put("refreshToken", kakaoRefreshToken);
@@ -62,7 +62,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {
 
-        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhone());
+        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhoneNum());
         userService.registerUser(userRegisterDTO, false);
         return ResponseEntity.ok("User registered successfully");
     }
@@ -71,7 +71,7 @@ public class UserController {
     @PostMapping("/register/admin")
     public ResponseEntity<?> registerAdmin(@RequestBody UserRegisterDTO userRegisterDTO) {
 
-        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhone());
+        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhoneNum());
         userService.registerUser(userRegisterDTO, true);
         return ResponseEntity.ok("Admin registered successfully");
     }
