@@ -1,7 +1,6 @@
 package com.example.backend.dto.user;
 
 import com.example.backend.entity.Address;
-import com.example.backend.entity.Users;
 import lombok.*;
 
 @Getter

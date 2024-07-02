@@ -21,11 +21,11 @@ public class Draw {
     @Column(nullable = false)
     private LuckyStatus luckyStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private Users user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "luckyId", nullable = false)
     private LuckyDraw luckyDraw;
 }
