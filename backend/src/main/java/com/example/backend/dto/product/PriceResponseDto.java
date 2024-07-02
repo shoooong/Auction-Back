@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceResponseDTO {
+public class PriceResponseDto {
     private BigDecimal expectBuyPrice;
     private BigDecimal expectSellPrice;
 }

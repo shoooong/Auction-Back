@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceRequestDTO {
+public class PriceRequestDto {
     private String modelNum;
     private Enum priceType;
 }
