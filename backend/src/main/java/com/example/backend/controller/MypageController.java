@@ -57,14 +57,13 @@ public class MypageController {
 //    }
 
 
-
     // 배송지 조회
     @GetMapping("/address")
     public List<AddressDTO> getAddress(@AuthenticationPrincipal UserDTO userDTO){
 
-        log.info("UserDTO: {}", userDTO);
-        log.info("userId: {}", userDTO.getUserId());
-        List<AddressDTO> addressDTO = addressService.getAllAddress(userDTO.getUserId());
+        Long userId = userDTO.getUserId();
+
+        List<AddressDTO> addressDTO = addressService.getAllAddress(userId);
 
         return addressDTO;
     }

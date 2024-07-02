@@ -14,7 +14,6 @@ public class AddressDTO {
     private String zoneNo;
     private String addressName;
     private boolean defaultAddress;
-    private Users user;
 
 
     public static AddressDTO fromEntity(Address address){
@@ -22,7 +21,6 @@ public class AddressDTO {
                 .addressId(address.getAddressId())
                 .zoneNo(address.getZoneNo())
                 .addressName(address.getAddressName())
-                .user(address.getUser())
                 .build();
     }
 
@@ -31,7 +29,6 @@ public class AddressDTO {
                 .addressId(addressDTO.getAddressId())
                 .zoneNo(addressDTO.getZoneNo())
                 .addressName(addressDTO.getAddressName())
-                .user(addressDTO.getUser())
                 .build();
     }
 }

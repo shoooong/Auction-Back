@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 

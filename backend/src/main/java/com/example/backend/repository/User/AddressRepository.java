@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
@@ -13,7 +12,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     /**
      * userId로 Address 목록 전체 조회
      */
-    List<Address> findByUser_UserId(Long userId);
+    List<Address> findByUserUserId(Long userId);
 
     /**
      * addressId와 userId로 Address 단건 조회
