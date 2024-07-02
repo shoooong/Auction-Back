@@ -1,6 +1,6 @@
 package com.example.backend.repository;
 
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class UserRepositoryTests {
     public void testInsertUser() {
         for (int i = 1; i <= 10; i++) {
 
-            User user = User.builder()
+            Users user = Users.builder()
                     .email("ncp" + i + "@naver.com")
                     .password(passwordEncoder.encode(String.valueOf(i).repeat(4)))
                     .nickname("ncp" + i)
