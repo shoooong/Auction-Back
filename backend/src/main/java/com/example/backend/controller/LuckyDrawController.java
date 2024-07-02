@@ -42,7 +42,9 @@ public class LuckyDrawController {
         drawDTO.setLuckyId(luckyId);
         log.info(drawDTO.toString());
 
-        drawService.saveDraw(drawDTO);
+//        drawService.saveDraw(drawDTO);
+
+//        drawService.saveDraw(drawDTO);
         return ResponseEntity.ok().body(drawDTO);
     }
 

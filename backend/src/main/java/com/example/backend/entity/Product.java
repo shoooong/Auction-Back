@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,6 +48,11 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String productSize;
+
+    @Column(nullable = false)
+    private ProductStatus productStatus;
+
+
 
 
 

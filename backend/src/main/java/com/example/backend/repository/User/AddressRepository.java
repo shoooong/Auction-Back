@@ -18,5 +18,5 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     /**
      * addressId와 userId로 Address 단건 조회
      */
-    Optional<Address> findByIdAndUser_UserId(Long addressId, Long userId);
+//    Optional<Address> findByIdAndUser_UserId(Long addressId, Long userId);
 }

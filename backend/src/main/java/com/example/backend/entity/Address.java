@@ -4,12 +4,12 @@ import com.example.backend.dto.user.AddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
+@Entity
 public class Address {
 
     @Id
