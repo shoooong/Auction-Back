@@ -14,6 +14,7 @@ import lombok.*;
 public class BuyingBidding extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long buyingBiddingId;
 
     @ManyToOne
