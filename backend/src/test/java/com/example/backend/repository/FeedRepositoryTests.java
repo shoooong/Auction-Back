@@ -85,7 +85,7 @@ public class FeedRepositoryTests {
     @Test
     public void testInsertFeedBookmark(){
 
-        User user = userRepository.findById(1L).orElseThrow();
+        Users user = userRepository.findById(1L).orElseThrow();
         StyleFeed styleFeed = styleFeedRepository.findById(3L).orElseThrow();
 
         FeedBookmark feedBookmark = FeedBookmark.builder()
@@ -116,7 +116,7 @@ public class FeedRepositoryTests {
         Optional<FeedBookmark> result = feedBookmarkRepository.findById(styleSavedId);
         FeedBookmark feedBookmark = result.orElseThrow();
 
-        User newUser = userRepository.findById(2L).orElseThrow();
+        Users newUser = userRepository.findById(2L).orElseThrow();
         StyleFeed newStyleFeed = styleFeedRepository.findById(4L).orElseThrow();
 
         feedBookmark.setUser(newUser);
@@ -174,7 +174,7 @@ public class FeedRepositoryTests {
     @Test
     public void testInsertInquiry(){
 
-        User user = userRepository.findById(1L).orElseThrow();
+        Users user = userRepository.findById(1L).orElseThrow();
 
         Inquiry inquiry = Inquiry.builder()
                 .inquiryTitle("공지")
