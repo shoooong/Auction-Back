@@ -4,8 +4,6 @@ import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,7 +38,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String mainDepartment;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String subDepartment;
 
     @Column(nullable = false)
@@ -49,9 +47,13 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String productSize;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
+
+    public void changeProductStatus(ProductStatus productStatus) {
+        this.productStatus = productStatus;
+    }
 
 
 
