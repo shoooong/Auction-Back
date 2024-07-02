@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.feed.FeedBookmarkDTO;
-import com.example.backend.dto.feed.StyleFeedDTO;
+import com.example.backend.dto.feed.FeedBookmarkDto;
+import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.FeedBookmark;
 import com.example.backend.entity.StyleFeed;
 import com.example.backend.entity.User;
@@ -30,12 +30,12 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 최신 등록순으로 피드 조회
     @Override
-    public List<StyleFeedDTO> getAllStyleFeedList() {
+    public List<StyleFeedDto> getAllStyleFeedList() {
         List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByCreateDateDesc();
         log.info("Found {} StyleFeeds", styleFeeds.size());
 
         return styleFeeds.stream()
-                .map(styleFeed -> new StyleFeedDTO(
+                .map(styleFeed -> new StyleFeedDto(
                         styleFeed.getFeedId(),
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedImage(),
@@ -49,12 +49,12 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 좋아요 순으로 피드 조회
     @Override
-    public List<StyleFeedDTO> getAllStyleFeedRanking() {
+    public List<StyleFeedDto> getAllStyleFeedRanking() {
         List<StyleFeed> styleFeeds = styleFeedRepository.findAllByOrderByLikeCountDesc();
         log.info("Found {} StyleFeeds", styleFeeds.size());
 
         return styleFeeds.stream()
-                .map(styleFeed -> new StyleFeedDTO(
+                .map(styleFeed -> new StyleFeedDto(
                         styleFeed.getFeedId(),
                         styleFeed.getFeedTitle(),
                         styleFeed.getFeedImage(),
@@ -68,11 +68,11 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 피드 상세 조회
     @Override
-    public StyleFeedDTO getStyleFeedById(Long feedId) {
+    public StyleFeedDto getStyleFeedById(Long feedId) {
         StyleFeed styleFeed = styleFeedRepository.findByFeedId(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
-        return new StyleFeedDTO(
+        return new StyleFeedDto(
                 styleFeed.getFeedId(),
                 styleFeed.getFeedTitle(),
                 styleFeed.getFeedImage(),
@@ -82,7 +82,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     }
 
     // 피드 등록
-    public StyleFeed createStyleFeed(StyleFeedDTO styleFeedDTO) {
+    public StyleFeed createStyleFeed(StyleFeedDto styleFeedDTO) {
         User user = userRepository.findById(styleFeedDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -98,7 +98,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 피드 수정
     @Override
-    public StyleFeedDTO updateStyleFeed(Long feedId, StyleFeedDTO styleFeedDTO) {
+    public StyleFeedDto updateStyleFeed(Long feedId, StyleFeedDto styleFeedDTO) {
         StyleFeed styleFeed = styleFeedRepository.findById(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
@@ -114,7 +114,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
         StyleFeed updatedFeed = styleFeedRepository.save(styleFeed);
 
-        return new StyleFeedDTO(
+        return new StyleFeedDto(
                 updatedFeed.getFeedId(),
                 updatedFeed.getFeedTitle(),
                 updatedFeed.getFeedImage(),
@@ -134,12 +134,12 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 관심피드 조회
     @Override
-    public List<FeedBookmarkDTO> getAllFeedBookmarks() {
+    public List<FeedBookmarkDto> getAllFeedBookmarks() {
         List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findAll();
         log.info("Found {} FeedBookmarks", feedBookmarks.size());
 
         return feedBookmarks.stream()
-                .map(feedBookmark -> new FeedBookmarkDTO(
+                .map(feedBookmark -> new FeedBookmarkDto(
                         feedBookmark.getUser().getUserId(),
                         feedBookmark.getStyleFeed().getFeedId()
                 ))
@@ -148,7 +148,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 관심피드 등록
     @Override
-    public FeedBookmarkDTO createFeedBookmark(FeedBookmarkDTO feedBookmarkDTO) {
+    public FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) {
         User user = userRepository.findById(feedBookmarkDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         StyleFeed styleFeed = styleFeedRepository.findById(feedBookmarkDTO.getFeedId())
@@ -162,7 +162,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         FeedBookmark savedFeedBookmark = feedBookmarkRepository.save(feedBookmark);
         log.info("새로운 북마크 생성: {}", savedFeedBookmark);
 
-        return new FeedBookmarkDTO(
+        return new FeedBookmarkDto(
                 savedFeedBookmark.getFeedBookmarkId(),
                 savedFeedBookmark.getUser().getUserId(),
                 savedFeedBookmark.getStyleFeed().getFeedId()

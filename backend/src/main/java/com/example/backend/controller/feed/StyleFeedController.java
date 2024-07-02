@@ -1,8 +1,7 @@
 package com.example.backend.controller.feed;
 
-import com.example.backend.dto.feed.FeedBookmarkDTO;
-import com.example.backend.dto.feed.StyleFeedDTO;
-import com.example.backend.entity.FeedBookmark;
+import com.example.backend.dto.feed.FeedBookmarkDto;
+import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.StyleFeed;
 import com.example.backend.service.StyleFeedService;
 import lombok.RequiredArgsConstructor;
@@ -23,24 +22,24 @@ public class StyleFeedController {
 
     // 최신순으로 피드 조회
     @GetMapping("/feedList")
-    public List<StyleFeedDTO> getAllStyleFeedList() {
-        List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedList();
+    public List<StyleFeedDto> getAllStyleFeedList() {
+        List<StyleFeedDto> styleFeeds = styleFeedService.getAllStyleFeedList();
         log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 
     // 좋아요 순으로 피드 조회
     @GetMapping("/feedRanking")
-    public List<StyleFeedDTO> getAllStyleFeedRanking() {
-        List<StyleFeedDTO> styleFeeds = styleFeedService.getAllStyleFeedRanking();
+    public List<StyleFeedDto> getAllStyleFeedRanking() {
+        List<StyleFeedDto> styleFeeds = styleFeedService.getAllStyleFeedRanking();
         log.info("성공: {} 개의 피드 가져옴", styleFeeds);
         return styleFeeds;
     }
 
     // 피드 상세 조회
     @GetMapping("/{feedId}")
-    public StyleFeedDTO getStyleFeedById() {
-        StyleFeedDTO styleFeedDTO = styleFeedService.getStyleFeedById(18L);
+    public StyleFeedDto getStyleFeedById() {
+        StyleFeedDto styleFeedDTO = styleFeedService.getStyleFeedById(18L);
         log.info("피드 상세 조회: {}", styleFeedDTO);
         return styleFeedDTO;
     }
@@ -48,14 +47,14 @@ public class StyleFeedController {
     // 피드 등록
     @PostMapping("/feed")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createStyleFeed(@RequestBody StyleFeedDTO styleFeedDTO) {
+    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDTO) {
         StyleFeed createdStyleFeed = styleFeedService.createStyleFeed(styleFeedDTO);
         log.info("새로운 피드 생성: {}", createdStyleFeed);
     }
 
     // 피드 수정
     @PutMapping("modify/{feedId}")
-    public StyleFeedDTO updateStyleFeed(@PathVariable Long feedId, @RequestBody StyleFeedDTO styleFeedDTO) {
+    public StyleFeedDto updateStyleFeed(@PathVariable Long feedId, @RequestBody StyleFeedDto styleFeedDTO) {
         return styleFeedService.updateStyleFeed(feedId, styleFeedDTO);
     }
 
@@ -67,8 +66,8 @@ public class StyleFeedController {
 
     // 관심피드 조회
     @GetMapping("/saveFeed")
-    public List<FeedBookmarkDTO> getAllFeedBookmarks() {
-        List<FeedBookmarkDTO> feedBookmarks = styleFeedService.getAllFeedBookmarks();
+    public List<FeedBookmarkDto> getAllFeedBookmarks() {
+        List<FeedBookmarkDto> feedBookmarks = styleFeedService.getAllFeedBookmarks();
         log.info("성공: {} 개의 북마크 가져옴", feedBookmarks.size());
         return feedBookmarks;
     }
@@ -76,8 +75,8 @@ public class StyleFeedController {
     // 관심피드 저장
     @PostMapping("/bookmark")
     @ResponseStatus(HttpStatus.CREATED)
-    public FeedBookmarkDTO createFeedBookmark(@RequestBody FeedBookmarkDTO feedBookmarkDTO) {
-        FeedBookmarkDTO createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
+    public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO) {
+        FeedBookmarkDto createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
         log.info("새로운 북마크 생성: {}", createdFeedBookmark);
         return createdFeedBookmark;
     }

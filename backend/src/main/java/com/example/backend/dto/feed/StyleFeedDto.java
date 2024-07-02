@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class StyleFeedDTO {
+public class StyleFeedDto {
     private Long feedId;
     private String feedTitle;
     private String feedImage;
@@ -19,6 +19,6 @@ public class StyleFeedDTO {
     private LocalDateTime modifyDate;
     private Long userId;
 
-    public StyleFeedDTO(Long feedId, String feedTitle, String feedPhoto, int likeCount, Long userId) {
+    public StyleFeedDto(Long feedId, String feedTitle, String feedPhoto, int likeCount, Long userId) {
     }
 }

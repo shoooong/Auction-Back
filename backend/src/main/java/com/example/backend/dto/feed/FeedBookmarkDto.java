@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeedBookmarkDTO {
+public class FeedBookmarkDto {
     private Long userId;
     private Long feedId;
 
-    public FeedBookmarkDTO(Long styleSavedId, Long userId, Long feedId) {
+    public FeedBookmarkDto(Long styleSavedId, Long userId, Long feedId) {
     }
 }
