@@ -1,7 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.*;
-import com.example.backend.repository.Announcement.AnnouncementRepository;
+import com.example.backend.repository.Notice.NoticeRepository;
 import com.example.backend.repository.FeedBookmark.FeedBookmarkRepository;
 import com.example.backend.repository.Inquiry.InquiryRepository;
 import com.example.backend.repository.StyleFeed.StyleFeedRepository;
@@ -27,7 +27,7 @@ public class FeedRepositoryTests {
     private FeedBookmarkRepository feedBookmarkRepository;
 
     @Autowired
-    private AnnouncementRepository announcementRepository;
+    private NoticeRepository noticeRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -140,14 +140,14 @@ public class FeedRepositoryTests {
                 .noticeContent("집 보내줘")
                 .build();
 
-        announcementRepository.save(announcement);
+        noticeRepository.save(announcement);
     }
 
     @Test
     public void testSelectAnnouncement(){
 
         Long announcementId = 1L;
-        Optional<Notice> result = announcementRepository.findById(announcementId);
+        Optional<Notice> result = noticeRepository.findById(announcementId);
         Notice announcement1 = result.orElseThrow();
 
         log.info(announcement1);
@@ -157,18 +157,18 @@ public class FeedRepositoryTests {
     public void testUpdateAnnouncement(){
 
         Long announcementId = 3L;
-        Optional<Notice> result = announcementRepository.findById(announcementId);
+        Optional<Notice> result = noticeRepository.findById(announcementId);
         Notice announcement = result.orElseThrow();
         announcement.change("안녕하세요", "불향티비입니다.");
 
-        announcementRepository.save(announcement);
+        noticeRepository.save(announcement);
     }
 
     @Test
     public void testDeleteAnnouncement(){
 
         Long announcementId = 1L;
-        announcementRepository.deleteById(announcementId);
+        noticeRepository.deleteById(announcementId);
     }
 
     @Test
