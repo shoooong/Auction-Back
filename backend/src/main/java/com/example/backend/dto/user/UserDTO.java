@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
@@ -13,6 +14,7 @@ import java.util.*;
 @ToString
 public class UserDTO extends User {
 
+    private Long userId;
     private String email;
     private String password;
     private int grade;
@@ -24,6 +26,7 @@ public class UserDTO extends User {
     public UserDTO(String email, String password, int grade, String nickname, String phoneNum, boolean social, boolean role) {
 
         super(email, password, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));
+
         this.email = email;
         this.password = password;
         this.grade = grade;
@@ -44,5 +47,17 @@ public class UserDTO extends User {
         claims.put("role", role);
 
         return claims;
+    }
+
+    public com.example.backend.entity.User toEntity() {
+        return com.example.backend.entity.User.builder()
+                .userId(this.userId)
+                .email(this.email)
+                .password(this.password)
+                .nickname(this.nickname)
+                .phoneNum(this.phoneNum)
+                .social(this.social)
+                .role(this.role)
+                .build();
     }
 }
