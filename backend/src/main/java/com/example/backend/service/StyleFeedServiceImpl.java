@@ -136,15 +136,19 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     @Override
     public List<FeedBookmarkDto> getAllFeedBookmarks() {
         List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findAll();
-        log.info("Found {} FeedBookmarks", feedBookmarks.size());
+        log.info("Found {} FeedBookmarks", feedBookmarks);
 
         return feedBookmarks.stream()
-                .map(feedBookmark -> new FeedBookmarkDto(
-                        feedBookmark.getUser().getUserId(),
-                        feedBookmark.getStyleFeed().getFeedId()
-                ))
+                .map(feedBookmark -> {
+                    FeedBookmarkDto dto = new FeedBookmarkDto();
+                    dto.setUserId(feedBookmark.getUser().getUserId());
+                    dto.setFeedId(feedBookmark.getStyleFeed().getFeedId());
+                    dto.setFeedImage(feedBookmark.getStyleFeed().getFeedImage());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
+
 
     // 관심피드 등록
     @Override

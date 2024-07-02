@@ -37,7 +37,7 @@ public class StyleFeedController {
     }
 
     // 피드 상세 조회
-    @GetMapping("styleFeed/{feedId}")
+    @GetMapping("/styleFeed/{feedId}")
     public StyleFeedDto getStyleFeedById(@PathVariable Long feedId) {
         StyleFeedDto styleFeedDto = styleFeedService.getStyleFeedById(feedId);
         log.info("피드 상세 조회: {}", styleFeedDto);
