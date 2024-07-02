@@ -37,35 +37,35 @@ public class StyleFeedController {
     }
 
     // 피드 상세 조회
-    @GetMapping("/{feedId}")
-    public StyleFeedDto getStyleFeedById() {
-        StyleFeedDto styleFeedDTO = styleFeedService.getStyleFeedById(18L);
-        log.info("피드 상세 조회: {}", styleFeedDTO);
-        return styleFeedDTO;
+    @GetMapping("styleFeed/{feedId}")
+    public StyleFeedDto getStyleFeedById(@PathVariable Long feedId) {
+        StyleFeedDto styleFeedDto = styleFeedService.getStyleFeedById(feedId);
+        log.info("피드 상세 조회: {}", styleFeedDto);
+        return styleFeedDto;
     }
 
     // 피드 등록
-    @PostMapping("/feed")
+    @PostMapping("/feedRegistration")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDTO) {
-        StyleFeed createdStyleFeed = styleFeedService.createStyleFeed(styleFeedDTO);
+    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDto) {
+        StyleFeed createdStyleFeed = styleFeedService.createStyleFeed(styleFeedDto);
         log.info("새로운 피드 생성: {}", createdStyleFeed);
     }
 
     // 피드 수정
-    @PutMapping("modify/{feedId}")
-    public StyleFeedDto updateStyleFeed(@PathVariable Long feedId, @RequestBody StyleFeedDto styleFeedDTO) {
-        return styleFeedService.updateStyleFeed(feedId, styleFeedDTO);
+    @PutMapping("modifyFeed/{feedId}")
+    public StyleFeedDto updateStyleFeed(@PathVariable Long feedId, @RequestBody StyleFeedDto styleFeedDto) {
+        return styleFeedService.updateStyleFeed(feedId, styleFeedDto);
     }
 
     // 피드 삭제
-    @DeleteMapping("style/{feedId}")
+    @DeleteMapping("deleteFeed/{feedId}")
     public void deleteStyleFeed(@PathVariable Long feedId) {
         styleFeedService.deleteStyleFeed(feedId);
     }
 
     // 관심피드 조회
-    @GetMapping("/saveFeed")
+    @GetMapping("/FeedBookmark")
     public List<FeedBookmarkDto> getAllFeedBookmarks() {
         List<FeedBookmarkDto> feedBookmarks = styleFeedService.getAllFeedBookmarks();
         log.info("성공: {} 개의 북마크 가져옴", feedBookmarks.size());
@@ -73,7 +73,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 저장
-    @PostMapping("/bookmark")
+    @PostMapping("/saveFeedBookmark")
     @ResponseStatus(HttpStatus.CREATED)
     public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO) {
         FeedBookmarkDto createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
@@ -82,7 +82,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 삭제
-    @DeleteMapping("saveStyle/{styleSavedId}")
+    @DeleteMapping("deleteFeedBookmark/{styleSavedId}")
     public void deleteFeedBookmark(@PathVariable Long styleSavedId) {
         styleFeedService.deleteFeedBookmark(styleSavedId);
     }

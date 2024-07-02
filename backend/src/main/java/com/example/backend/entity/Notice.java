@@ -2,16 +2,15 @@ package com.example.backend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
+@Getter
+@Setter
 public class Notice extends BaseEntity {
 
     @Id
