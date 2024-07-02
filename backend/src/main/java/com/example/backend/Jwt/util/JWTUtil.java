@@ -53,7 +53,8 @@ public class JWTUtil {
      * JWT 유효성 검증 및 claims 반환
      */
     public static Map<String, Object> validateToken(String token) {
-        Map<String, Object> claims = null;
+        Map<String, Object> claims;
+
 
         try {
             SecretKey key = Keys.hmacShaKeyFor(JWTUtil.SECRET_KEY.getBytes("UTF-8"));
@@ -85,7 +86,7 @@ public class JWTUtil {
      */
     public static boolean checkTime(Integer exp) {
 
-        java.util.Date expDate = new java.util.Date((long) exp * 1000);
+        Date expDate = new Date((long) exp * 1000);
 
         long gap = expDate.getTime() - System.currentTimeMillis();
 

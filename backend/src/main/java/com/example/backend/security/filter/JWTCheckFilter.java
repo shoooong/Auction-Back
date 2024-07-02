@@ -60,12 +60,17 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             String accessToken = authHeaderStr.substring(7);
             Map<String, Object> claims = JWTUtil.validateToken(accessToken);
 
-            log.info("JWT claims: {}", claims);
+            log.info("###JWT claims: {}", claims);
 
             /**
              * 접근 권한별 처리를 위한 인증 컨텍스트 설정
              */
-            Long userId = (Long) claims.get("userId");
+            Long userId = ((Integer)claims.get("userId")).longValue();
+//            Long userId = ((Number) claims.get("userId")).longValue();
+
+            log.info("###: {}", userId);
+            log.info("### : {}", userId.getClass());
+
             String email = (String) claims.get("email");
             String password = (String) claims.get("password");
             int grade = (int) claims.get("grade");
