@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Data
@@ -14,12 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ProductResponseDto {
 
-    private Long productId;
-    private String productPhoto;
+    private String productImg;
     private String productBrand;
     private String productName;
-    private String modelNum;
-    private BigDecimal originalPrice;
     private int productLike;
-    private LocalDateTime createdAt;
+    private String modelNum;
+    private List<BuyingDto> buyingDto;
 }

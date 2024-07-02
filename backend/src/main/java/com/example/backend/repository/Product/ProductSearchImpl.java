@@ -1,39 +1,57 @@
-//package com.example.backend.repository.Product;
-//
-//import com.example.backend.dto.product.PriceResponseDTO;
-//import com.example.backend.entity.*;
-//import com.querydsl.core.BooleanBuilder;
-//import com.querydsl.jpa.impl.JPAQuery;
-//import com.querydsl.jpa.impl.JPAQueryFactory;
-//import jakarta.transaction.Transactional;
-//import lombok.AllArgsConstructor;
-//import lombok.extern.log4j.Log4j2;
-//import org.springframework.stereotype.Repository;
-//
-//import java.math.BigDecimal;
-//import java.util.List;
-//
-//import static com.example.backend.entity.Bid.BidKind.BUY;
-//import static com.example.backend.entity.Bid.BidKind.SELL;
-//
-//@Repository
-//@AllArgsConstructor
-//@Log4j2
-//
-//public class ProductSearchImpl implements ProductSearch {
-//
-//    private final JPAQueryFactory queryFactory;
-//
-//    private static final QProducts products = QProducts.products;
-//    private static final QCategory category = QCategory.category;
-//    private static final QSize size = QSize.size;
-//    private static final QSizePrice sizePrice = QSizePrice.sizePrice;
-//    private static final QBid bid = QBid.bid;
-//
-//    // Sub Query : 구매/판매 희망가 조회, SubBid 는 별명
-//    private static final QSizePrice subSizePrice = new QSizePrice("subSizePrice");
-//    private static final QBid subBid = new QBid("subBid");
-//
+package com.example.backend.repository.Product;
+
+import com.example.backend.entity.*;
+import com.example.backend.entity.enumData.BinddingStatus;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+
+@Repository
+@AllArgsConstructor
+@Log4j2
+
+public class ProductSearchImpl implements ProductSearch {
+
+    private final JPAQueryFactory queryFactory;
+
+    private final QProduct product = QProduct.product;
+    private final QBuyingBidding mainBuying = QBuyingBidding.buyingBidding;
+
+    private final QBuyingBidding subBuying = new QBuyingBidding("subBuying");
+
+    @Override
+    @Transactional
+    public List<Product> subProductInfo(String subDepartment) {
+
+        // 각 상품별 입찰 구매희망가가 가장 낮은 가격
+        JPAQuery<Long> lowPrice = queryFactory.select(subBuying.buyingPrice.min())
+                .from(subBuying)
+                .where(subBuying.binddingStatus.eq(BinddingStatus.PROCESS)
+                        .and(subBuying.product.subDepartment.eq(subDepartment)))
+                .groupBy(subBuying.product.modelNum);
+
+        log.info("minBuyingPrice: " + lowPrice);
+
+        BooleanBuilder whereSplit = new BooleanBuilder();
+        whereSplit.and(product.subDepartment.eq(subDepartment))
+                .and(mainBuying.buyingPrice.in(lowPrice));
+
+        log.info("서브쿼리 실행 결과 : {}", whereSplit.toString());
+
+        return queryFactory.selectFrom(product)
+                .leftJoin(mainBuying).on(mainBuying.product.eq(product)).fetchJoin()
+                .where(whereSplit)
+                .orderBy(product.createDate.desc())
+                .fetch();
+    }
+
 //    @Override
 //    @Transactional
 //    // categoryName 에 대한 소분류 전체 보기
@@ -100,4 +118,4 @@
 //
 //        return responseDTO;
 //    }
-//}
+}

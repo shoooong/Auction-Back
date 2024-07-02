@@ -1,34 +1,67 @@
-//package com.example.backend.service;
-//
-//import com.example.backend.dto.product.*;
-//import com.example.backend.entity.Product;
-//import com.example.backend.repository.Bid.BidRepository;
-//import com.example.backend.repository.Product.ProductsRepository;
-//import com.example.backend.repository.Size.SizePriceRepository;
-//import com.example.backend.repository.Size.SizeRepository;
-//import jakarta.transaction.Transactional;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.log4j.Log4j2;
-//import org.modelmapper.ModelMapper;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@Log4j2
-//@Transactional
-//@RequiredArgsConstructor
-//public class ProductServiceImpl implements ProductService {
-//
-//    private final ProductsRepository productsRepository;
-//    private final SizeRepository sizeRepository;
-//    private final SizePriceRepository sizePriceRepository;
-//    private final BidRepository bidRepository;
-//    private final ModelMapper modelMapper;
-//
-//    // JPA 사용 버전
-//    // 상품 상세 조회(기본 정보)
+package com.example.backend.service;
+
+import com.example.backend.dto.product.*;
+import com.example.backend.entity.Product;
+import com.example.backend.repository.Bidding.BuyingBiddingRepository;
+import com.example.backend.repository.Product.ProductRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Log4j2
+@Transactional
+@RequiredArgsConstructor
+public class ProductServiceImpl implements ProductService {
+
+    @Autowired
+    private final ProductRepository productRepository;
+    @Autowired
+    private final BuyingBiddingRepository buyingBiddingRepository;
+
+    @Autowired
+    private final ModelMapper modelMapper;
+
+    // 상품 소분류 조회
+    @Override
+    public List<ProductResponseDto> selectCategoryValue(String subDepartment) {
+        log.info("subDepartment : " + subDepartment);
+
+        List<Product> subProduct = productRepository.subProductInfo(subDepartment);
+        log.info("subProduct : " + subProduct);
+
+//        return Collections.singletonList(modelMapper.map(subProduct, ProductResponseDto.class));
+
+        return subProduct.stream()
+                .map(this::convertProductDto)
+                .collect(Collectors.toList());
+    }
+
+    private ProductResponseDto convertProductDto(Product product) {
+        // 해당 product 값들을 DTO 로 변환
+        ProductResponseDto productDto = modelMapper.map(product, ProductResponseDto.class);
+
+        // Product와 연관된 BuyingBidding 엔티티들을 BuyingDto로 변환
+        List<BuyingDto> buyingDtos = buyingBiddingRepository.findByProduct(product).stream()
+                .map(buyingBidding -> modelMapper.map(buyingBidding, BuyingDto.class))
+                .collect(Collectors.toList());
+
+        // 변환된 BuyingDto 리스트를 ProductResponseDto에 설정
+        productDto.setBuyingDto(buyingDtos);
+
+        return productDto;
+    }
+
+
+    // JPA 사용 버전
+    // 상품 상세 조회(기본 정보)
 //    @Override
 //    public OnlyProductResponseDTO detailProductSelect(OnlyProductRequestDTO onlyProductRequestDTO) {
 //
@@ -48,8 +81,8 @@
 //
 //        return modelMapper.map(products, PriceResponseDTO.class);
 //    }
-//
-//    // categoryName 에 따른 소분류 조회
+
+    // categoryName 에 따른 소분류 조회
 //    @Override
 //    public List<ProductResponseDTO> selectCategoryValue(CategoryDTO categoryDTO) {
 //
@@ -92,4 +125,4 @@
 //        productDTO.setSizes(sizes);
 //        return productDTO;
 //    }
-//}
+}
