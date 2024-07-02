@@ -1,5 +1,6 @@
 package com.example.backend.dto.user;
 
+import com.example.backend.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,10 +24,11 @@ public class UserDTO extends User {
     private boolean social;
     private boolean role;
 
-    public UserDTO(String email, String password, int grade, String nickname, String phoneNum, boolean social, boolean role) {
+    public UserDTO(Long userId, String email, String password, int grade, String nickname, String phoneNum, boolean social, boolean role) {
 
         super(email, password, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));
 
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.grade = grade;
@@ -38,6 +40,7 @@ public class UserDTO extends User {
 
     public Map<String, Object> getClaims() {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
         claims.put("email", email);
         claims.put("password", password);
         claims.put("nickname", nickname);
@@ -49,8 +52,8 @@ public class UserDTO extends User {
         return claims;
     }
 
-    public com.example.backend.entity.User toEntity() {
-        return com.example.backend.entity.User.builder()
+    public Users toEntity() {
+        return Users.builder()
                 .userId(this.userId)
                 .email(this.email)
                 .password(this.password)

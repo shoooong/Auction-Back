@@ -28,7 +28,7 @@ public class Inquiry extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
     public void change(String inquiryTitle, String inquiryContent) {
         this.inquiryContent = inquiryContent;

@@ -4,7 +4,7 @@ package com.example.backend.service;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -16,8 +16,9 @@ public interface UserService {
 
    UserDTO getKakaoMember(String accessToken);
 
-   default UserDTO entityToDTO(User user) {
+   default UserDTO entityToDTO(Users user) {
       UserDTO userDTO = new UserDTO(
+              user.getUserId(),
                user.getEmail(),
                user.getPassword(),
                user.getGrade(),
@@ -33,9 +34,9 @@ public interface UserService {
 
    String makeTempPassword();
 
-   User makeSocialUser(List<String> socialAccountList);
+   Users makeSocialUser(List<String> socialAccountList);
 
    void modifyUser(UserModifyDTO userModifyDTO);
 
-   User validateUserEmail(String email);
+   Users validateUserEmail(String email);
 }

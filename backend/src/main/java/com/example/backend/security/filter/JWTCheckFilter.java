@@ -65,6 +65,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             /**
              * 접근 권한별 처리를 위한 인증 컨텍스트 설정
              */
+            Long userId = (Long) claims.get("userId");
             String email = (String) claims.get("email");
             String password = (String) claims.get("password");
             int grade = (int) claims.get("grade");
@@ -73,7 +74,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             Boolean social = (Boolean) claims.get("social");
             Boolean role = (Boolean) claims.get("role");
 
-            UserDTO userDTO = new UserDTO(email, password, grade, nickname, phoneNum, social, role);
+            UserDTO userDTO = new UserDTO(userId, email, password, grade, nickname, phoneNum, social, role);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDTO, password, userDTO.getAuthorities());
             log.info("authentication: {}", authentication);

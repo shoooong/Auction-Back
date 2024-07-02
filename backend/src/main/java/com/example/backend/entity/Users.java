@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-public class User extends BaseEntity {
+public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;

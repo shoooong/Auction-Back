@@ -4,7 +4,7 @@ import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.FeedBookmark;
 import com.example.backend.entity.StyleFeed;
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import com.example.backend.repository.FeedBookmark.FeedBookmarkRepository;
 import com.example.backend.repository.StyleFeed.StyleFeedRepository;
 import com.example.backend.repository.User.UserRepository;
@@ -83,7 +83,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 피드 등록
     public StyleFeed createStyleFeed(StyleFeedDto styleFeedDTO) {
-        User user = userRepository.findById(styleFeedDTO.getUserId())
+        Users user = userRepository.findById(styleFeedDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         StyleFeed styleFeed = new StyleFeed();
@@ -149,7 +149,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     // 관심피드 등록
     @Override
     public FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) {
-        User user = userRepository.findById(feedBookmarkDTO.getUserId())
+        Users user = userRepository.findById(feedBookmarkDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         StyleFeed styleFeed = styleFeedRepository.findById(feedBookmarkDTO.getFeedId())
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));

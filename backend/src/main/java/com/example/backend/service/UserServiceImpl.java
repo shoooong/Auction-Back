@@ -3,7 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // TODO: 이후 주소 api 호출 기능 구현되면, 회원가입 시 기본 배송지 입력 받도록 추가
-        User user = User.builder()
+        Users user = Users.builder()
                 .email(userRegisterDTO.getEmail())
                 .password(passwordEncoder.encode(userRegisterDTO.getPassword()))
                 .nickname(userRegisterDTO.getNickname())
@@ -56,14 +56,10 @@ public class UserServiceImpl implements UserService {
         List<String> kakaoAccountList = getProfileFromKakaoToken(accessToken);
         String email = kakaoAccountList.get(0);
 
-        Optional<User> user = userRepository.findByEmail(email);
+        Users user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        if (user.isPresent()) {
-            UserDTO userDTO = entityToDTO(user.get());
-            return userDTO;
-        }
-
-        User socialUser = makeSocialUser(kakaoAccountList);
+        Users socialUser = makeSocialUser(kakaoAccountList);
 
         userRepository.save(socialUser);
 
@@ -141,13 +137,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User makeSocialUser(List<String> kakaoAccountList) {
+    public Users makeSocialUser(List<String> kakaoAccountList) {
         String tempPassword = makeTempPassword();
         String email = kakaoAccountList.get(0);
         String nickname = kakaoAccountList.get(1);
 
 
-        User user = User.builder()
+        Users user = Users.builder()
                 .email(email)
                 .password(tempPassword)
                 .nickname(nickname)
@@ -165,7 +161,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void modifyUser(UserModifyDTO userModifyDTO) {
-        User user = validateUserEmail(userModifyDTO.getEmail());
+        Users user = validateUserEmail(userModifyDTO.getEmail());
 
         user.updateUser(userModifyDTO, passwordEncoder);
 
@@ -176,7 +172,7 @@ public class UserServiceImpl implements UserService {
      * 존재하는 회원인지 확인
      */
     @Override
-    public User validateUserEmail(String email) {
+    public Users validateUserEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
     }

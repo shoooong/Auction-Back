@@ -26,7 +26,7 @@ public class Notice extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
     public void change(String noticeTitle, String noticeContent) {
         this.noticeTitle = noticeTitle;

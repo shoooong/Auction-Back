@@ -27,7 +27,7 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
 
     public void updateAddress(AddressDTO addressDTO) {

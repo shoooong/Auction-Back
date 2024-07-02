@@ -25,7 +25,7 @@ public class InquiryResponse extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
     @OneToOne
     @JoinColumn(name = "inquiryId", nullable = false)

@@ -29,7 +29,7 @@ public class StyleFeed extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private Users user;
 
     public void change(String feedTitle, String feedImage) {
         this.feedTitle = feedTitle;

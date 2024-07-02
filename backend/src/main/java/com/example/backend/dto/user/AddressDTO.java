@@ -1,7 +1,7 @@
 package com.example.backend.dto.user;
 
 import com.example.backend.entity.Address;
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import lombok.*;
 
 @Getter
@@ -14,7 +14,7 @@ public class AddressDTO {
     private String zoneNo;
     private String addressName;
     private boolean defaultAddress;
-    private User user;
+    private Users user;
 
 
     public static AddressDTO fromEntity(Address address){

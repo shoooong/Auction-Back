@@ -18,7 +18,7 @@ public class BuyingBidding extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
     @ManyToOne
     @JoinColumn(name = "productId", nullable = false)

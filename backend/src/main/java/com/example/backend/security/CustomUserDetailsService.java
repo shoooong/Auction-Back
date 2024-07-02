@@ -1,7 +1,7 @@
 package com.example.backend.security;
 
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.User;
+import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,12 +23,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.info("========loadUserByUsername 메서드 호출========");
 
-        User user = userRepository.findByEmail(username)
+        Users user = userRepository.findByEmail(username)
                         .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 email 입니다."));
 
         log.info("User found: {}", user);
 
         UserDTO userDTO = new UserDTO(
+                user.getUserId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getGrade(),

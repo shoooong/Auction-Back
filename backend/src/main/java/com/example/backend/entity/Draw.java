@@ -23,7 +23,7 @@ public class Draw {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    private Users user;
 
     @ManyToOne
     @JoinColumn(name = "luckyId", nullable = false)
