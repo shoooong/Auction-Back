@@ -1,8 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.user.AddressDTO;
-import com.example.backend.dto.user.UserDTO;
-import com.example.backend.dto.user.UserModifyDTO;
+import com.example.backend.dto.user.*;
+import com.example.backend.service.AccountService;
 import com.example.backend.service.AddressService;
 import com.example.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ public class MypageController {
 
     private final UserService userService;
     private final AddressService addressService;
+    private final AccountService accountService;
 
     // 마이페이지 메인
     @GetMapping("")
@@ -28,7 +28,7 @@ public class MypageController {
 
     // 회원 정보 수정
     @PutMapping("/modify")
-    public ResponseEntity<String> modifyUser(@RequestBody UserModifyDTO userModifyDTO){
+    public ResponseEntity<String> modifyUser(@RequestBody UserModifyDTO userModifyDTO) {
         log.info("UserModifyDTO: {}", userModifyDTO);
 
         userService.modifyUser(userModifyDTO);
@@ -37,35 +37,15 @@ public class MypageController {
     }
 
 
-//    @PutMapping("/modify")
-//    public ResponseEntity<String> modifyUser(@RequestBody UserModifyDTO userModifyDTO){
-//        log.info("UserModifyDTO: {}", userModifyDTO);
-//
-//        try {
-//            if (userModifyDTO.isSocial()){
-//                userService.modifyPasswordOnly(passwordModifyDTO);
-//            } else {
-//                userService.modifyUser(userModifyDTO);
-//            }
-//
-//            userService.modifyUser(userModifyDTO);
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//
-//        return ResponseEntity.ok("User information updated successfully!");
-//    }
-
-
     // 배송지 조회
     @GetMapping("/address")
-    public List<AddressDTO> getAddress(@AuthenticationPrincipal UserDTO userDTO){
+    public ResponseEntity<List<AddressDTO>> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
 
         Long userId = userDTO.getUserId();
 
         List<AddressDTO> addressDTO = addressService.getAllAddress(userId);
 
-        return addressDTO;
+        return ResponseEntity.ok(addressDTO);
     }
 
     // 배송지 수정
@@ -77,5 +57,32 @@ public class MypageController {
 //
 //        return ResponseEntity.ok(addressDTO);
 //    }
+
+
+
+    // 등록 계좌 조회
+    @GetMapping("/account")
+    public ResponseEntity<AccountDTO> getAccount(@AuthenticationPrincipal UserDTO userDTO) {
+
+        Long userId = userDTO.getUserId();
+
+        AccountDTO accountDTO =  accountService.getAccount(userId);
+
+        return ResponseEntity.ok(accountDTO);
+    }
+
+
+    // 계좌 등록 및 수정
+    @PutMapping("/account")
+    public ResponseEntity<AccountDTO> registerOrModifyAccount(@AuthenticationPrincipal UserDTO userDTO, @RequestBody AccountReqDTO accountReqDTO) {
+
+        log.info("AccountReqDTO: {}", accountReqDTO);
+
+        Long userId = userDTO.getUserId();
+
+        AccountDTO accountDTO = accountService.updateAccount(userId, accountReqDTO);
+
+        return ResponseEntity.ok(accountDTO);
+    }
 
 }
