@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.announcement;
 
 import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
 import com.example.backend.entity.LuckyDraw;
@@ -49,6 +49,8 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
         luckyDrawAnnouncement.setLuckyDraw(luckyDraw);
 
         LuckyDrawAnnouncement saved = luckyDrawAnnouncementRepository.save(luckyDrawAnnouncement);
+        log.info(saved.toString());
+
         return saved;
     }
     // 수정
@@ -74,5 +76,4 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
     public void deleteLuckyDrawAnnouncement(final long luckyAnnouncementId) {
         luckyDrawAnnouncementRepository.deleteById(luckyAnnouncementId);
     }
-
 }

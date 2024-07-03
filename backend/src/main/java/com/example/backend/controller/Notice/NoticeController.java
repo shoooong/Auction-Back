@@ -1,6 +1,6 @@
 package com.example.backend.controller.Notice;
 
-import com.example.backend.dto.Notice.NoticeDto;
+import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.entity.Notice;
 import com.example.backend.service.NoticeService;
 import lombok.RequiredArgsConstructor;

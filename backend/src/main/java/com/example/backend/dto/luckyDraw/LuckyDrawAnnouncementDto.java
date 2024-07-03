@@ -1,8 +1,6 @@
 package com.example.backend.dto.luckyDraw;
 
-import com.example.backend.entity.LuckyDraw;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Data
 @Builder

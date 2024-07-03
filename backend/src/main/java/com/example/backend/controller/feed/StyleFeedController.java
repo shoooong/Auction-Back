@@ -3,7 +3,7 @@ package com.example.backend.controller.feed;
 import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.StyleFeed;
-import com.example.backend.service.StyleFeedService;
+import com.example.backend.service.feed.StyleFeedService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
