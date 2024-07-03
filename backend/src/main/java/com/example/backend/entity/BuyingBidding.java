@@ -5,6 +5,8 @@ import com.example.backend.entity.enumData.BinddingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +32,8 @@ public class BuyingBidding extends BaseEntity {
     private int buyingQuantity;
 
     private Long buyingPrice;
+
+    private LocalDateTime buyingBiddingTime;
 
     @Enumerated(EnumType.STRING)
     private BinddingStatus binddingStatus;

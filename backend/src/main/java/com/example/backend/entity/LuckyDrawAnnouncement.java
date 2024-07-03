@@ -1,11 +1,7 @@
 package com.example.backend.entity;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -14,6 +10,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
+@Getter
+@Setter
 public class LuckyDrawAnnouncement {
 
     @Id
@@ -22,9 +20,6 @@ public class LuckyDrawAnnouncement {
 
     @Column(nullable = false, length = 100)
     private String luckyTitle;
-//
-//    @Column(nullable = false)
-//    private LocalDate luckyRegDate;
 
     @Column(nullable = false, length = 255)
     private String luckyContent;

@@ -1,18 +1,17 @@
 package com.example.backend.dto.feed;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeedBookmarkDto {
     private Long userId;
     private Long feedId;
+    private String feedImage;
 
-    public FeedBookmarkDto(Long styleSavedId, Long userId, Long feedId) {
+    public FeedBookmarkDto(Long feedBookmarkId, Long userId, Long feedId) {
     }
 }

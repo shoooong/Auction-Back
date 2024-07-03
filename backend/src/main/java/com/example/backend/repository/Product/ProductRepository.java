@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct {
+public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct, ProductSearch {
     //상품상태에 따른 상품 찾기
     List<Product> findByProductStatus(ProductStatus productStatus);
 
