@@ -6,12 +6,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class SalesBidding extends BaseEntity{
 
     @Id
@@ -24,19 +24,20 @@ public class SalesBidding extends BaseEntity{
 
     private Long salesPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    @ToString.Exclude
-    private Users user ;
-
-    @ManyToOne
-    @JoinColumn(name = "productId")
-    @ToString.Exclude
-    private Product product;
-
     @Enumerated(EnumType.STRING)
     private SalesStatus salesStatus;
 
     private LocalDateTime salesBiddingTime;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    @ToString.Exclude
+    private Users user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "productId")
+    @ToString.Exclude
+    private Product product;
 
 }
