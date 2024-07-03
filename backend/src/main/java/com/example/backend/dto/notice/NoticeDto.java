@@ -1,4 +1,4 @@
-package com.example.backend.dto.Notice;
+package com.example.backend.dto.notice;
 
 import lombok.*;
 

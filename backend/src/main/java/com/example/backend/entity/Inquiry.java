@@ -2,10 +2,7 @@ package com.example.backend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -14,6 +11,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Entity
+@Getter
+@Setter
 public class Inquiry extends BaseEntity {
 
     @Id

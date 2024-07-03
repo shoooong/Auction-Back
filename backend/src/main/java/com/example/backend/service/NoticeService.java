@@ -2,7 +2,7 @@ package com.example.backend.service;
 
 
 
-import com.example.backend.dto.Notice.NoticeDto;
+import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.entity.Notice;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.Notice.NoticeDto;
+import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.entity.Notice;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.Notice.NoticeRepository;

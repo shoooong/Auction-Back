@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.feed;
 
 import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
@@ -77,6 +77,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 styleFeed.getFeedTitle(),
                 styleFeed.getFeedImage(),
                 styleFeed.getLikeCount(),
+                styleFeed.getCreateDate(),
+                styleFeed.getModifyDate(),
                 styleFeed.getUser().getUserId()
         );
     }
@@ -119,6 +121,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 updatedFeed.getFeedTitle(),
                 updatedFeed.getFeedImage(),
                 updatedFeed.getLikeCount(),
+                updatedFeed.getCreateDate(),
+                updatedFeed.getModifyDate(),
                 updatedFeed.getUser().getUserId()
         );
     }

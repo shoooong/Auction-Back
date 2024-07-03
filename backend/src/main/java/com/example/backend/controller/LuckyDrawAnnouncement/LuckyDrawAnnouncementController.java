@@ -1,10 +1,8 @@
 package com.example.backend.controller.LuckyDrawAnnouncement;
 
-import com.example.backend.controller.LuckyDrawController;
 import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
 import com.example.backend.entity.LuckyDrawAnnouncement;
-import com.example.backend.service.LuckyDrawAnnouncementService;
-import com.example.backend.service.LuckyDrawService;
+import com.example.backend.service.announcement.LuckyDrawAnnouncementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +23,7 @@ public class LuckyDrawAnnouncementController {
     @GetMapping("/luckyDrawAnnouncementList")
     public List<LuckyDrawAnnouncementDto> luckyDrawAnnouncement(){
         List<LuckyDrawAnnouncementDto> announcement = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
+        log.info("조회 완료{}", announcement);
         return announcement;
     }
 

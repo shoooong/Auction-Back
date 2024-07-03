@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.feed;
 
 import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
