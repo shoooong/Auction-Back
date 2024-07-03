@@ -1,11 +1,9 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.SalesBidding.SaleHistoryDTO;
 import com.example.backend.dto.orders.BuyHistoryDTO;
 import com.example.backend.dto.user.*;
-import com.example.backend.service.AccountService;
-import com.example.backend.service.AddressService;
-import com.example.backend.service.OrdersService;
-import com.example.backend.service.UserService;
+import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,7 @@ public class MypageController {
     private final AddressService addressService;
     private final AccountService accountService;
     private final OrdersService ordersService;
+    private final SalesBiddingService salesBiddingService;
 
     // 마이페이지 메인
     @GetMapping("")
@@ -113,5 +112,19 @@ public class MypageController {
         return ResponseEntity.ok(buyHistoryDTO);
     }
 
+
+    /**
+     * 쇼핑 정보 - 판매 내역
+     * 전체, 검수 중, 진행 중, 종료 건수
+     * 판매 내역 전체 조회 (판매 입찰 시간 최신순 정렬)
+     */
+    @GetMapping("/saleHistory")
+    ResponseEntity<SaleHistoryDTO> saleHistory(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        SaleHistoryDTO saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
+
+        return ResponseEntity.ok(saleHistoryDTO);
+    }
 
 }
