@@ -1,4 +1,4 @@
-package com.example.backend.dto.luckyDraw;
+package com.example.backend.dto.mypage.drawHistory;
 
 import com.example.backend.entity.enumData.LuckyStatus;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.example.backend.dto.user;
+package com.example.backend.dto.mypage.accountSettings;
 
 import com.example.backend.entity.Account;
 import lombok.Builder;
@@ -10,15 +10,15 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class AccountReqDTO {
+public class AccountDTO {
 
     private String depositor;
     private String bankName;
     private String accountNum;
 
-    public static AccountReqDTO fromEntity(Account account) {
+    public static AccountDTO fromEntity(Account account) {
 
-        return AccountReqDTO.builder()
+        return AccountDTO.builder()
                 .depositor(account.getDepositor())
                 .bankName(account.getBankName())
                 .accountNum(account.getAccountNum())

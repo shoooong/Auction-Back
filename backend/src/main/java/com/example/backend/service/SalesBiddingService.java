@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.SalesBidding.SaleDetailsDTO;
-import com.example.backend.dto.SalesBidding.SaleHistoryDTO;
+import com.example.backend.dto.mypage.saleHistory.SaleDetailsDTO;
+import com.example.backend.dto.mypage.saleHistory.SaleHistoryDTO;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

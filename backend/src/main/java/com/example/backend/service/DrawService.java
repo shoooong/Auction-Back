@@ -1,8 +1,8 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.luckyDraw.DrawDTO;
-import com.example.backend.dto.luckyDraw.DrawDetailsDto;
-import com.example.backend.dto.luckyDraw.DrawHistoryDto;
+import com.example.backend.dto.mypage.drawHistory.DrawDetailsDto;
+import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.entity.Draw;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Users;

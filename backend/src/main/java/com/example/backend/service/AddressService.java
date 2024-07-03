@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.user.AddressDTO;
+import com.example.backend.dto.mypage.addressSettings.AddressDTO;
 import com.example.backend.repository.User.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

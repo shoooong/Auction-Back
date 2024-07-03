@@ -1,6 +1,6 @@
 package com.example.backend.entity;
 
-import com.example.backend.dto.user.AddressDTO;
+import com.example.backend.dto.mypage.addressSettings.AddressDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

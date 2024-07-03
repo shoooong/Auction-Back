@@ -1,6 +1,6 @@
 package com.example.backend.repository.Bidding;
 
-import com.example.backend.dto.SalesBidding.SaleDetailsDTO;
+import com.example.backend.dto.mypage.saleHistory.SaleDetailsDTO;
 import com.example.backend.entity.SalesBidding;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,7 +30,7 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
 
     // TODO: QueryDSL로 변경할 것
     // 판매 입찰 상세 정보
-    @Query("SELECT new com.example.backend.dto.SalesBidding.SaleDetailsDTO(p.productImg, p.productName, p.productSize, s.salesPrice, s.salesStatus) " +
+    @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDTO(p.productImg, p.productName, p.productSize, s.salesPrice, s.salesStatus) " +
             "FROM SalesBidding s JOIN s.product p JOIN s.user u " +
             "WHERE u.userId = :userId " +
             "ORDER BY s.salesBiddingTime DESC")

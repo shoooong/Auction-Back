@@ -1,4 +1,4 @@
-package com.example.backend.dto.orders;
+package com.example.backend.dto.mypage.buyHistory;
 
 import com.example.backend.entity.enumData.OrderStatus;
 import lombok.Builder;

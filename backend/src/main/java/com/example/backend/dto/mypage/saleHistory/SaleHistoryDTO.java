@@ -1,4 +1,4 @@
-package com.example.backend.dto.SalesBidding;
+package com.example.backend.dto.mypage.saleHistory;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.user.AccountDTO;
-import com.example.backend.dto.user.AccountReqDTO;
+import com.example.backend.dto.mypage.accountSettings.AccountDTO;
+import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import com.example.backend.entity.Account;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.AccountRepository;

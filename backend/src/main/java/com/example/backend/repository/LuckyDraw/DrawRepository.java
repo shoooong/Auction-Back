@@ -1,6 +1,6 @@
 package com.example.backend.repository.LuckyDraw;
 
-import com.example.backend.dto.luckyDraw.DrawDetailsDto;
+import com.example.backend.dto.mypage.drawHistory.DrawDetailsDto;
 import com.example.backend.entity.Draw;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,7 +25,7 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
 
     // TODO: QueryDSL로 변경할 것
     // 럭키드로우 응모 상세 정보
-    @Query("SELECT new com.example.backend.dto.luckyDraw.DrawDetailsDto(l.luckyImage, l.luckyName, l.luckySize, l.luckyDate, d.luckyStatus) " +
+    @Query("SELECT new com.example.backend.dto.mypage.drawHistory.DrawDetailsDto(l.luckyImage, l.luckyName, l.luckySize, l.luckyDate, d.luckyStatus) " +
             "FROM Draw d JOIN d.luckyDraw l JOIN d.user u " +
             "WHERE u.userId = :userId " +
             "ORDER BY l.luckyDate DESC")

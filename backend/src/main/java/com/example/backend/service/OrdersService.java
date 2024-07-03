@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.orders.BuyHistoryDTO;
-import com.example.backend.dto.orders.OrderDetailsDTO;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryDTO;
+import com.example.backend.dto.mypage.buyHistory.OrderDetailsDTO;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
 import com.example.backend.repository.Orders.OrdersRepository;
 import lombok.RequiredArgsConstructor;

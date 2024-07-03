@@ -1,4 +1,4 @@
-package com.example.backend.dto.user;
+package com.example.backend.dto.mypage.addressSettings;
 
 import com.example.backend.entity.Address;
 import lombok.*;
