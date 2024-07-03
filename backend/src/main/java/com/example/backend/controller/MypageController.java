@@ -1,8 +1,12 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.SalesBidding.SaleHistoryDTO;
-import com.example.backend.dto.luckyDraw.DrawHistoryDto;
-import com.example.backend.dto.orders.BuyHistoryDTO;
+import com.example.backend.dto.mypage.accountSettings.AccountDTO;
+import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
+import com.example.backend.dto.mypage.addressSettings.AddressDTO;
+import com.example.backend.dto.mypage.main.MypageMainDto;
+import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
+import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
 import com.example.backend.dto.user.*;
 import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +30,17 @@ public class MypageController {
     private final SalesBiddingService salesBiddingService;
     private final DrawService drawService;
 
-    // 마이페이지 메인
+    /**
+     * 마이페이지 메인
+     */
     @GetMapping("")
+    public ResponseEntity<MypageMainDto> getMyPage(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        MypageMainDto mypageMainDto = userService.getMyPageInfo(userId);
+
+        return ResponseEntity.ok(mypageMainDto);
+    }
 
 
     /**
@@ -39,6 +52,7 @@ public class MypageController {
         log.info("UserModifyDTO: {}", userModifyDTO);
 
         userService.modifyUser(userModifyDTO);
+        // TODO: 사용자 검증 방법 통일
 
         return ResponseEntity.ok("User information updated successfully!");
     }
@@ -106,10 +120,10 @@ public class MypageController {
      * 구매 내역 전체 조회 (주문 날짜 최신순 정렬)
      */
     @GetMapping("/buyHistory")
-    public ResponseEntity<BuyHistoryDTO> buyHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<BuyHistoryDto> buyHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        BuyHistoryDTO buyHistoryDTO = ordersService.getBuyHistory(userId);
+        BuyHistoryDto buyHistoryDTO = ordersService.getBuyHistory(userId);
 
         return ResponseEntity.ok(buyHistoryDTO);
     }
@@ -121,10 +135,10 @@ public class MypageController {
      * 판매 내역 전체 조회 (판매 입찰 시간 최신순 정렬)
      */
     @GetMapping("/saleHistory")
-    ResponseEntity<SaleHistoryDTO> saleHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    ResponseEntity<SaleHistoryDto> saleHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        SaleHistoryDTO saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
+        SaleHistoryDto saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
 
         return ResponseEntity.ok(saleHistoryDTO);
     }

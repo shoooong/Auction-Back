@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 
+import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
@@ -38,5 +39,7 @@ public interface UserService {
 
    void modifyUser(UserModifyDTO userModifyDTO);
 
-   Users validateUserEmail(String email);
+//   Users validateUserEmail(String email);
+
+   MypageMainDto getMyPageInfo(Long userId);
 }

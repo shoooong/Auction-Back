@@ -1,5 +1,9 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
+import com.example.backend.dto.mypage.main.MypageMainDto;
+import com.example.backend.dto.mypage.main.ProfileDto;
+import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
@@ -22,7 +26,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final OrdersService ordersService;
+    private final SalesBiddingService salesBiddingService;
+    private final UserCouponService userCouponService;
 
     @Override
     public void registerUser(UserRegisterDTO userRegisterDTO, boolean isAdmin) {
@@ -54,10 +61,10 @@ public class UserServiceImpl implements UserService {
     public UserDTO getKakaoMember(String accessToken) {
 
         List<String> kakaoAccountList = getProfileFromKakaoToken(accessToken);
-        String email = kakaoAccountList.get(0);
-
-        Users user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+//        String email = kakaoAccountList.get(0);
+//
+//        Users user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Users socialUser = makeSocialUser(kakaoAccountList);
 
@@ -161,7 +168,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void modifyUser(UserModifyDTO userModifyDTO) {
-        Users user = validateUserEmail(userModifyDTO.getEmail());
+        Users user = userRepository.findByEmail(userModifyDTO.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         user.updateUser(userModifyDTO, passwordEncoder);
 
@@ -171,9 +179,36 @@ public class UserServiceImpl implements UserService {
     /**
      * 존재하는 회원인지 확인
      */
+//    @Override
+//    public Users validateUserEmail(String email) {
+//        return userRepository.findByEmail(email)
+//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+//    }
+
+    /**
+     *
+     */
     @Override
-    public Users validateUserEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
+    public MypageMainDto getMyPageInfo(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        ProfileDto profileDto = ProfileDto.builder()
+                .profileImg(user.getProfileImg())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .grade(user.getGrade())
+                .build();
+
+        Long couponCount = userCouponService.getValidCouponCount(userId);
+        BuyHistoryDto buyHistoryDto = ordersService.getRecentBuyHistory(userId);
+        SaleHistoryDto saleHistoryDto = salesBiddingService.getRecentSaleHistory(userId);
+
+        return MypageMainDto.builder()
+                .profileDto(profileDto)
+                .couponCount(couponCount)
+                .buyHistoryDto(buyHistoryDto)
+                .saleHistoryDto(saleHistoryDto)
+                .build();
     }
 }

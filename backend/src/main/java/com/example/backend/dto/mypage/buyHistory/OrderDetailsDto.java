@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class OrderDetailsDTO {
+public class OrderDetailsDto {
 
     private String productImg;
     private String productName;
@@ -16,7 +16,7 @@ public class OrderDetailsDTO {
     private OrderStatus orderStatus;
 
 
-    public OrderDetailsDTO(String productImg, String productName, String productSize, Long orderPrice, OrderStatus orderStatus) {
+    public OrderDetailsDto(String productImg, String productName, String productSize, Long orderPrice, OrderStatus orderStatus) {
         this.productImg = productImg;
         this.productName = productName;
         this.productSize = productSize;
