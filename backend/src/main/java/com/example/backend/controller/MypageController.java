@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.SalesBidding.SaleHistoryDTO;
+import com.example.backend.dto.luckyDraw.DrawHistoryDto;
 import com.example.backend.dto.orders.BuyHistoryDTO;
 import com.example.backend.dto.user.*;
 import com.example.backend.service.*;
@@ -23,6 +24,7 @@ public class MypageController {
     private final AccountService accountService;
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
+    private final DrawService drawService;
 
     // 마이페이지 메인
     @GetMapping("")
@@ -125,6 +127,23 @@ public class MypageController {
         SaleHistoryDTO saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
 
         return ResponseEntity.ok(saleHistoryDTO);
+    }
+
+
+    /**
+     * 쇼핑 정보 - 응모 내역
+     * 전체, 진행 중, 당첨 건수
+     * 럭키드로우 응모 내역 전체 조회 (당첨발표일 최신순 정렬)
+     */
+    // TODO: 추후 당첨, 미당첨 필터 추가
+    // TODO: 당첨발표일 지나면 당첨 여부 바뀌게 수정
+    @GetMapping("/drawHistory")
+    public ResponseEntity<DrawHistoryDto> drawHistory(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        DrawHistoryDto drawHistoryDto = drawService.getDrawHistory(userId);
+
+        return ResponseEntity.ok(drawHistoryDto);
     }
 
 }

@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.luckyDraw.DrawDTO;
+import com.example.backend.dto.luckyDraw.DrawDetailsDto;
+import com.example.backend.dto.luckyDraw.DrawHistoryDto;
 import com.example.backend.entity.Draw;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Users;
@@ -12,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +26,9 @@ public class DrawService {
     private final UserRepository userRepository;
     private final LuckyDrawRepository luckyDrawRepository;
 
-
+    /**
+     * 럭키드로우 응모 내역 저장
+     */
     public DrawDTO saveDraw(Long userId, Long luckyDrawId) {
 
         Users user = userRepository.findById(userId)
@@ -40,5 +46,23 @@ public class DrawService {
         DrawDTO drawDTO = DrawDTO.fromEntity(drawRepository.save(draw));
 
         return drawDTO;
+    }
+
+    /**
+     * 마이페이지 응모 내역 조회
+     */
+    public DrawHistoryDto getDrawHistory(Long userId) {
+        Long allCount = drawRepository.countAllByUserId(userId);
+        Long processCount = drawRepository.countProcessByUserId(userId);
+        Long luckyCount = drawRepository.countLuckyByUserId(userId);
+
+        List<DrawDetailsDto> drawDetailsDto = drawRepository.findDrawDetailsByUserId(userId);
+
+        return DrawHistoryDto.builder()
+                .allCount(allCount)
+                .processCount(processCount)
+                .luckyCount(luckyCount)
+                .drawDetails(drawDetailsDto)
+                .build();
     }
 }
