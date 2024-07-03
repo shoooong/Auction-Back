@@ -20,6 +20,7 @@ public class AddressDTO {
                 .addressId(address.getAddressId())
                 .zoneNo(address.getZoneNo())
                 .addressName(address.getAddressName())
+                .defaultAddress(address.getDefaultAddress())
                 .build();
     }
 
