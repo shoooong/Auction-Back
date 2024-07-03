@@ -6,12 +6,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class Orders {
 
     @Id
@@ -28,13 +28,17 @@ public class Orders {
     @Column(nullable = false)
     private Long orderPrice;
 
-    @OneToOne
-    @JoinColumn(name = "userCouponId")
-    private UserCoupon userCouponId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    private Users user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId", nullable = false)
     private Product product;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyingBiddingId")
+    private BuyingBidding buyingBidding;
 
 
 }
