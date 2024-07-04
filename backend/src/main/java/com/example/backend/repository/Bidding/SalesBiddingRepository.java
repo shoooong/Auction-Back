@@ -32,18 +32,18 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
 
     // TODO: QueryDSL로 변경할 것
     // 판매 입찰 상세 정보
-    @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesPrice, s.salesStatus) " +
+    @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesBiddingPrice, s.salesStatus) " +
             "FROM SalesBidding s JOIN s.product p JOIN s.user u " +
             "WHERE u.userId = :userId " +
             "ORDER BY s.salesBiddingTime DESC")
-    List<SaleDetailsDto> findSaleDetailsByUserId(@Param("userId") Long userId);
+    List<SaleDetailsDto> findSaleDetailsByUserId(Long userId);
 
     // 판매 입찰 상세 정보 - 최근 3건 조회
-    @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesPrice, s.salesStatus) " +
+    @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesBiddingPrice, s.salesStatus) " +
             "FROM SalesBidding s JOIN s.product p JOIN s.user u " +
             "WHERE u.userId = :userId " +
             "ORDER BY s.salesBiddingTime DESC")
-    List<SaleDetailsDto> findRecentSaleDetailsByUserId(@Param("userId") Long userId, Pageable pageable);
+    List<SaleDetailsDto> findRecentSaleDetailsByUserId(Long userId, Pageable pageable);
 
     Optional<SalesBidding> findTopByProductModelNumOrderBySalesBiddingTimeDesc(String modelNum);
 }

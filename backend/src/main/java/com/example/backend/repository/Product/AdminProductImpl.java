@@ -124,7 +124,6 @@ public class AdminProductImpl implements AdminProduct {
                 .select(Projections.fields(
                         BuyinBiddingDto.class,
                         buyingBidding.buyingBiddingId.as("buyingBiddingId"),
-                        buyingBidding.buyingPrice.as("buyingPrice"),
                         buyingBidding.buyingBiddingPrice.as("buyingBiddingPrice"),
                         Projections.fields(
                                 AdminUserDto.class,
@@ -132,7 +131,7 @@ public class AdminProductImpl implements AdminProduct {
                                 buyer.nickname.as("nickname")
                         ).as("buyer")
                 ))
-                .from(buyingBidding)
+        .from(buyingBidding)
                 .innerJoin(buyingBidding.user, buyer)
                 .where(buyingBidding.product.modelNum.eq(modelNum)
                         .and(sizeCondition != null ? buyingBidding.product.productSize.eq(productSize) : modelNumCondition).and(isRegistered()).and(buyingCondition))
@@ -144,7 +143,6 @@ public class AdminProductImpl implements AdminProduct {
                 .select(Projections.fields(
                         SalesBiddingDto.class,
                         salesBidding.salesBiddingId.as("salesBiddingId"),
-                        salesBidding.salesPrice.as("salesPrice"),
                         salesBidding.salesBiddingPrice.as("salesBiddingPrice"),
                         salesBidding.salesStatus.as("salesStatus"),
                         Projections.fields(
