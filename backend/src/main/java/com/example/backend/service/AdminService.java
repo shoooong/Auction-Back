@@ -9,7 +9,9 @@ import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Product.ProductRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -92,16 +94,41 @@ public class AdminService {
 
     //검수 승인 처리
     @Transactional
-    public void acceptSales(Long salesBiddingId) {
+    public AcceptSaleRespDto acceptSales(Long salesBiddingId) {
 
         //해당 id의 판매입찰 정보 찾기
         Optional<SalesBidding> salesBidding = salesBiddingRepository.findById(salesBiddingId);
-        SalesBidding result = salesBidding.orElseThrow();
+        SalesBidding acceptSales = salesBidding.orElseThrow();
 
         //판매입찰 상태 검수 -> 판매중으로 변경
-        result.chageSalesStatus(SalesStatus.PROCESS);
+        acceptSales.chageSalesStatus(SalesStatus.PROCESS);
+
+        //판매입찰의 상품아이디 가져오기
+        Long productId = acceptSales.getProduct().getProductId();
+
+        //해당 상품의 productId를 가진 상품의 수량 증가
+        Optional<Product> selectProduct = productRepository.findById(productId);
+        Product product = selectProduct.orElseThrow();
+        product.addQuantity(1);
+
+        return new AcceptSaleRespDto(acceptSales, product);
 
     }
+
+    @Getter
+    @Setter
+    public static class AcceptSaleRespDto{
+        private Long salesBiddingId;
+        private Long productId;
+        private int productQuantity;
+
+        public AcceptSaleRespDto(SalesBidding salesBidding, Product product) {
+            this.salesBiddingId = salesBidding.getSalesBiddingId();
+            this.productId = product.getProductId();
+            this.productQuantity = product.getProductQuantity();
+        }
+    }
+
 
 
 }

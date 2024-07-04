@@ -64,12 +64,12 @@ public class AdminController {
     //판매입찰(검수중) 상품 검수 승인
     //위에서 판매입찰 id를 받아와서 해당 판매입찰 상태 변경
     @PostMapping("/sales/{salesBiddingId}/approve")
-    public ResponseEntity<?> acceptSaleBidding(@PathVariable Long salesBiddingId){
+    public ResponseEntity<AdminService.AcceptSaleRespDto> acceptSaleBidding(@PathVariable Long salesBiddingId){
         //salesBiddingId를 통하여 검수요청중인 salesStatus = INSPECTION ->PROCESS 으로 변경
 
-        adminService.acceptSales(salesBiddingId);
+        AdminService.AcceptSaleRespDto acceptSaleRespDto = adminService.acceptSales(salesBiddingId);
 
-        return new ResponseEntity<>("",HttpStatus.OK);
+        return new ResponseEntity<>(acceptSaleRespDto,HttpStatus.OK);
     }
 
 

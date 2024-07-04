@@ -55,6 +55,11 @@ public class Product extends BaseEntity {
         this.productStatus = productStatus;
     }
 
+    //  상품 수량 증가 메서드
+    public void addQuantity(int productQuantity) {
+        this.productQuantity += productQuantity;
+    }
+
 
 
 
