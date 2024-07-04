@@ -1,7 +1,7 @@
 package com.example.backend.entity;
 
 
-import com.example.backend.entity.enumData.BinddingStatus;
+import com.example.backend.entity.enumData.BiddingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +36,6 @@ public class BuyingBidding extends BaseEntity {
     private LocalDateTime buyingBiddingTime;
 
     @Enumerated(EnumType.STRING)
-    private BinddingStatus binddingStatus;
+    private BiddingStatus biddingStatus;
 
 }
