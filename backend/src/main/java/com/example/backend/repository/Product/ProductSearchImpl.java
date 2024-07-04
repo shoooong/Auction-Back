@@ -1,7 +1,7 @@
 package com.example.backend.repository.Product;
 
 import com.example.backend.entity.*;
-import com.example.backend.entity.enumData.BinddingStatus;
+import com.example.backend.entity.enumData.BiddingStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,7 +33,7 @@ public class ProductSearchImpl implements ProductSearch {
         // 각 상품별 입찰 구매희망가가 가장 낮은 가격
         JPAQuery<Long> lowPrice = queryFactory.select(subBuying.buyingPrice.min())
                 .from(subBuying)
-                .where(subBuying.binddingStatus.eq(BinddingStatus.PROCESS)
+                .where(subBuying.biddingStatus.eq(BiddingStatus.PROCESS)
                         .and(subBuying.product.subDepartment.eq(subDepartment)))
                 .groupBy(subBuying.product.modelNum);
 

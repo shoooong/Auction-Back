@@ -2,7 +2,7 @@ package com.example.backend.repository.Product;
 
 import com.example.backend.dto.admin.*;
 import com.example.backend.entity.*;
-import com.example.backend.entity.enumData.BinddingStatus;
+import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
@@ -102,7 +102,7 @@ public class AdminProductImpl implements AdminProduct {
         BooleanExpression sizeCondition = productSize != null ? product.productSize.eq(productSize) : null;
         BooleanExpression saleCondition1 = salesBidding.salesStatus.eq(SalesStatus.PROCESS);
         BooleanExpression saleCondition2 = salesBidding.salesStatus.eq(SalesStatus.INSPECTION);
-        BooleanExpression buyingCondition = buyingBidding.binddingStatus.eq(BinddingStatus.PROCESS );
+        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS );
 
         List<AdminProductDetailDto> productDetails = queryFactory
                 .select(Projections.fields(

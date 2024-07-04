@@ -4,7 +4,7 @@ import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.entity.BuyingBidding;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.Users;
-import com.example.backend.entity.enumData.BinddingStatus;
+import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
@@ -65,7 +65,7 @@ public class ProductsTests {
         BuyingBidding buyBid = BuyingBidding.builder()
                 .buyingBiddingPrice(124000L)
                 .buyingQuantity(1)
-                .binddingStatus(BinddingStatus.PROCESS)
+                .biddingStatus(BiddingStatus.PROCESS)
                 .buyingPrice(129000L)
                 .product(product)
                 .user(user)
