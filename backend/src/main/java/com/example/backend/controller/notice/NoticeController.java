@@ -1,4 +1,4 @@
-package com.example.backend.controller.Notice;
+package com.example.backend.controller.notice;
 
 import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.entity.Notice;

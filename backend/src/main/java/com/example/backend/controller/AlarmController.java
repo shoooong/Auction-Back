@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.alarm.RequestAlarmDto;
 import com.example.backend.dto.alarm.ResponseAlarmDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.alarm.AlarmService;
@@ -10,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 

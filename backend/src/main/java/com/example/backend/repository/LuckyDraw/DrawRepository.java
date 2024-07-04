@@ -2,6 +2,8 @@ package com.example.backend.repository.LuckyDraw;
 
 import com.example.backend.dto.mypage.drawHistory.DrawDetailsDto;
 import com.example.backend.entity.Draw;
+import com.example.backend.entity.LuckyDraw;
+import com.example.backend.entity.enumData.LuckyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -30,4 +32,6 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
             "WHERE u.userId = :userId " +
             "ORDER BY l.luckyDate DESC")
     List<DrawDetailsDto> findDrawDetailsByUserId(Long userId);
+
+    Draw findByLuckyDrawAndLuckyStatus(LuckyDraw luckyDraw, LuckyStatus luckyStatus);
 }

@@ -19,5 +19,5 @@ public class InquiryDto {
     private LocalDateTime createdDate;
     private LocalDateTime modifyDate;
     private Long userId;
-    private List<InquiryResponseDto> responses;
+    private String response;
 }

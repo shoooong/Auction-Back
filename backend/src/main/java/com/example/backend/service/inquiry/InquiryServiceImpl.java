@@ -58,15 +58,11 @@ public class InquiryServiceImpl implements InquiryService{
 
         List<InquiryResponse> responses = inquiryResponseRepository.findByInquiry_inquiryId(inquiryId);
 
-        List<InquiryResponseDto> responseDtos = responses.stream()
+        List <InquiryResponseDto> responseDtos = responses.stream()
                 .map(response -> InquiryResponseDto.builder()
-                        .responseId(response.getResponseId())
-                        .inquiryId(response.getInquiry().getInquiryId())
-                        .userId(response.getUser().getUserId())
-                        .createDate(response.getCreateDate())
                         .response(response.getResponse())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         return InquiryDto.builder()
                 .inquiryId(inquiry.getInquiryId())
@@ -75,7 +71,7 @@ public class InquiryServiceImpl implements InquiryService{
                 .createdDate(inquiry.getCreateDate())
                 .modifyDate(inquiry.getModifyDate())
                 .userId(inquiry.getUser().getUserId())
-                .responses(responseDtos)  // InquiryResponseDto 리스트 추가
+                .response(responseDtos.toString())
                 .build();
     }
 

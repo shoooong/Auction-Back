@@ -1,19 +1,10 @@
 package com.example.backend.service.alarm;
-
-import com.example.backend.dto.alarm.RequestAlarmDto;
 import com.example.backend.dto.alarm.ResponseAlarmDto;
-import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.Alarm;
-import com.example.backend.entity.Users;
-import com.example.backend.entity.enumData.AlarmType;
 import com.example.backend.repository.alarm.AlarmRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import javax.management.Notification;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
