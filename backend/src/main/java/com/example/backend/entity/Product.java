@@ -4,6 +4,8 @@ import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,6 +51,18 @@ public class Product extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
+
+    @Column
+    private Long latestPrice;
+
+    @Column
+    private LocalDateTime latestDate;
+
+    @Column
+    private Long previousPrice;
+
+    @Column
+    private Double previousPercentage;
 
 
     public void changeProductStatus(ProductStatus productStatus) {

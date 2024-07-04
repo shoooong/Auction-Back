@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long> {
@@ -44,4 +45,5 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
             "ORDER BY s.salesBiddingTime DESC")
     List<SaleDetailsDto> findRecentSaleDetailsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    Optional<SalesBidding> findTopByProductModelNumOrderBySalesBiddingTimeDesc(String modelNum);
 }

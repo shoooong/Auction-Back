@@ -1,8 +1,10 @@
-package com.example.backend.service;
+package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
+import com.example.backend.dto.product.Detail.BasicInformationDto;
 import com.example.backend.entity.Product;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
+import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +13,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     @Autowired
     private final BuyingBiddingRepository buyingBiddingRepository;
+    @Autowired
+    private final SalesBiddingRepository salesBiddingRepository;
 
     @Autowired
     private final ModelMapper modelMapper;
@@ -32,12 +36,10 @@ public class ProductServiceImpl implements ProductService {
     // 상품 소분류 조회
     @Override
     public List<ProductResponseDto> selectCategoryValue(String subDepartment) {
-        log.info("subDepartment : " + subDepartment);
+        log.info("subDepartment : {}", subDepartment);
 
         List<Product> subProduct = productRepository.subProductInfo(subDepartment);
-        log.info("subProduct : " + subProduct);
-
-//        return Collections.singletonList(modelMapper.map(subProduct, ProductResponseDto.class));
+        log.info("subProduct : {}", subProduct);
 
         return subProduct.stream()
                 .map(this::convertProductDto)
@@ -48,16 +50,54 @@ public class ProductServiceImpl implements ProductService {
         // 해당 product 값들을 DTO 로 변환
         ProductResponseDto productDto = modelMapper.map(product, ProductResponseDto.class);
 
-        // Product와 연관된 BuyingBidding 엔티티들을 BuyingDto로 변환
-        List<BuyingDto> buyingDtos = buyingBiddingRepository.findByProduct(product).stream()
+        // Product 와 연관된 BuyingBidding 엔티티들을 BuyingDto로 변환
+        List<BuyingDto> buyingDto = buyingBiddingRepository.findByProduct(product).stream()
                 .map(buyingBidding -> modelMapper.map(buyingBidding, BuyingDto.class))
                 .collect(Collectors.toList());
 
-        // 변환된 BuyingDto 리스트를 ProductResponseDto에 설정
-        productDto.setBuyingDto(buyingDtos);
+        // 변환된 BuyingDto 리스트를 ProductResponseDto 에 설정
+        productDto.setBuyingDto(buyingDto);
 
         return productDto;
     }
+
+    // 상품의 기본정보 조회
+    @Override
+    public BasicInformationDto basicInformation(String modelNum) {
+        log.info("modelNum : {}", modelNum);
+
+        Optional<Product> productOptional = productRepository.findFirstByModelNum(modelNum);
+        // 망할 ModelMapper 이슈로
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            BasicInformationDto basicInformationDto = new BasicInformationDto();
+            basicInformationDto.setProductId(product.getProductId());
+            basicInformationDto.setProductImg(product.getProductImg());
+            basicInformationDto.setProductBrand(product.getProductBrand());
+            basicInformationDto.setModelNum(product.getModelNum());
+            basicInformationDto.setProductName(product.getProductName());
+            basicInformationDto.setOriginalPrice(product.getOriginalPrice());
+            basicInformationDto.setProductLike(product.getProductLike());
+
+            log.info("basicInformationDto DTO 변환 : {}", basicInformationDto);
+
+            BasicInformationDto priceValue = productRepository.searchProductPrice(modelNum);
+            basicInformationDto.setBuyingBiddingPrice(priceValue.getBuyingBiddingPrice());
+            basicInformationDto.setSalesBiddingPrice(priceValue.getSalesBiddingPrice());
+            return basicInformationDto;
+        }
+        return null;
+    }
+
+    // 상세 상품에 대한 입찰희망 구매/판매 가격 조회
+    @Override
+    public BasicInformationDto selectProductDetailPrice(String modelNum) {
+
+        log.info("서비스 수행 전 모델번호 확인 : {}", modelNum);
+        return productRepository.searchProductPrice(modelNum);
+    }
+
+    // 해당 상품의 모델번호를 통해 거래 체결된 것이 있는지 확인
 
 
     // JPA 사용 버전

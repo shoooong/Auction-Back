@@ -1,4 +1,4 @@
-package com.example.backend.dto.product;
+package com.example.backend.dto.product.Detail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuyingDto {
-    private Long buyingId;
-    private LocalDateTime buyingBiddingTime;
-    private Long buyingPrice;
+public class SalesBiddingDto {
+
+    private LocalDateTime salesBiddingTime;
+    private Long salesBiddingPrice;
 }

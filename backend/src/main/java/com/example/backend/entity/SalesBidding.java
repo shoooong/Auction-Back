@@ -22,8 +22,6 @@ public class SalesBidding extends BaseEntity{
 
     private int salesQuantity;
 
-    private Long salesPrice;
-
     @Enumerated(EnumType.STRING)
     private SalesStatus salesStatus;
 

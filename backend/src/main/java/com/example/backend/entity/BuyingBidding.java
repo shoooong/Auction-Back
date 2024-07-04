@@ -31,8 +31,6 @@ public class BuyingBidding extends BaseEntity {
 
     private int buyingQuantity;
 
-    private Long buyingPrice;
-
     private LocalDateTime buyingBiddingTime;
 
     @Enumerated(EnumType.STRING)
