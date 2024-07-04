@@ -2,7 +2,6 @@ package com.example.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Entity
-public class UserCoupon extends BaseEntity{
+public class CouponIssue extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

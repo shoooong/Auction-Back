@@ -7,12 +7,12 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class Coupon extends BaseEntity{
 
     @Id
@@ -23,26 +23,21 @@ public class Coupon extends BaseEntity{
     private String couponTitle;
 
     @Column(nullable = false)
-    private int couponQuantity;
+    private Long couponQuantity;
 
     @Column(nullable = false)
-    private int maxQuantity;
+    private Long maxQuantity;
 
     @Column(nullable = false, length = 1000)
     private String couponCode;
 
     @Column(nullable = false)
-    private int expDay;
+    private Long expDay;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DiscountType discountType;
 
     @Column(nullable = false)
-    private int amount;
-
-    @Enumerated(EnumType.STRING)
-    private SalesStatus salesStatus;
-
-
+    private Long amount;
 }
