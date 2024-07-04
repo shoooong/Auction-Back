@@ -24,10 +24,12 @@ public class AdminRespDto {
         @Getter
         public class ProductDto {
 
+            private Long productId;
             private String productName;
             private String productBrand;
 
             public ProductDto(Product product) {
+                this.productId = product.getProductId();
                 this.productName = product.getProductName();
                 this.productBrand = product.getProductBrand();
             }
@@ -37,6 +39,7 @@ public class AdminRespDto {
     @Getter
     @Setter
     public static class ReqProductRespDto{
+        private Long productId;
         private String productName;
         private String productBrand;
         private String productImg;
@@ -45,6 +48,7 @@ public class AdminRespDto {
         private String productSize;
 
         public ReqProductRespDto(Product product) {
+            this.productId = product.getProductId();
             this.productName = product.getProductName();
             this.productBrand = product.getProductBrand();
             this.productImg = product.getProductImg();
@@ -57,6 +61,7 @@ public class AdminRespDto {
     @Getter
     @Setter
     public static class RegProductRespDto{
+        private Long productId;
         private String productName;
         private String productBrand;
         private String productImg;
@@ -65,6 +70,8 @@ public class AdminRespDto {
         private String productSize;
         private ProductStatus productStatus;
         public RegProductRespDto(Product product) {
+
+            this.productId = product.getProductId();
             this.productName = product.getProductName();
             this.productBrand = product.getProductBrand();
             this.productImg = product.getProductImg();

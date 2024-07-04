@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 
 import com.example.backend.dto.admin.AdminProductDto;
+import com.example.backend.dto.admin.AdminProductRespDto;
 import com.example.backend.dto.admin.AdminRespDto;
 import com.example.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RequestMapping("/admin")
@@ -41,22 +41,36 @@ public class AdminController {
         return new ResponseEntity<>(regProductRespDto,HttpStatus.OK);
     }
 
-//    // 전체상품 카테고리별로 조회
-//    @GetMapping("/products/{mainDepartment}")
-//    public ResponseEntity<?> findProductByDepartment(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
-//        log.info("subDepartment {} mainDepartment{}", subDepartment, mainDepartment);
-//
-//        AdminRespDto.AdminProductsRespDto adminProductsRespDto = adminService.findProductByDepartment(mainDepartment, subDepartment);
-//
-//
-//        return new ResponseEntity<>(adminProductsRespDto,HttpStatus.OK);
-//    }
-
+    //관리자 상품 카테고리별 조회(대분류, 소분류)
     @GetMapping("/products/{mainDepartment}")
-    public ResponseEntity<?> getProducts(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
+    public ResponseEntity<?> getProductsByDepartment(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
 
         List<AdminProductDto> products= adminService.getProducts(mainDepartment, subDepartment);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
+
+    //관리자 상품 상세 조회(구매입찰 + 판매입찰)
+    @GetMapping("/products/detailed/{modelNum}")
+    public ResponseEntity<?> findDetailedProduct(@PathVariable String modelNum, @RequestParam(value = "productSize", required = false) String productSize) {
+        log.info("$$$$$$$$$$$$$$");
+        log.info("modelNum{} productSize{}", modelNum, productSize);
+
+        //modelnum을 이용해서 상품 상세 조회, size에 따라 카테고리 조회하듯이 입찰 정보 불러오기
+        List<AdminProductRespDto> detailedProduct =  adminService.getDetailProduct(modelNum, productSize);
+        return new ResponseEntity<>(detailedProduct,HttpStatus.OK);
+
+    }
+
+    //판매입찰(검수중) 상품 검수 승인
+    //위에서 판매입찰 id를 받아와서 해당 판매입찰 상태 변경
+    @PostMapping("/sales/{salesBiddingId}/approve")
+    public ResponseEntity<?> acceptSaleBidding(@PathVariable Long salesBiddingId){
+        //salesBiddingId를 통하여 검수요청중인 salesStatus = INSPECTION ->PROCESS 으로 변경
+
+        adminService.acceptSales(salesBiddingId);
+
+        return new ResponseEntity<>("",HttpStatus.OK);
+    }
+
 
 }

@@ -40,4 +40,8 @@ public class SalesBidding extends BaseEntity{
     @ToString.Exclude
     private Product product;
 
+    // 판매 입찰 상태 변경
+    public void chageSalesStatus(SalesStatus salesStatus){
+        this.salesStatus = salesStatus;
+    }
 }
