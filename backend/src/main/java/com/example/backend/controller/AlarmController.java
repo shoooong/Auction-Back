@@ -1,17 +1,18 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.alarm.AlarmDto;
+import com.example.backend.dto.alarm.RequestAlarmDto;
+import com.example.backend.dto.alarm.ResponseAlarmDto;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.Alarm;
-import com.example.backend.service.AlarmService;
+import com.example.backend.service.alarm.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,12 +21,16 @@ import java.util.List;
 @RequestMapping("/alarm")
 @Log4j2
 public class AlarmController {
-
     private final AlarmService alarmService;
 
-    @GetMapping("/request")
-    public ResponseEntity<?> request(@AuthenticationPrincipal UserDTO userDTO) {
-        List<?> list = alarmService.getAllAlarmList(userDTO.getUserId());
+    @GetMapping("/subscribe")
+    public SseEmitter subscribe(){
+        return alarmService.subscribe();
+    }
+
+    @GetMapping("/send")
+    public ResponseEntity<List<ResponseAlarmDto>> sendAlarm(@AuthenticationPrincipal UserDTO userDTO) throws IOException {
+        List<ResponseAlarmDto> list = alarmService.getAllAlarmList(userDTO.getUserId());
 
         return ResponseEntity.ok(list);
     }

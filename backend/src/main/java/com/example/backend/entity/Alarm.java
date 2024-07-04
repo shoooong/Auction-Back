@@ -19,22 +19,16 @@ public class Alarm {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long alarmId;
 
-    private LocalDate alarmDate;
-
-    @Column(nullable = false, length = 150)
-    private String alarmTitle;
-
-    @Column(nullable = false, length = 255)
-    private String alarmContent;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "alarmUserId", nullable = false)
-    private Users users;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AlarmType alarmType;
+
+    private LocalDate alarmDate;
 
     @Column(nullable = false)
     private Boolean alarmRead;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alarmUserId", nullable = false)
+    private Users users;
 }

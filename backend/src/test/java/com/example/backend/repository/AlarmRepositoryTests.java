@@ -23,12 +23,9 @@ public class AlarmRepositoryTests {
 
     @Test
     public void insert(){
-        Users users = userRepository.findById(2L).orElseThrow();
+        Users users = userRepository.findById(1L).orElseThrow();
 
         Alarm alarm = Alarm.builder()
-                .alarmId(3L)
-                .alarmContent("test")
-                .alarmTitle("test")
                 .alarmRead(false)
                 .alarmType(AlarmType.STYLE)
                 .alarmDate(LocalDate.now())
