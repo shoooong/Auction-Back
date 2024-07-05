@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
 import com.example.backend.entity.LuckyDraw;
+import com.example.backend.entity.enumData.LuckyProcessStatus;
 import com.example.backend.entity.enumData.LuckyStatus;
 import com.example.backend.repository.LuckyDraw.DrawRepository;
 import com.example.backend.repository.LuckyDraw.LuckyDrawRepository;
@@ -28,7 +29,7 @@ public class LuckyDrawService {
      * 럭키드로우 메인페이지 상품 전체 조회
      */
     public List<LuckyDrawsDto> getAllLuckyDraws(){
-        return luckyDrawRepository.findByEndStatusFalse().stream()
+        return luckyDrawRepository.findByProcess(LuckyProcessStatus.PROCESS).stream()
                 .map(LuckyDrawsDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -45,7 +46,7 @@ public class LuckyDrawService {
     /**
      * 매일 18시에 응모마감일 확인 후 luckyStatus 및 endStatus 변경
      */
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "3 55 15 * * *")
     @Transactional
     public void getTodayLucky(){
 
@@ -78,7 +79,7 @@ public class LuckyDrawService {
 
             drawRepository.updateLuckyStatus(LuckyStatus.LUCKY, pickDrawIdList);
 
-            luckyDrawRepository.updateEndStatus(luckyId);
+            luckyDrawRepository.updateEndStatus(luckyId, LuckyProcessStatus.END);
 
             drawIdList.removeAll(pickDrawIdList);
             drawRepository.updateLuckyStatus(LuckyStatus.UNLUCKY, drawIdList);

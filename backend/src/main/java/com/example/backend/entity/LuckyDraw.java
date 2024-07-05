@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 
+import com.example.backend.entity.enumData.LuckyProcessStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,9 +48,9 @@ public class LuckyDraw {
     private Integer luckyPeople;
 
     // 마감 여부
-    // false = 진행중, true = 응모 마감
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean endStatus;
+    private LuckyProcessStatus luckyProcessStatus;
 }
 
 
