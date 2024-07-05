@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
 
+    // 메인페이지에서 응모 진행 중인 상품만 조회
+    List<LuckyDraw> findByEndStatusFalse();
+
     // 현재를 지난 당첨발표일과 럭키드로우id 조회
     @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyDate <= :currentDate")
     List<LuckyDraw> findTodayLucky(LocalDateTime currentDate);

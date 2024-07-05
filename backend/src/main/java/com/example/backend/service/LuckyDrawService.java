@@ -28,7 +28,7 @@ public class LuckyDrawService {
      * 럭키드로우 메인페이지 상품 전체 조회
      */
     public List<LuckyDrawsDto> getAllLuckyDraws(){
-        return luckyDrawRepository.findAll().stream()
+        return luckyDrawRepository.findByEndStatusFalse().stream()
                 .map(LuckyDrawsDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -43,7 +43,7 @@ public class LuckyDrawService {
     }
 
     /**
-     * 매일 18시에 luckyDate 확인 후 luckyStatus 변경
+     * 매일 18시에 응모마감일 확인 후 luckyStatus 및 endStatus 변경
      */
     @Scheduled(cron = "0 0 18 * * *")
     @Transactional
