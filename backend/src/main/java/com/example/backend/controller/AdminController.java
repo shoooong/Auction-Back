@@ -3,6 +3,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.admin.AdminProductDto;
 import com.example.backend.dto.admin.AdminProductRespDto;
+import com.example.backend.dto.admin.AdminReqDto;
 import com.example.backend.dto.admin.AdminRespDto;
 import com.example.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -64,13 +65,34 @@ public class AdminController {
     //판매입찰(검수중) 상품 검수 승인
     //위에서 판매입찰 id를 받아와서 해당 판매입찰 상태 변경
     @PostMapping("/sales/{salesBiddingId}/approve")
-    public ResponseEntity<AdminService.AcceptSaleRespDto> acceptSaleBidding(@PathVariable Long salesBiddingId){
+    public ResponseEntity<AdminRespDto.ChangeRespDto> acceptSaleBidding(@PathVariable Long salesBiddingId){
         //salesBiddingId를 통하여 검수요청중인 salesStatus = INSPECTION ->PROCESS 으로 변경
 
-        AdminService.AcceptSaleRespDto acceptSaleRespDto = adminService.acceptSales(salesBiddingId);
+        AdminRespDto.ChangeRespDto acceptSaleRespDto = adminService.acceptSales(salesBiddingId);
 
         return new ResponseEntity<>(acceptSaleRespDto,HttpStatus.OK);
     }
+
+
+    @PostMapping("/luckydraw/insert")
+    public ResponseEntity<?> insertLuckDraw(@RequestBody AdminReqDto.AdminLuckDrawDto adminLuckDrawDto){
+
+        //관리자가 상품 폼만 등록, 실제 럭키드로우 상품을 schedule을 통하여 등록됨
+        log.info("럭키드로우등록"+adminLuckDrawDto.getLuckyName());
+
+        adminService.insertLucky(adminLuckDrawDto);
+
+        return new ResponseEntity<>(adminLuckDrawDto,HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+
+
 
 
 }

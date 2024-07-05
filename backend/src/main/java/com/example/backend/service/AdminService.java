@@ -2,12 +2,16 @@ package com.example.backend.service;
 
 
 import com.example.backend.dto.admin.*;
+import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.Users;
+import com.example.backend.entity.enumData.LuckyProcessStatus;
+import com.example.backend.entity.enumData.LuckyStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
+import com.example.backend.repository.LuckyDraw.LuckyDrawRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +20,12 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +37,7 @@ public class AdminService {
 
     private final ProductRepository productRepository;
     private final SalesBiddingRepository salesBiddingRepository;
+    private final LuckyDrawRepository luckyDrawRepository;
 
     //요청상품 다건 조회
     public AdminRespDto.ReqProductsRespDto reqProducts(){
@@ -94,7 +102,7 @@ public class AdminService {
 
     //검수 승인 처리
     @Transactional
-    public AcceptSaleRespDto acceptSales(Long salesBiddingId) {
+    public AdminRespDto.ChangeRespDto acceptSales(Long salesBiddingId) {
 
         //해당 id의 판매입찰 정보 찾기
         Optional<SalesBidding> salesBidding = salesBiddingRepository.findById(salesBiddingId);
@@ -111,22 +119,58 @@ public class AdminService {
         Product product = selectProduct.orElseThrow();
         product.addQuantity(1);
 
-        return new AcceptSaleRespDto(acceptSales, product);
+        return new AdminRespDto.ChangeRespDto(acceptSales, product);
 
     }
 
-    @Getter
-    @Setter
-    public static class AcceptSaleRespDto{
-        private Long salesBiddingId;
-        private Long productId;
-        private int productQuantity;
+    //관리자 럭키드로우 상품 등록
+    @Transactional
+    public AdminReqDto.AdminLuckDrawDto insertLucky(AdminReqDto.AdminLuckDrawDto adminLuckDrawDto) {
 
-        public AcceptSaleRespDto(SalesBidding salesBidding, Product product) {
-            this.salesBiddingId = salesBidding.getSalesBiddingId();
-            this.productId = product.getProductId();
-            this.productQuantity = product.getProductQuantity();
+        //관리자가 luckyDrawDto 폼에 등록한 변수
+        LuckyDraw luckyDraw = LuckyDraw.builder()
+                .luckyName(adminLuckDrawDto.getLuckyName())
+                .content(adminLuckDrawDto.getContent())
+                .luckyImage(adminLuckDrawDto.getLuckyImage())
+                .luckyProcessStatus(LuckyProcessStatus.READY)
+                .luckyPeople(adminLuckDrawDto.getLuckyPeople())
+                .build();
+
+        LuckyDraw insertLucky = luckyDrawRepository.save(luckyDraw);
+        return new AdminReqDto.AdminLuckDrawDto(insertLucky);
+
+    }
+
+    public void registerLucky(){
+
+
+    }
+
+    //test
+    //매주 첫째주 11시에 시작
+//    @Scheduled(cron = "0 0 11 ? * MON")
+    @Scheduled(cron = "2 00 17 * * *")
+    @Transactional
+    public void cronJob(){
+        //스케줄 실행시, 데이터 베이스에 저장되어 있는 럭키드로우 데이터 startDate, endDate, LuckDate 등록
+
+        //LuckyProcessStatus = READY인 상품 조회
+        List<LuckyDraw> ready = luckyDrawRepository.findByLuckyProcessStatus(LuckyProcessStatus.READY);
+
+        //시작 날짜 매주 월요일 11:00:00
+        LocalDateTime startDate = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+        // 마감 날짜 시작 날짜 + 7
+        LocalDateTime endDate = startDate.plusDays(7).withHour(11).withMinute(0).withSecond(0).withNano(0);
+        // 발표일 : 마감 날짜 + 1 18:00:00
+        LocalDateTime luckDate = endDate.plusDays(1).withHour(18).withMinute(0).withSecond(0).withNano(0);
+
+        for(LuckyDraw luckyDraw : ready){
+            luckyDraw.changeDate(startDate,endDate, luckDate);
+            luckyDraw.changeLuckyProcessStatus(LuckyProcessStatus.PROCESS);
         }
+
+
+
     }
 
 

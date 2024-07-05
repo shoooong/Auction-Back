@@ -1,6 +1,7 @@
 package com.example.backend.dto.admin;
 
 import com.example.backend.entity.Product;
+import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.enumData.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,6 +83,20 @@ public class AdminRespDto {
         }
     }
 
+    //판매입찰 상태 검수변경 dto
+    @Getter
+    @Setter
+    public static class ChangeRespDto{
+        private Long salesBiddingId;
+        private Long productId;
+        private int productQuantity;
+
+        public ChangeRespDto(SalesBidding salesBidding, Product product) {
+            this.salesBiddingId = salesBidding.getSalesBiddingId();
+            this.productId = product.getProductId();
+            this.productQuantity = product.getProductQuantity();
+        }
+    }
 
 
 

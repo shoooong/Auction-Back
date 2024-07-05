@@ -26,4 +26,7 @@ public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
     @Query("UPDATE LuckyDraw ld SET ld.luckyProcessStatus = :luckyProcessStatus WHERE ld.luckyId = :luckyId")
     void updateEndStatus(Long luckyId, LuckyProcessStatus luckyProcessStatus);
 
+
+    //LuckyProcessStatus 상태에 따라 상품 조회
+    List<LuckyDraw> findByLuckyProcessStatus(LuckyProcessStatus luckyProcessStatus);
 }

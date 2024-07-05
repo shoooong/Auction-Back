@@ -48,6 +48,20 @@ public class LuckyDraw {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LuckyProcessStatus luckyProcessStatus;
+
+
+
+    //날짜 변경
+    public void changeDate(LocalDateTime luckyStartDate, LocalDateTime luckyEndDate, LocalDateTime luckyDate) {
+        this.luckyStartDate = luckyStartDate;
+        this.luckyEndDate = luckyEndDate;
+        this.luckyDate = luckyDate;
+    }
+
+    public void changeLuckyProcessStatus(LuckyProcessStatus luckyProcessStatus) {
+        this.luckyProcessStatus = luckyProcessStatus;
+    }
+
 }
 
 
