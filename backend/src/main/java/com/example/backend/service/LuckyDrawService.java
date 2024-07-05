@@ -46,7 +46,7 @@ public class LuckyDrawService {
     /**
      * 매일 18시에 응모마감일 확인 후 luckyStatus 및 endStatus 변경
      */
-    @Scheduled(cron = "3 55 15 * * *")
+    @Scheduled(cron = "0 0 18 * * *")
     @Transactional
     public void getTodayLucky(){
 
