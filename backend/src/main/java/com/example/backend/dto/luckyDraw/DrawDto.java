@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class DrawDTO {
+public class DrawDto {
 
     private LuckyStatus luckyStatus;
     private Users user;
@@ -19,8 +19,8 @@ public class DrawDTO {
     /**
      * 응모 POST 요청 결과 응답으로 Entity를 DTO로 변환 후 클라이언트에 전달
      */
-    public static DrawDTO fromEntity(Draw draw) {
-        return DrawDTO.builder()
+    public static DrawDto fromEntity(Draw draw) {
+        return DrawDto.builder()
                 .luckyStatus(draw.getLuckyStatus())
                 .user(draw.getUser())
                 .luckyDraw(draw.getLuckyDraw())

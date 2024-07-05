@@ -5,6 +5,7 @@ import com.example.backend.entity.Draw;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.enumData.LuckyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -33,5 +34,16 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
             "ORDER BY l.luckyDate DESC")
     List<DrawDetailsDto> findDrawDetailsByUserId(Long userId);
 
+
+    @Query("SELECT d.drawId FROM Draw d WHERE d.luckyDraw.luckyId = :luckyId")
+    List<Long> findAllDrawIdByLuckyDraw(Long luckyId);
+
+    // luckystatus 상태 변경
+    @Modifying
+    @Query("UPDATE Draw d SET d.luckyStatus = :luckyStatus WHERE d.drawId IN :drawIdList")
+    void updateLuckyStatus(LuckyStatus luckyStatus, List<Long> drawIdList);
+
+
     Draw findByLuckyDrawAndLuckyStatus(LuckyDraw luckyDraw, LuckyStatus luckyStatus);
+
 }

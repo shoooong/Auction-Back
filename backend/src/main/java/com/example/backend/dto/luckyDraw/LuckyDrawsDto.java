@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class LuckyDrawsDTO {
+public class LuckyDrawsDto {
 
     private Long luckyId;
     private String luckyName;
@@ -20,8 +20,8 @@ public class LuckyDrawsDTO {
     private Integer luckyPeople;
 
 
-    public static LuckyDrawsDTO fromEntity(LuckyDraw luckyDraw){
-        return LuckyDrawsDTO.builder()
+    public static LuckyDrawsDto fromEntity(LuckyDraw luckyDraw){
+        return LuckyDrawsDto.builder()
                 .luckyId(luckyDraw.getLuckyId())
                 .luckyName(luckyDraw.getLuckyName())
                 .content(luckyDraw.getContent())

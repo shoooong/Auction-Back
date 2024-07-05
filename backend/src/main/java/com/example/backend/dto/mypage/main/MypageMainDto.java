@@ -5,6 +5,8 @@ import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class MypageMainDto {
@@ -15,5 +17,5 @@ public class MypageMainDto {
     private SaleHistoryDto saleHistoryDto;
 
     // TODO: 관심상품Dto 추가
-    // private LikeProductsDto likeProductsDto;
+     private List<LikeProductsDto> likeProductsDto;
 }

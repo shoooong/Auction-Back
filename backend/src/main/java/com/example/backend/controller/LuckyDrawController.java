@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.luckyDraw.DrawDTO;
-import com.example.backend.dto.luckyDraw.LuckyDrawsDTO;
+import com.example.backend.dto.luckyDraw.DrawDto;
+import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.DrawService;
 import com.example.backend.service.LuckyDrawService;
@@ -26,7 +26,7 @@ public class LuckyDrawController {
      * 럭키드로우 메인
      */
     @GetMapping("")
-    public List<LuckyDrawsDTO> luckyDraws() {
+    public List<LuckyDrawsDto> luckyDraws() {
         return luckyDrawService.getAllLuckyDraws();
     }
 
@@ -34,7 +34,7 @@ public class LuckyDrawController {
      * 럭키드로우 상세
      */
     @GetMapping("/{luckyId}")
-    public LuckyDrawsDTO luckyDrawById(@PathVariable("luckyId") Long luckyId) {
+    public LuckyDrawsDto luckyDrawById(@PathVariable("luckyId") Long luckyId) {
         return luckyDrawService.getLuckyDrawById(luckyId);
     }
 
@@ -43,11 +43,11 @@ public class LuckyDrawController {
      * 사용자 럭키드로우 응모
      */
     @PostMapping("/{luckyId}/enter")
-    public ResponseEntity<DrawDTO> enterLuckyDraw(@PathVariable Long luckyId, @AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<DrawDto> enterLuckyDraw(@PathVariable Long luckyId, @AuthenticationPrincipal UserDTO userDTO) {
 
         Long userId = userDTO.getUserId();
 
-        DrawDTO drawDTO = drawService.saveDraw(userId, luckyId);
+        DrawDto drawDTO = drawService.saveDraw(userId, luckyId);
 
         return ResponseEntity.ok().body(drawDTO);
     }

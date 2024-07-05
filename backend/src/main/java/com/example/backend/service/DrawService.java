@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.luckyDraw.DrawDTO;
+import com.example.backend.dto.luckyDraw.DrawDto;
 import com.example.backend.dto.mypage.drawHistory.DrawDetailsDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.entity.Draw;
@@ -29,7 +29,7 @@ public class DrawService {
     /**
      * 럭키드로우 응모 내역 저장
      */
-    public DrawDTO saveDraw(Long userId, Long luckyDrawId) {
+    public DrawDto saveDraw(Long userId, Long luckyDrawId) {
 
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
@@ -43,7 +43,7 @@ public class DrawService {
                 .luckyDraw(luckyDraw)
                 .build();
 
-        DrawDTO drawDTO = DrawDTO.fromEntity(drawRepository.save(draw));
+        DrawDto drawDTO = DrawDto.fromEntity(drawRepository.save(draw));
 
         return drawDTO;
     }
