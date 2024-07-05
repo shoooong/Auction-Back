@@ -2,6 +2,7 @@ package com.example.backend.repository.LuckyDraw;
 
 import com.example.backend.entity.LuckyDraw;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +15,10 @@ public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
     // 현재를 지난 당첨발표일과 럭키드로우id 조회
     @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyDate <= :currentDate")
     List<LuckyDraw> findTodayLucky(LocalDateTime currentDate);
+
+    // endStatus 상태 변경
+    @Modifying
+    @Query("UPDATE LuckyDraw ld SET ld.endStatus = true WHERE ld.luckyId = :luckyId")
+    void updateEndStatus(Long luckyId);
 
 }

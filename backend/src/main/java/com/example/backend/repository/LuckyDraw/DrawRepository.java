@@ -38,7 +38,7 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
     @Query("SELECT d.drawId FROM Draw d WHERE d.luckyDraw.luckyId = :luckyId")
     List<Long> findAllDrawIdByLuckyDraw(Long luckyId);
 
-    // luckystatus 상태 변경
+    // luckyStatus 상태 변경
     @Modifying
     @Query("UPDATE Draw d SET d.luckyStatus = :luckyStatus WHERE d.drawId IN :drawIdList")
     void updateLuckyStatus(LuckyStatus luckyStatus, List<Long> drawIdList);

@@ -45,6 +45,11 @@ public class LuckyDraw {
     // 당첨 인원
     @Column(nullable = false)
     private Integer luckyPeople;
+
+    // 마감 여부
+    // false = 진행중, true = 응모 마감
+    @Column(nullable = false)
+    private boolean endStatus;
 }
 
 

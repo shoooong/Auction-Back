@@ -78,6 +78,8 @@ public class LuckyDrawService {
 
             drawRepository.updateLuckyStatus(LuckyStatus.LUCKY, pickDrawIdList);
 
+            luckyDrawRepository.updateEndStatus(luckyId);
+
             drawIdList.removeAll(pickDrawIdList);
             drawRepository.updateLuckyStatus(LuckyStatus.UNLUCKY, drawIdList);
         }
