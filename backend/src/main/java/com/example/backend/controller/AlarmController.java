@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.alarm.RequestAlarmDto;
 import com.example.backend.dto.alarm.ResponseAlarmDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.alarm.AlarmService;
@@ -21,14 +22,15 @@ public class AlarmController {
     private final AlarmService alarmService;
 
     @GetMapping("/subscribe")
-    public SseEmitter subscribe(){
-        return alarmService.subscribe();
+    public SseEmitter subscribe(@AuthenticationPrincipal UserDTO userDTO) throws IOException {
+
+        return alarmService.subscribe(userDTO.getUserId());
     }
 
-    @GetMapping("/send")
-    public ResponseEntity<List<ResponseAlarmDto>> sendAlarm(@AuthenticationPrincipal UserDTO userDTO) throws IOException {
-        List<ResponseAlarmDto> list = alarmService.getAllAlarmList(userDTO.getUserId());
-
-        return ResponseEntity.ok(list);
-    }
+//    @GetMapping("/send")
+//    public ResponseEntity<List<ResponseAlarmDto>> sendAlarm(@AuthenticationPrincipal UserDTO userDTO) throws IOException {
+//        List<ResponseAlarmDto> list = alarmService.getAllAlarmList(userDTO.getUserId());
+//
+//        return ResponseEntity.ok(list);
+//    }
 }

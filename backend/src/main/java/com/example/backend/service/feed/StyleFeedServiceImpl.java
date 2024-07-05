@@ -1,17 +1,24 @@
 package com.example.backend.service.feed;
 
+import com.example.backend.dto.alarm.RequestAlarmDto;
 import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.FeedBookmark;
 import com.example.backend.entity.StyleFeed;
 import com.example.backend.entity.Users;
+import com.example.backend.entity.enumData.AlarmType;
 import com.example.backend.repository.FeedBookmark.FeedBookmarkRepository;
 import com.example.backend.repository.StyleFeed.StyleFeedRepository;
 import com.example.backend.repository.User.UserRepository;
+import com.example.backend.service.alarm.AlarmService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +34,9 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     @Autowired
     private FeedBookmarkRepository feedBookmarkRepository;
+
+    @Autowired
+    private AlarmService alarmService;
 
     // 최신 등록순으로 피드 조회
     @Override
@@ -156,7 +166,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 관심피드 등록
     @Override
-    public FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) {
+//    @Transactional
+    public FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) throws IOException {
         Users user = userRepository.findById(feedBookmarkDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         StyleFeed styleFeed = styleFeedRepository.findById(feedBookmarkDTO.getFeedId())
@@ -169,6 +180,10 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
         FeedBookmark savedFeedBookmark = feedBookmarkRepository.save(feedBookmark);
         log.info("새로운 북마크 생성: {}", savedFeedBookmark);
+
+        // 알람생성
+        Long userId = styleFeed.getUser().getUserId();
+        alarmService.saveAlarm(userId, AlarmType.STYLE);
 
         return new FeedBookmarkDto(
                 savedFeedBookmark.getFeedBookmarkId(),

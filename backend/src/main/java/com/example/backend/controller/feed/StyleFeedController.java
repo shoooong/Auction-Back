@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -75,7 +76,7 @@ public class StyleFeedController {
     // 관심피드 저장
     @PostMapping("/saveFeedBookmark")
     @ResponseStatus(HttpStatus.CREATED)
-    public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO) {
+    public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO) throws IOException {
         FeedBookmarkDto createdFeedBookmark = styleFeedService.createFeedBookmark(feedBookmarkDTO);
         log.info("새로운 북마크 생성: {}", createdFeedBookmark);
         return createdFeedBookmark;

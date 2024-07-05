@@ -4,6 +4,7 @@ import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.entity.StyleFeed;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface StyleFeedService {
@@ -30,7 +31,7 @@ public interface StyleFeedService {
     List<FeedBookmarkDto> getAllFeedBookmarks();
 
     // 관심피드 등록
-    FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO);
+    FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) throws IOException;
 
     // 관심피드 삭제
     void deleteFeedBookmark(final long styleSavedId);
