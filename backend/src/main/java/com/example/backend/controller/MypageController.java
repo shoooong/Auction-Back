@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import com.example.backend.dto.mypage.addressSettings.AddressDTO;
+import com.example.backend.dto.mypage.main.LikeProductsDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
@@ -29,6 +30,8 @@ public class MypageController {
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
     private final DrawService drawService;
+    private final BookmarkProductService bookmarkProductService;
+//    private final AddressRepository addressRepository;
 
     /**
      * 마이페이지 메인
@@ -64,13 +67,11 @@ public class MypageController {
      */
     // 배송지 조회
     @GetMapping("/address")
-    public ResponseEntity<List<AddressDTO>> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
+    public List<AddressDTO> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
 
         Long userId = userDTO.getUserId();
 
-        List<AddressDTO> addressDTO = addressService.getAllAddress(userId);
-
-        return ResponseEntity.ok(addressDTO);
+        return addressService.getAllAddress(userId);
     }
 
     // 배송지 수정
@@ -78,9 +79,26 @@ public class MypageController {
 //    public ResponseEntity<AddressDTO> modifyAddress(@PathVariable("addressId") Long addressId,
 //                                                    @RequestBody AddressDTO addressDTO, @AuthenticationPrincipal UserDTO userDTO){
 //
-//        addressService.modifyAddress(addressId, addressDTO, userDTO.getUserId());
+//        Long userId = userDTO.getUserId();
+////        addressService.modifyAddress(addressId, addressDTO, userDTO.getUserId());
 //
-//        return ResponseEntity.ok(addressDTO);
+//        Optional<Address> otpAddress = addressRepository.findByAddressIdAndUserUserId(addressId, userId);
+//
+//        if (otpAddress.isPresent()) {
+//            Address address = otpAddress.get();
+//            address.updateAddress(addressDTO);
+//            Address updatedAddress = addressRepository.save(address);
+//
+//            AddressDTO updatedAddressDTO = AddressDTO.builder()
+//                    .zoneNo(updatedAddress.getZoneNo())
+//                    .addressName(updatedAddress.getAddressName())
+//                    .defaultAddress(updatedAddress.getDefaultAddress())
+//                    .build();
+//
+//            return ResponseEntity.ok(updatedAddressDTO);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
 //    }
 
 
@@ -120,7 +138,7 @@ public class MypageController {
      * 구매 내역 전체 조회 (주문 날짜 최신순 정렬)
      */
     @GetMapping("/buyHistory")
-    public ResponseEntity<BuyHistoryDto> buyHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<BuyHistoryDto> getBuyHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
         BuyHistoryDto buyHistoryDTO = ordersService.getBuyHistory(userId);
@@ -135,7 +153,7 @@ public class MypageController {
      * 판매 내역 전체 조회 (판매 입찰 시간 최신순 정렬)
      */
     @GetMapping("/saleHistory")
-    ResponseEntity<SaleHistoryDto> saleHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    ResponseEntity<SaleHistoryDto> getSaleHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
         SaleHistoryDto saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
@@ -150,14 +168,32 @@ public class MypageController {
      * 럭키드로우 응모 내역 전체 조회 (당첨발표일 최신순 정렬)
      */
     // TODO: 추후 당첨, 미당첨 필터 추가
-    // TODO: 당첨발표일 지나면 당첨 여부 바뀌게 수정
     @GetMapping("/drawHistory")
-    public ResponseEntity<DrawHistoryDto> drawHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<DrawHistoryDto> getDrawHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
         DrawHistoryDto drawHistoryDto = drawService.getDrawHistory(userId);
 
         return ResponseEntity.ok(drawHistoryDto);
     }
+
+
+    /**
+     * 쇼핑 정보 - 관심
+     * 1) 관심 상품
+     */
+    @GetMapping("/bookmark/product")
+    public List<LikeProductsDto> getBookmarkProduct(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        return bookmarkProductService.getAllLikeProducts(userId);
+    }
+
+
+    /**
+     * 쇼핑 정보 - 관심
+     * 2) 관심 스타일
+     */
+//    @GetMapping("/bookmark/style")
 
 }
