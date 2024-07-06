@@ -1,6 +1,7 @@
 package com.example.backend.repository.BookmarkProduct;
 
 import com.example.backend.entity.BookmarkProduct;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,8 +12,8 @@ import java.util.List;
 public interface BookmarkProductRepository extends JpaRepository<BookmarkProduct, Long> {
 
     // 회원의 모든 관심상품 productId 조회
-    @Query("SELECT bp.products.productId FROM BookmarkProduct bp WHERE bp.user.userId = :userId")
-    List<Long> findBookmarkProductIdList(Long userId);
+    @Query("SELECT bp.products.productId FROM BookmarkProduct bp WHERE bp.user.userId = :userId ORDER BY bp.bookmarkProductId DESC")
+    List<Long> findBookmarkProductIdList(Long userId, Pageable pageable);
 
     // 회원 관심상품과 같은 모델번호를 가진 전체 상품Id 조회
 //    @Query("SELECT p.productId FROM Users u " +

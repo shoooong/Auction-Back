@@ -7,6 +7,8 @@ import com.example.backend.repository.BookmarkProduct.BookmarkProductRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,12 +32,19 @@ public class BookmarkProductService {
         return nowLowPrice;
     }
 
+    public List<LikeProductsDto> getAllLikeProducts(Long userId) {
+        return getLikeProducts(userId, Pageable.unpaged());
+    }
+
+    public List<LikeProductsDto> getLatestLikeProducts(Long userId) {
+        return getLikeProducts(userId, PageRequest.of(0, 8));
+    }
 
     // TODO: 다른 방법 생각해보기
-    public List<LikeProductsDto> getLikeProducts(Long userId) {
+    public List<LikeProductsDto> getLikeProducts(Long userId, Pageable pageable) {
 
         // 회원의 모든 관심상품 productId 조회
-        List<Long> bookmarkProductIdList =  bookmarkProductRepository.findBookmarkProductIdList(userId);
+        List<Long> bookmarkProductIdList =  bookmarkProductRepository.findBookmarkProductIdList(userId, pageable);
         log.info("bookmarkProductIdList: {}", bookmarkProductIdList);
 
         // 관심상품 productId들과 연관된 모든 productId 조회

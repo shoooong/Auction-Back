@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
 //    }
 
     /**
-     *
+     * 마이페이지 메인 - 모든 정보 조회
      */
     @Override
     public MypageMainDto getMyPageInfo(Long userId) {
@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
                 .couponCount(couponCount)
                 .buyHistoryDto(buyHistoryDto)
                 .saleHistoryDto(saleHistoryDto)
-                .likeProductsDto(bookmarkProductService.getLikeProducts(userId))
+                .likeProductsDto(bookmarkProductService.getLatestLikeProducts(userId))
                 .build();
     }
 }
