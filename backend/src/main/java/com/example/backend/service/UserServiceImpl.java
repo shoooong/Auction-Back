@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
     private final UserCouponService userCouponService;
+    private final BookmarkProductService bookmarkProductService;
 
     @Override
     public void registerUser(UserRegisterDTO userRegisterDTO, boolean isAdmin) {
@@ -209,6 +210,7 @@ public class UserServiceImpl implements UserService {
                 .couponCount(couponCount)
                 .buyHistoryDto(buyHistoryDto)
                 .saleHistoryDto(saleHistoryDto)
+                .likeProductsDto(bookmarkProductService.getLikeProducts(userId))
                 .build();
     }
 }

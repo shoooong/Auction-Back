@@ -7,6 +7,7 @@ import lombok.Getter;
 @Builder
 public class ProductsDetailsDto {
 
+    private Long productId;
     private String productImg;
     private String productBrand;
     private String productName;
