@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
                 .couponCount(couponCount)
                 .buyHistoryDto(buyHistoryDto)
                 .saleHistoryDto(saleHistoryDto)
-                .likeProductsDto(bookmarkProductService.getLatestLikeProducts(userId))
+                .bookmarkProductsDto(bookmarkProductService.getLatestBookmarkProducts(userId))
                 .build();
     }
 }

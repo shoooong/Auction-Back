@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.mypage.main.LikeProductsDto;
+import com.example.backend.dto.mypage.main.BookmarkProductsDto;
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
 import com.example.backend.repository.BookmarkProduct.BookmarkProductRepository;
@@ -32,16 +32,16 @@ public class BookmarkProductService {
         return nowLowPrice;
     }
 
-    public List<LikeProductsDto> getAllLikeProducts(Long userId) {
-        return getLikeProducts(userId, Pageable.unpaged());
+    public List<BookmarkProductsDto> getAllBookmarkProducts(Long userId) {
+        return getBookmarkProducts(userId, Pageable.unpaged());
     }
 
-    public List<LikeProductsDto> getLatestLikeProducts(Long userId) {
-        return getLikeProducts(userId, PageRequest.of(0, 8));
+    public List<BookmarkProductsDto> getLatestBookmarkProducts(Long userId) {
+        return getBookmarkProducts(userId, PageRequest.of(0, 8));
     }
 
     // TODO: 다른 방법 생각해보기
-    public List<LikeProductsDto> getLikeProducts(Long userId, Pageable pageable) {
+    public List<BookmarkProductsDto> getBookmarkProducts(Long userId, Pageable pageable) {
 
         // 회원의 모든 관심상품 productId 조회
         List<Long> bookmarkProductIdList =  bookmarkProductRepository.findBookmarkProductIdList(userId, pageable);
@@ -75,7 +75,7 @@ public class BookmarkProductService {
                 .map(detailsDto -> {
                     Long nowLowPrice = modelNumToLowPriceMap.get(detailsDto.getModelNum());
 
-                    return LikeProductsDto.builder()
+                    return BookmarkProductsDto.builder()
                             .productDetailsDto(detailsDto)
                             .nowLowPrice(nowLowPrice)
                             .build();

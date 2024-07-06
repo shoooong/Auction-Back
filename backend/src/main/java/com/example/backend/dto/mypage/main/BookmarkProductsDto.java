@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class LikeProductsDto {
+public class BookmarkProductsDto {
 
     // 사진, 브랜드, 상품명, 모델번호
     private ProductDetailsDto productDetailsDto;

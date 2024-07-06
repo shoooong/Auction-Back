@@ -16,6 +16,5 @@ public class MypageMainDto {
     private BuyHistoryDto buyHistoryDto;
     private SaleHistoryDto saleHistoryDto;
 
-    // TODO: 관심상품Dto 추가
-     private List<LikeProductsDto> likeProductsDto;
+    private List<BookmarkProductsDto> bookmarkProductsDto;
 }

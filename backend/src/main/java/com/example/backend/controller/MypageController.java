@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import com.example.backend.dto.mypage.addressSettings.AddressDTO;
-import com.example.backend.dto.mypage.main.LikeProductsDto;
+import com.example.backend.dto.mypage.main.BookmarkProductsDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
@@ -183,10 +183,10 @@ public class MypageController {
      * 1) 관심 상품
      */
     @GetMapping("/bookmark/product")
-    public List<LikeProductsDto> getBookmarkProduct(@AuthenticationPrincipal UserDTO userDTO) {
+    public List<BookmarkProductsDto> getBookmarkProduct(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        return bookmarkProductService.getAllLikeProducts(userId);
+        return bookmarkProductService.getAllBookmarkProducts(userId);
     }
 
 
