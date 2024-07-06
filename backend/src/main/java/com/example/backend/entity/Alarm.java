@@ -20,15 +20,17 @@ public class Alarm {
     private Long alarmId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private AlarmType alarmType;
 
-    private LocalDate alarmDate;
+    private LocalDateTime alarmDate;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean alarmRead;
+    private Boolean alarmRead = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alarmUserId", nullable = false)
     private Users users;
+
 }

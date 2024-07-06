@@ -1,13 +1,11 @@
 package com.example.backend.service.alarm;
 import com.example.backend.dto.alarm.RequestAlarmDto;
 import com.example.backend.dto.alarm.ResponseAlarmDto;
-import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.Alarm;
-import com.example.backend.entity.Users;
 import com.example.backend.entity.enumData.AlarmType;
-import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.alarm.AlarmRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,58 +13,74 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.example.backend.entity.QAlarm.alarm;
+
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class AlarmService {
-    private final AlarmRepository alarmRepository;
+    private AlarmRepository alarmRepository;
 
-    private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>() {};
     private final static Long DEFAULT_TIMEOUT = 3600000L;
+    private final ConcurrentHashMap<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
+//    private final ConcurrentHashMap<Long, CopyOnWriteArrayList<Alarm>> userNoti =new ConcurrentHashMap<>();
+
 
     public SseEmitter subscribe(Long userId){
-        SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
-        userEmitters.put(userId, sseEmitter);
-//        userEmitters.put(userDTO.getUserId(), sseEmitter);
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        userEmitters.put(userId, emitter);
 
-        sseEmitter.onCompletion(()->userEmitters.remove(userId));
-        sseEmitter.onTimeout(()->userEmitters.remove(userId));
-        sseEmitter.onError((e)-> userEmitters.remove(userId));
+        emitter.onCompletion(() -> userEmitters.remove(userId));
+        emitter.onTimeout(() -> userEmitters.remove(userId));
+        emitter.onError(e -> userEmitters.remove(userId));
 
-        return sseEmitter;
+        return emitter;
+
     }
 
-    // 알람저장
-//    @Transactional
-    public void saveAlarm(Long userId, AlarmType alarmType) throws IOException {
+    // 알람 sseEmitter 저장
+    @Transactional
+    public void saveAlarm(Long userId, AlarmType alarmType) {
 
-        Alarm newAlarm = RequestAlarmDto.toEntity(userId, alarmType);
+//        CopyOnWriteArrayList<Alarm> notifications = userNoti.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>());
+        Alarm alarm = RequestAlarmDto.toEntity(userId, alarmType);
+        sendNotification(userId, alarm);
 
-        Alarm savedAlarm = alarmRepository.save(newAlarm);
-        getAllAlarmList(savedAlarm);
     }
 
-    // 알림불러오기
-//    @Transactional
-//    @Async
-    public void getAllAlarmList(Alarm alarm) throws IOException {
+    // 알림들 가져오기
+    @Async
+    public void sendAlarmNotification(Long userId) {
 
-        List<ResponseAlarmDto> list = alarmRepository.findByUsersUserId(alarm.getUsers().getUserId());
-        SseEmitter sseEmitter = userEmitters.get(alarm.getUsers().getUserId());
+        SseEmitter emitter = userEmitters.get(userId);
 
-        sseEmitter.send(SseEmitter.event().name("alarm").data(list));
-//        for (SseEmitter emitter : sseEmitter) {
-//            try {
-//                // 알림 보내기
-//                emitter.send(SseEmitter.event().name("alarm").data(list));
-//
-//            } catch (IOException e) {
-//                emitters.remove(emitter);
-//            }
-//        }
+        try {
+            if (emitter != null) {
+                emitter.send(SseEmitter.event()
+                        .id(String.valueOf(userId))
+                        .name("alarm")
+                        .data(emitter));
+//                emitter.send(SseEmitter.event().name("alarm").data(notifications));
+            }
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+    }
 
-    };
+    // 알림 보내기
+    @Async
+    public void sendNotification(Long userId, Alarm alarm){
+        SseEmitter emitter = userEmitters.get(userId);
 
+        try {
+            if (emitter != null) {
+                emitter.send(SseEmitter.event().name("alarm").data(alarm).id(String.valueOf(alarm.getAlarmId())));
+            }
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+    }
 }

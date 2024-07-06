@@ -22,7 +22,7 @@ public class ResponseAlarmDto {
                 .alarmId(alarm.getAlarmId())
                 .alarmType(alarm.getAlarmType())
                 .alarmRead(alarm.getAlarmRead())
-                .alarmDate(alarm.getAlarmDate())
+                .alarmDate(alarm.getAlarmDate().toLocalDate())
                 .build();
     }
 
