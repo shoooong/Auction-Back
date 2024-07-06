@@ -21,5 +21,5 @@ public class BookmarkProduct {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId", nullable = false)
-    private Product products;
+    private Product product;
 }

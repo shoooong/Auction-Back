@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProductsDetailsDto {
+public class ProductDetailsDto {
 
     private Long productId;
     private String productImg;

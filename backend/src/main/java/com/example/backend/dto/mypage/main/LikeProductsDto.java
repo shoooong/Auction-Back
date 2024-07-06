@@ -8,7 +8,7 @@ import lombok.Getter;
 public class LikeProductsDto {
 
     // 사진, 브랜드, 상품명, 모델번호
-    private ProductsDetailsDto productsDetailsDto;
+    private ProductDetailsDto productDetailsDto;
 
     // 즉시구매가
     private Long nowLowPrice;

@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.mypage.main.LikeProductsDto;
-import com.example.backend.dto.mypage.main.ProductsDetailsDto;
+import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
 import com.example.backend.repository.BookmarkProduct.BookmarkProductRepository;
 import com.example.backend.repository.Product.ProductRepository;
@@ -52,7 +52,7 @@ public class BookmarkProductService {
         log.info("relatedProductIdList: {}", relatedProductIdList);
 
         // 관심 상품의 상세 정보 조회
-        List<ProductsDetailsDto> productsDetailsDtoList = productRepository.findProductsDetails(bookmarkProductIdList);
+        List<ProductDetailsDto> productDetailsDtoList = productRepository.findProductsDetails(bookmarkProductIdList);
 
         // relatedProductIdList를 기반으로 각 modelNum에 대한 productId를 그룹화
         Map<String, List<Long>> productIdListByModelNum = productRepository.findProductIdAndModelNum(relatedProductIdList).stream()
@@ -71,12 +71,12 @@ public class BookmarkProductService {
                         entry -> getNowLowPrice(entry.getValue())));
 
 
-        return productsDetailsDtoList.stream()
+        return productDetailsDtoList.stream()
                 .map(detailsDto -> {
                     Long nowLowPrice = modelNumToLowPriceMap.get(detailsDto.getModelNum());
 
                     return LikeProductsDto.builder()
-                            .productsDetailsDto(detailsDto)
+                            .productDetailsDto(detailsDto)
                             .nowLowPrice(nowLowPrice)
                             .build();
                 })

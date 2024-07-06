@@ -1,7 +1,7 @@
 package com.example.backend.repository.Product;
 
 
-import com.example.backend.dto.mypage.main.ProductsDetailsDto;
+import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,9 +26,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
 
     // TODO: QueryDSL로 변경
     // 회원의 관심상품 productIdList로 상품 상세 정보 조회
-    @Query("SELECT new com.example.backend.dto.mypage.main.ProductsDetailsDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum) " +
+    @Query("SELECT new com.example.backend.dto.mypage.main.ProductDetailsDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum) " +
             "FROM Product p WHERE p.productId IN :productIdList")
-    List<ProductsDetailsDto> findProductsDetails(List<Long> productIdList);
+    List<ProductDetailsDto> findProductsDetails(List<Long> productIdList);
 
     // 각 productId에 해당하는 modelNum 조회 후, 같은 modelNum을 가진 모든 productId 조회
     @Query("SELECT DISTINCT p2.productId FROM Product p " +
