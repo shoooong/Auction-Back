@@ -59,11 +59,6 @@ public class DrawService {
 
         DrawDto drawDTO = DrawDto.fromEntity(drawRepository.save(draw));
 
-        // 알람저장
-        log.info("drawservice info : {} ", alarmRepository.save(RequestAlarmDto.toEntity(userId, AlarmType.LUCKYAPPLY)));
-        alarmRepository.save(RequestAlarmDto.toEntity(userId, AlarmType.LUCKYAPPLY));
-
-
         return drawDTO;
     }
 

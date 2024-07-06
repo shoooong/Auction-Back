@@ -22,7 +22,7 @@ import static com.example.backend.entity.QAlarm.alarm;
 @RequiredArgsConstructor
 @Service
 public class AlarmService {
-    private AlarmRepository alarmRepository;
+    private final AlarmRepository alarmRepository;
 
     private final static Long DEFAULT_TIMEOUT = 3600000L;
     private final ConcurrentHashMap<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
@@ -32,6 +32,8 @@ public class AlarmService {
     public SseEmitter subscribe(Long userId){
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         userEmitters.put(userId, emitter);
+        log.info("emitter send : {}", emitter);
+        log.info("put send : {}", userEmitters.put(userId, emitter));
 
         emitter.onCompletion(() -> userEmitters.remove(userId));
         emitter.onTimeout(() -> userEmitters.remove(userId));
@@ -44,10 +46,13 @@ public class AlarmService {
     // 알람 sseEmitter 저장
     @Transactional
     public void saveAlarm(Long userId, AlarmType alarmType) {
-
 //        CopyOnWriteArrayList<Alarm> notifications = userNoti.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>());
-        Alarm alarm = RequestAlarmDto.toEntity(userId, alarmType);
-        sendNotification(userId, alarm);
+
+        // 알람저장
+        Alarm newAlarm = alarmRepository.save(RequestAlarmDto.toEntity(userId, alarmType));
+//        Alarm alarm = RequestAlarmDto.toEntity(userId, alarmType);
+        log.info("saveAlarm : {}", newAlarm);
+        sendNotification(userId, newAlarm);
 
     }
 
@@ -78,6 +83,8 @@ public class AlarmService {
         try {
             if (emitter != null) {
                 emitter.send(SseEmitter.event().name("alarm").data(alarm).id(String.valueOf(alarm.getAlarmId())));
+
+                log.info("alarm emitter send : {}", alarm);
             }
         } catch (IOException e) {
             emitter.completeWithError(e);
