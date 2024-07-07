@@ -7,6 +7,7 @@ import com.example.backend.entity.Users;
 import com.example.backend.repository.Address.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class AddressService {
     /**
      * 배송지 전체 조회
      * 1 : N
+     * 기본 배송지로 설정된 배송지가 가장 상위에 정렬
      */
     public List<AddressDto> getAllAddress(Long userId) {
         return addressRepository.findAllByUserId(userId).stream()
@@ -30,6 +32,7 @@ public class AddressService {
     /**
      * 배송지 등록
      */
+    @Transactional
     public AddressDto addAddress(Long userId, AddressReqDto addressReqDto) {
 
         boolean existAddress = addressRepository
@@ -38,6 +41,8 @@ public class AddressService {
         if (existAddress) {
             return null;
         } else {
+            updateDefaultAddress(userId, addressReqDto);
+
             Address address = Address.builder()
                     .user(Users.builder().userId(userId).build())
                     .zoneCode(addressReqDto.getZoneCode())
@@ -58,15 +63,29 @@ public class AddressService {
     /**
      * 배송지 수정
      */
+    @Transactional
     public AddressDto updateAddress(Long userId, Long addressId, AddressReqDto addressReqDto) {
 
         Address address = addressRepository.findByAddressIdAndUserUserId(addressId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 배송지 입니다."));
+
+        updateDefaultAddress(userId, addressReqDto);
 
         address.updateAddress(addressReqDto);
 
         addressRepository.save(address);
 
         return AddressDto.fromEntity(address);
+    }
+
+    /**
+     * 기본 배송지를 선택했는지 확인
+     * 기존 기본 배송지에서 새로 입력한 배송지로 기본 배송지 변경
+     */
+    @Transactional
+    public void updateDefaultAddress(Long userId, AddressReqDto addressReqDto) {
+        if (addressReqDto.isDefaultAddress()) {
+            addressRepository.updateDefaultAddress(userId);
+        }
     }
 }

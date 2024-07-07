@@ -2,6 +2,7 @@ package com.example.backend.repository.Address;
 
 import com.example.backend.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,12 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
      * addressId와 userId로 Address 조회
      */
     Optional<Address> findByAddressIdAndUserUserId(Long addressId, Long userId);
+
+    /**
+     * 기존 기본 배송지 상태 변경
+     */
+    @Modifying
+    @Query("UPDATE Address a SET a.defaultAddress = false WHERE a.user.userId = :userId AND a.defaultAddress = true")
+    void updateDefaultAddress(Long userId);
+
 }
