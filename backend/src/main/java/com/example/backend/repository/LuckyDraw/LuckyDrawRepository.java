@@ -17,14 +17,18 @@ public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
     @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyProcessStatus = :luckyProcessStatus")
     List<LuckyDraw> findByProcess(LuckyProcessStatus luckyProcessStatus);
 
-    // 현재를 지난 당첨발표일과 럭키드로우id 조회
+    // 현재를 지난 응모마감일인 럭키드로우 조회
+    @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyEndDate <= :currentDate")
+    List<LuckyDraw> findTodayEnd(LocalDateTime currentDate);
+
+    // 현재를 지난 당첨발표일인 럭키드로우 조회
     @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyDate <= :currentDate")
     List<LuckyDraw> findTodayLucky(LocalDateTime currentDate);
 
-    // endStatus 상태 변경
+    // luckyProcessStatus 상태 변경
     @Modifying
     @Query("UPDATE LuckyDraw ld SET ld.luckyProcessStatus = :luckyProcessStatus WHERE ld.luckyId = :luckyId")
-    void updateEndStatus(Long luckyId, LuckyProcessStatus luckyProcessStatus);
+    void updateLuckyProcessStatus(Long luckyId, LuckyProcessStatus luckyProcessStatus);
 
 
     //LuckyProcessStatus 상태에 따라 상품 조회

@@ -44,9 +44,25 @@ public class LuckyDrawService {
     }
 
     /**
-     * 매일 18시에 응모마감일 확인 후 luckyStatus 및 endStatus 변경
+     * 매주 월요일 11시에 응모마감일 확인 후 luckyProcessStatus 변경
      */
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 11 * * MON")
+    @Transactional
+    public void changeLuckyProcessStatus() {
+
+        List<LuckyDraw> luckyDrawList =  luckyDrawRepository.findTodayEnd(LocalDateTime.now());
+
+        for (LuckyDraw luckyDraw : luckyDrawList) {
+            luckyDrawRepository.updateLuckyProcessStatus(luckyDraw.getLuckyId(), LuckyProcessStatus.END);
+        }
+
+        log.info("luckyProcessStatus 변경 완료");
+    }
+
+    /**
+     * 매주 화요일 18시에 당첨발표일 확인 후 luckyStatus 변경
+     */
+    @Scheduled(cron = "0 0 18 * * TUE")
     @Transactional
     public void getTodayLucky(){
 
@@ -59,11 +75,13 @@ public class LuckyDrawService {
         luckyDrawsDto.stream()
                 .map(LuckyDrawsDto::getLuckyId)
                 .forEach(this::changeLuckyStatus);
+
+        log.info("luckyStatus 변경 완료");
     }
 
     @Transactional
     public void changeLuckyStatus(Long luckyId) {
-        LuckyDraw luckyDraw = validateLuckyId(luckyId);
+        LuckyDraw luckyDraw = validationLuckyId(luckyId);
 
         List<Long> drawIdList = drawRepository.findAllDrawIdByLuckyDraw(luckyId);
 
@@ -79,21 +97,15 @@ public class LuckyDrawService {
 
             drawRepository.updateLuckyStatus(LuckyStatus.LUCKY, pickDrawIdList);
 
-            luckyDrawRepository.updateEndStatus(luckyId, LuckyProcessStatus.END);
-
             drawIdList.removeAll(pickDrawIdList);
             drawRepository.updateLuckyStatus(LuckyStatus.UNLUCKY, drawIdList);
         }
     }
 
     /**
-     * 응모마감일(luckyEndDate) 지나면 메인페이지에서 내리기
-     */
-
-    /**
      * 존재하는 럭키드로우인지 검사
      */
-    public LuckyDraw validateLuckyId(Long luckyId) {
+    public LuckyDraw validationLuckyId(Long luckyId) {
         return luckyDrawRepository.findById(luckyId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 럭키드로우 입니다."));
     }
