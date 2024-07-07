@@ -2,17 +2,25 @@ package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.BasicInformationDto;
+import com.example.backend.dto.product.Detail.RecentlyPriceDto;
+import com.example.backend.dto.product.Detail.SalesBiddingDto;
 import com.example.backend.entity.Product;
+import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
-import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Product.ProductRepository;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,14 +35,16 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     @Autowired
     private final BuyingBiddingRepository buyingBiddingRepository;
-    @Autowired
-    private final SalesBiddingRepository salesBiddingRepository;
 
-    @Autowired
-    private final ModelMapper modelMapper;
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private LocalDateTime lastCheckedTime;
+    private boolean isUpdated = false;
 
     // 상품 소분류 조회
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponseDto> selectCategoryValue(String subDepartment) {
         log.info("subDepartment : {}", subDepartment);
 
@@ -47,22 +57,41 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductResponseDto convertProductDto(Product product) {
-        // 해당 product 값들을 DTO 로 변환
-        ProductResponseDto productDto = modelMapper.map(product, ProductResponseDto.class);
+        ProductResponseDto productDto = new ProductResponseDto();
+        productDto.setProductId(product.getProductId());
+        productDto.setProductImg(product.getProductImg());
+        productDto.setProductBrand(product.getProductBrand());
+        productDto.setProductName(product.getProductName());
+        productDto.setProductLike(product.getProductLike());
+        productDto.setModelNum(product.getModelNum());
 
         // Product 와 연관된 BuyingBidding 엔티티들을 BuyingDto로 변환
-        List<BuyingDto> buyingDto = buyingBiddingRepository.findByProduct(product).stream()
-                .map(buyingBidding -> modelMapper.map(buyingBidding, BuyingDto.class))
+        List<BuyingDto> buyingDtoList = buyingBiddingRepository.findByProductAndBiddingStatus(product, BiddingStatus.PROCESS).stream()
+                .map(buyingBidding -> {
+                    BuyingDto buyingDto = new BuyingDto();
+                    buyingDto.setBuyingId(buyingBidding.getBuyingBiddingId());
+                    buyingDto.setBuyingBiddingTime(buyingBidding.getBuyingBiddingTime());
+                    buyingDto.setBuyingBiddingPrice(buyingBidding.getBuyingBiddingPrice());
+                    return buyingDto;
+                })
                 .collect(Collectors.toList());
 
-        // 변환된 BuyingDto 리스트를 ProductResponseDto 에 설정
-        productDto.setBuyingDto(buyingDto);
+        // 최저 입찰가 찾기
+        Long minPrice = buyingDtoList.stream()
+                .mapToLong(BuyingDto::getBuyingBiddingPrice)
+                .min()
+                .orElse(0L);
+
+        // 변환된 BuyingDto 리스트와 최저 입찰가를 ProductResponseDto 에 설정
+        productDto.setBuyingDto(buyingDtoList);
+        productDto.setProductMinPrice(minPrice);
 
         return productDto;
     }
 
     // 상품의 기본정보 조회
     @Override
+    @Transactional
     public BasicInformationDto basicInformation(String modelNum) {
         log.info("modelNum : {}", modelNum);
 
@@ -84,85 +113,112 @@ public class ProductServiceImpl implements ProductService {
             BasicInformationDto priceValue = productRepository.searchProductPrice(modelNum);
             basicInformationDto.setBuyingBiddingPrice(priceValue.getBuyingBiddingPrice());
             basicInformationDto.setSalesBiddingPrice(priceValue.getSalesBiddingPrice());
+
+            RecentlyPriceDto recentlyContractPrice = selectRecentlyPrice(modelNum);
+            log.info("recentlyContractPrice : {}", recentlyContractPrice);
+            basicInformationDto.setLatestDate(recentlyContractPrice.getLatestDate());
+            basicInformationDto.setLatestPrice(recentlyContractPrice.getLatestPrice());
+            basicInformationDto.setPreviousPrice(recentlyContractPrice.getPreviousPrice());
+            basicInformationDto.setChangePercentage(recentlyContractPrice.getChangePercentage());
+            basicInformationDto.setRecentlyContractDate(recentlyContractPrice.getSalesBiddingTime());
+            basicInformationDto.setCalculationValue(recentlyContractPrice.getCalculationValue());
+
+            log.info("상세상품 변환 완료 : {}", basicInformationDto);
             return basicInformationDto;
         }
         return null;
     }
 
-    // 상세 상품에 대한 입찰희망 구매/판매 가격 조회
-    @Override
-    public BasicInformationDto selectProductDetailPrice(String modelNum) {
-
-        log.info("서비스 수행 전 모델번호 확인 : {}", modelNum);
-        return productRepository.searchProductPrice(modelNum);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateDate(Long recentlyProductId) {
+        if (isUpdated) {
+            Optional<Product> optionalProduct = productRepository.findProductsByProductId(recentlyProductId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.updateLatestDate(LocalDateTime.now());
+                productRepository.save(product);
+                log.info("서버 종료 시점 저장 완료 : {}", LocalDateTime.now());
+                productRepository.flush(); // 강제로 flush
+                entityManager.clear();     // 엔티티 매니저 캐시 비우기
+            }
+        }
     }
 
-    // 해당 상품의 모델번호를 통해 거래 체결된 것이 있는지 확인
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public RecentlyPriceDto selectRecentlyPrice(String modelNum) {
+        Optional<Product> oldContractValue = productRepository.findFirstByModelNumOrderByLatestDateDesc(modelNum);
+        if (oldContractValue.isPresent()) {
+            lastCheckedTime = oldContractValue.get().getLatestDate();
+        } else {
+            lastCheckedTime = LocalDateTime.now();
+        }
+        log.info("!!! 서버가 마지막까지 유지했던 시간 : {}", lastCheckedTime);
 
+        List<SalesBiddingDto> newAllContractSelect = productRepository.recentlyTransaction(modelNum);
+        if (newAllContractSelect.isEmpty()) {
+            log.info("체결된 거래가 없습니다.");
+            return new RecentlyPriceDto();
+        }
 
-    // JPA 사용 버전
-    // 상품 상세 조회(기본 정보)
-//    @Override
-//    public OnlyProductResponseDTO detailProductSelect(OnlyProductRequestDTO onlyProductRequestDTO) {
-//
-//        log.info("Query Execution Started for modelNum : {}", onlyProductRequestDTO.getModelNum());
-//        Product products = productsRepository.findFirstByModelNum(onlyProductRequestDTO.getModelNum());
-//        log.info("Query Execution Completed Info : {}", products);
-//
-//        return modelMapper.map(products, OnlyProductResponseDTO.class);
-//    }
-//
-//    // 해당 상품에 대한 구매 / 판매 가격 가져오기
-//    @Override
-//    public PriceResponseDTO selectProductPrice(OnlyProductRequestDTO onlyProductRequestDTO) {
-//        log.info("상품 조회하고 가격까지 조회하러 왔습니다~ : {}", onlyProductRequestDTO.getModelNum());
-//        PriceResponseDTO products = productsRepository.searchProductPrice(onlyProductRequestDTO.getModelNum());
-//        log.info("해당 상품에 대한 가격 반환까지 완료되었습니다~ : {}", products);
-//
-//        return modelMapper.map(products, PriceResponseDTO.class);
-//    }
+        SalesBiddingDto recentlyContractValue = newAllContractSelect.get(0);
+        LocalDateTime recentlyContractTime = recentlyContractValue.getSalesBiddingTime();
+        log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
-    // categoryName 에 따른 소분류 조회
-//    @Override
-//    public List<ProductResponseDTO> selectCategoryValue(CategoryDTO categoryDTO) {
-//
-//        List<Product> products = productsRepository.allProductInfo(categoryDTO.getCategoryName());
-//        return products.stream()
-//                .map(this::convertProductToDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//    private ProductResponseDTO convertProductToDTO(Product product) {
-//
-//        // 해당 product 값들을 DTO로 변환
-//        ProductResponseDTO productDTO = modelMapper.map(product, ProductResponseDTO.class);
-//
-//        // Products 엔티티에 연관되어있는 Size엔티티들을 SizeDTO로 변환
-//        List<SizeDTO> sizes = sizeRepository.findByProduct(product).stream()
-//                .map(size -> {
-//                    // 각 Size 엔티티를 SizeDTO로 변환
-//                    SizeDTO sizeDTO = modelMapper.map(size, SizeDTO.class);
-//
-//                    // Size 엔티티에 연관된 SizePrice -> DTO 변환
-//                    List<SizePriceDTO> sizePrices = sizePriceRepository.findBySize(size).stream()
-//                            .map(sizePrice -> modelMapper.map(sizePrice, SizePriceDTO.class))
-//                            .collect(Collectors.toList());
-//
-//                    // Size 엔티티에 연관된 Bid -> DTO 변환
-//                    List<BidDTO> bids = bidRepository.findBySize(size).stream()
-//                            .map(bid -> modelMapper.map(bid, BidDTO.class))
-//                            .collect(Collectors.toList());
-//
-//                    // 변환된 DTO를 SizeDTO에 저장
-//                    sizeDTO.setSizePrices(sizePrices);
-//                    sizeDTO.setBids(bids);
-//                    return sizeDTO;
-//                })
-//                // Stream -> List 변환
-//                .collect(Collectors.toList());
-//
-//        // SizeDTO -> Products 저장
-//        productDTO.setSizes(sizes);
-//        return productDTO;
-//    }
+        RecentlyPriceDto recentlyPriceDto = new RecentlyPriceDto();
+        recentlyPriceDto.setLatestDate(recentlyContractTime);
+        recentlyPriceDto.setLatestPrice(recentlyContractValue.getLatestPrice());
+        recentlyPriceDto.setSalesBiddingTime(recentlyContractTime);
+        recentlyPriceDto.setSalesBiddingPrice(recentlyContractValue.getSalesBiddingPrice());
+
+        if (lastCheckedTime.isBefore(recentlyContractTime)) {
+            for (SalesBiddingDto product : newAllContractSelect) {
+                if (product.getPreviousPrice() == null || product.getPreviousPercentage() == null) {
+                    productRepository.resetPreviousPrice(product.getProductId());
+                    log.info("기본값 설정 완료");
+                }
+            }
+
+            Long recentlyProductId = recentlyContractValue.getProductId();
+            Long recentlyContractPrice = recentlyContractValue.getLatestPrice();
+            Long previousContractPrice = oldContractValue.get().getLatestPrice();
+
+            log.info("업데이트 전 recentlyProductId : {}, recentlyContractPrice : {}", recentlyProductId, recentlyContractPrice);
+
+            if (previousContractPrice != null) {
+                productRepository.updatePreviousPrice(recentlyProductId, previousContractPrice);
+                log.info("Updated previousPrice for productId: {} with price: {}", recentlyProductId, previousContractPrice);
+            } else {
+                log.warn("previousContractPrice is null, skipping update for previousPrice");
+            }
+            productRepository.updateLatestPrice(recentlyProductId, recentlyContractPrice);
+            log.info("Updated latestPrice for productId: {}", recentlyProductId);
+            productRepository.flush();
+            entityManager.clear(); // 엔티티 매니저 캐시 비우기
+
+            Long result = recentlyContractPrice - previousContractPrice;
+            double changePercentage = (((recentlyContractPrice - previousContractPrice) / (double) previousContractPrice) * 100);
+            DecimalFormat df = new DecimalFormat("#.##");
+            String format = df.format(changePercentage);
+            double finalChangePercentage = Double.parseDouble(format);
+            productRepository.updateRecentlyContractPercentage(recentlyProductId, finalChangePercentage);
+            recentlyPriceDto.setCalculationValue(result);
+            recentlyPriceDto.setChangePercentage(finalChangePercentage);
+            recentlyPriceDto.setPreviousPrice(previousContractPrice);
+
+            lastCheckedTime = recentlyContractTime;
+            isUpdated = true;
+            log.info("최근 체결 내역 업데이트 완료");
+            updateDate(recentlyProductId);
+        } else {
+            recentlyPriceDto.setLatestDate(oldContractValue.get().getLatestDate());
+            recentlyPriceDto.setLatestPrice(oldContractValue.get().getLatestPrice());
+            recentlyPriceDto.setPreviousPrice(oldContractValue.get().getPreviousPrice());
+            recentlyPriceDto.setChangePercentage(oldContractValue.get().getPreviousPercentage());
+            recentlyPriceDto.setSalesBiddingTime(oldContractValue.get().getLatestDate());
+            recentlyPriceDto.setSalesBiddingPrice(oldContractValue.get().getLatestPrice());
+            log.info("현재 등록된 거래가 최신입니다.");
+        }
+        return recentlyPriceDto;
+    }
 }

@@ -15,5 +15,6 @@ public interface ProductSearch {
     // 상품 최고, 최저 입찰 희망가격 조회
     BasicInformationDto searchProductPrice(String modelNum);
 
-    SalesBiddingDto RecentlyTransaction(Long productId);
+    // 해당 상품의 기존 체결가가 있는지 확인
+    List<SalesBiddingDto> recentlyTransaction(String modelNum);
 }

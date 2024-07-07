@@ -30,14 +30,9 @@ public class ProductController {
     @GetMapping("/products/details/{modelNum}")
     public BasicInformationDto productDetailSelect(@PathVariable String modelNum) {
 
-        // 상품의 기본 정보 && 해당 상품의 구매(최저) / 판매(최고)가 조회
+        // (상품의 기본 정보) && (해당 상품의 구매(최저) / 판매(최고)가 조회) && (해당 상품에 대한 최근 체결 정보)
         BasicInformationDto basicInformationDto = productService.basicInformation(modelNum);
         log.info("basicInformationDto : " + basicInformationDto);
-
-//        SalesBiddingDto salesBiddingDto = productService.updateTransactionPrice(89L);
-//        log.info("salesBiddingDto : 반환 " + salesBiddingDto);
-//        // 해당 모델번호에 속한 상품 중 최근에 거래가 체결된 날짜 및 가격을 가져와야됌
-
 
         return basicInformationDto;
     }
