@@ -9,6 +9,7 @@ import com.example.backend.repository.CouponIssue.CouponIssueRepository;
 import com.example.backend.repository.CouponIssue.RedisRepository;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.coupon.CouponRepository;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +25,7 @@ public class CouponIssueService {
     private final CouponCreateProducer couponCreateProducer;
     private final RedisRepository redisRepository;
 
+    @Transactional
     public void couponIssue(String couponPolicyId, String userId){
 
         Users user = userRepository.findById(Long.valueOf(userId))
@@ -44,13 +46,13 @@ public class CouponIssueService {
 
         if (issuedCount != null && issuedCount > 100) { //
             redisRepository.issuedCancel(couponPolicyId);
-            System.out.println("Coupon limit reached");
+            System.out.println("쿠폰 발급 수 초과");
             return;
         }
 
         boolean isUserAdded = redisRepository.add(couponPolicyId, userId);
         if (!isUserAdded) {
-            System.out.println("User already received a coupon");
+            System.out.println("이미 발급 받음");
             redisRepository.issuedCancel(couponPolicyId);
             return;
         }
