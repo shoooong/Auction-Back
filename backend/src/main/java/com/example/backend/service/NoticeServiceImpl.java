@@ -56,13 +56,15 @@ public class NoticeServiceImpl implements NoticeService {
                 notice.getUser().getUserId()
         );
     }
-
-    // 공지사항 등록
     @Override
     public Notice createNotice(NoticeDto noticeDto) {
 
         Users user = userRepository.findById(noticeDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isRole()) {
+            throw new RuntimeException("Only administrators can create notices");
+        }
 
         Notice notice = new Notice();
         notice.setNoticeTitle(noticeDto.getNoticeTitle());
@@ -72,11 +74,11 @@ public class NoticeServiceImpl implements NoticeService {
         return noticeRepository.save(notice);
     }
 
-    // 공지사항 수정
+
     @Override
     public NoticeDto updateNotice(Long noticeId, NoticeDto noticeDto) {
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new RuntimeException("notice not found"));
+                .orElseThrow(() -> new RuntimeException("Notice not found"));
 
         if (noticeDto.getNoticeTitle() != null) {
             notice.setNoticeTitle(noticeDto.getNoticeTitle());
@@ -84,15 +86,15 @@ public class NoticeServiceImpl implements NoticeService {
         if (noticeDto.getNoticeContent() != null) {
             notice.setNoticeContent(noticeDto.getNoticeContent());
         }
-        Notice updatenotice = noticeRepository.save(notice);
+        Notice updatedNotice = noticeRepository.save(notice);
 
         return new NoticeDto(
-                updatenotice.getNoticeId(),
-                updatenotice.getNoticeTitle(),
-                updatenotice.getNoticeContent(),
-                updatenotice.getCreateDate(),
-                updatenotice.getModifyDate(),
-                updatenotice.getUser().getUserId()
+                updatedNotice.getNoticeId(),
+                updatedNotice.getNoticeTitle(),
+                updatedNotice.getNoticeContent(),
+                updatedNotice.getCreateDate(),
+                updatedNotice.getModifyDate(),
+                updatedNotice.getUser().getUserId()
         );
     }
 

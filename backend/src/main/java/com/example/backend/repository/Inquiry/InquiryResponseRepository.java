@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface InquiryResponseRepository extends JpaRepository <InquiryResponse, Long> {
     List<InquiryResponse> findByInquiry_inquiryId(Long inquiryId);
+
+    List<InquiryResponse> findByInquiry_InquiryId(Long inquiryId);
 }

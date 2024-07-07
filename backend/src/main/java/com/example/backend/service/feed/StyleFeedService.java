@@ -24,15 +24,15 @@ public interface StyleFeedService {
     // 피드 수정
     StyleFeedDto updateStyleFeed(Long feedId, StyleFeedDto styleFeedDTO);
 
-    // 피드 삭제
-    void deleteStyleFeed(final long feedId);
+//    // 피드 삭제
+    void deleteStyleFeed(final long feedId, Long userId);
 
     // 관심피드 조회
-    List<FeedBookmarkDto> getAllFeedBookmarks();
+    List<FeedBookmarkDto> getUserFeedBookmarks(Long userId);
 
     // 관심피드 등록
     FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) throws IOException;
 
     // 관심피드 삭제
-    void deleteFeedBookmark(final long styleSavedId);
+    void deleteFeedBookmark(final long styleSavedId, Long userId);
 }

@@ -85,6 +85,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
     }
 
     // 피드 등록
+    @Override
     public StyleFeed createStyleFeed(StyleFeedDto styleFeedDTO) {
         Users user = userRepository.findById(styleFeedDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -95,8 +96,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
         styleFeed.setUser(user);
 
-        StyleFeed savedStyleFeed = styleFeedRepository.save(styleFeed);
-        return savedStyleFeed;
+        return styleFeedRepository.save(styleFeed);
     }
 
     // 피드 수정
@@ -105,16 +105,19 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         StyleFeed styleFeed = styleFeedRepository.findById(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
+        Long userId = styleFeed.getUser().getUserId();
+        Long requestUserId = styleFeedDTO.getUserId();
+
+        if (!userId.equals(requestUserId)) {
+            throw new RuntimeException("User is not authorized to update this feed");
+        }
+
         if (styleFeedDTO.getFeedTitle() != null) {
             styleFeed.setFeedTitle(styleFeedDTO.getFeedTitle());
         }
         if (styleFeedDTO.getFeedImage() != null) {
             styleFeed.setFeedImage(styleFeedDTO.getFeedImage());
         }
-        if (styleFeedDTO.getLikeCount() != 0) {
-            styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
-        }
-
         StyleFeed updatedFeed = styleFeedRepository.save(styleFeed);
 
         return new StyleFeedDto(
@@ -130,18 +133,27 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
     // 피드 삭제
     @Override
-    public void deleteStyleFeed(final long feedId) {
+    public void deleteStyleFeed(final long feedId, Long userId) {
+
+        StyleFeed styleFeed = styleFeedRepository.findById(feedId)
+                .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
+
+        Long feedUserId = styleFeed.getUser().getUserId();
+
+        if (!feedUserId.equals(userId)) {
+            throw new RuntimeException("User is not authorized to delete this feed");
+        }
+
         final List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByStyleFeed_FeedId(feedId);
         feedBookmarkRepository.deleteAll(feedBookmarks);
         styleFeedRepository.deleteById(feedId);
     }
 
-
     // 관심피드 조회
     @Override
-    public List<FeedBookmarkDto> getAllFeedBookmarks() {
-        List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findAll();
-        log.info("Found {} FeedBookmarks", feedBookmarks);
+    public List<FeedBookmarkDto> getUserFeedBookmarks(Long userId) {
+        List<FeedBookmark> feedBookmarks = feedBookmarkRepository.findByUser_UserId(userId);
+        log.info("Found {} FeedBookmarks for user {}", feedBookmarks.size(), userId);
 
         return feedBookmarks.stream()
                 .map(feedBookmark -> {
@@ -154,14 +166,19 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 .collect(Collectors.toList());
     }
 
-
-    // 관심피드 등록
+    // 관심피드 저장
     @Override
-//    @Transactional
     public FeedBookmarkDto createFeedBookmark(FeedBookmarkDto feedBookmarkDTO) {
-        Users user = userRepository.findById(feedBookmarkDTO.getUserId())
+        Long userId = feedBookmarkDTO.getUserId();
+        Long feedId = feedBookmarkDTO.getFeedId();
+
+        if (feedBookmarkRepository.existsByUser_UserIdAndStyleFeed_FeedId(userId, feedId)) {
+            throw new RuntimeException("이미 해당 피드를 저장하였습니다.");
+        }
+
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        StyleFeed styleFeed = styleFeedRepository.findById(feedBookmarkDTO.getFeedId())
+        StyleFeed styleFeed = styleFeedRepository.findById(feedId)
                 .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
 
         FeedBookmark feedBookmark = FeedBookmark.builder()
@@ -179,9 +196,18 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
+
     // 관심피드 삭제
     @Override
-    public void deleteFeedBookmark(final long styleSavedId) {
+    public void deleteFeedBookmark(final long styleSavedId, Long userId) {
+        // Check if the feed bookmark belongs to the logged-in user
+        FeedBookmark feedBookmark = feedBookmarkRepository.findById(styleSavedId)
+                .orElseThrow(() -> new RuntimeException("Feed bookmark not found"));
+
+        if (!feedBookmark.getUser().getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized: Cannot delete feed bookmark");
+        }
+
         feedBookmarkRepository.deleteById(styleSavedId);
     }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FeedBookmarkRepository extends JpaRepository<FeedBookmark, Long> {
     List<FeedBookmark> findByStyleFeed_FeedId(Long feedId);
+    List<FeedBookmark> findByUser_UserId(Long userId);
+    boolean existsByUser_UserIdAndStyleFeed_FeedId(Long userId, Long feedId);
 }

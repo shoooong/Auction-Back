@@ -45,5 +45,4 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
 
 
     Draw findByLuckyDrawAndLuckyStatus(LuckyDraw luckyDraw, LuckyStatus luckyStatus);
-
 }

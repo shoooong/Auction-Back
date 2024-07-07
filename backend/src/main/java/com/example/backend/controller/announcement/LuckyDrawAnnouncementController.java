@@ -2,14 +2,15 @@ package com.example.backend.controller.announcement;
 
 import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
 import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementListDto;
+import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.LuckyDrawAnnouncement;
 import com.example.backend.service.announcement.LuckyDrawAnnouncementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -39,20 +40,44 @@ public class LuckyDrawAnnouncementController {
     // 이벤트 공지사항 등록
     @PostMapping("/announcementRegistration")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createLuckyDrawAnnouncement(@RequestBody LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto){
+    public LuckyDrawAnnouncement createLuckyDrawAnnouncement(
+            @RequestBody LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto,
+            @AuthenticationPrincipal UserDTO userDTO) {
+
+        if (!userDTO.isRole()) {
+            throw new RuntimeException("Only administrators can register announcements");
+        }
+
         LuckyDrawAnnouncement createLuckyAnnouncement = luckyDrawAnnouncementService.createLuckyDrawAnnouncement(luckyDrawAnnouncementListDto);
         log.info("새로운 공지사항 생성: {}", createLuckyAnnouncement);
+        return createLuckyAnnouncement;
     }
+
 
     // 이벤트 공지사항 수정
     @PutMapping("modifyAnnouncement/{announcementId}")
-    public LuckyDrawAnnouncementListDto updateLuckyDrawAnnouncement(@PathVariable Long announcementId, @RequestBody LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto){
+    public LuckyDrawAnnouncementListDto updateLuckyDrawAnnouncement(
+            @PathVariable Long announcementId,
+            @RequestBody LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto,
+            @AuthenticationPrincipal UserDTO userDTO) {
+
+        if (!userDTO.isRole()) {
+            throw new RuntimeException("Only administrators can modify announcements");
+        }
+
         return luckyDrawAnnouncementService.updateLuckyDrawAnnouncement(announcementId, luckyDrawAnnouncementListDto);
     }
 
+
     // 이벤트 공지사항 삭제
     @DeleteMapping("deleteAnnouncement/{announcementId}")
-    public void deleteLuckyDrawAnnouncement(@PathVariable Long announcementId){
+    public void deleteLuckyDrawAnnouncement(@PathVariable Long announcementId,
+                                            @AuthenticationPrincipal UserDTO userDTO) {
+
+        if (!userDTO.isRole()) {
+            throw new RuntimeException("Only administrators can delete announcements");
+        }
+
         luckyDrawAnnouncementService.deleteLuckyDrawAnnouncement(announcementId);
     }
 }

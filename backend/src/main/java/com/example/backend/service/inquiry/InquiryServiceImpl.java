@@ -34,9 +34,9 @@ public class InquiryServiceImpl implements InquiryService{
 
     // 1:1 문의 조회
     @Override
-    public List<InquiryListDto> getAllInquiryList(){
-        List<Inquiry> inquiryList = inquiryRepository.findAll();
-        log.info("Found {} inquiryList", inquiryList.size());
+    public List<InquiryListDto> getAllInquiryList(Long userId) {
+        List<Inquiry> inquiryList = inquiryRepository.findByUser_UserId(userId);
+        log.info("Found {} inquiryList for user {}", inquiryList.size(), userId);
 
         return inquiryList.stream()
                 .map(inquiry -> new InquiryListDto(
@@ -52,13 +52,13 @@ public class InquiryServiceImpl implements InquiryService{
 
     // 1:1 문의 상세 조회
     @Override
-    public InquiryDto getInquiryById(Long inquiryId) {
-        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+    public InquiryDto getInquiryById(Long inquiryId, Long userId) {
+        Inquiry inquiry = (Inquiry) inquiryRepository.findByInquiryIdAndUser_UserId(inquiryId, userId)
                 .orElseThrow(() -> new RuntimeException("해당 문의를 찾을 수 없습니다."));
 
         List<InquiryResponse> responses = inquiryResponseRepository.findByInquiry_inquiryId(inquiryId);
 
-        List <InquiryResponseDto> responseDtos = responses.stream()
+        List<InquiryResponseDto> responseDtos = responses.stream()
                 .map(response -> InquiryResponseDto.builder()
                         .response(response.getResponse())
                         .build())
@@ -75,10 +75,16 @@ public class InquiryServiceImpl implements InquiryService{
                 .build();
     }
 
+    @Override
+    public void deleteInquiry(long inquiryId, Long userId) {
+
+    }
+
+
     // 1:1 문의 등록
     @Override
-    public Inquiry createInquiry(InquiryDto inquiryDto) {
-        Users user = userRepository.findById(inquiryDto.getUserId())
+    public Inquiry createInquiry(Long userId, InquiryDto inquiryDto) {
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Inquiry inquiry = new Inquiry();
@@ -92,13 +98,27 @@ public class InquiryServiceImpl implements InquiryService{
         return savedInquiry;
     }
 
+
     // 1:1 문의 삭제
     @Override
-    public void deleteInquiry(final long inquiryId) {
-        final List<InquiryResponse> inquiryResponses = responseRepository.findByInquiry_inquiryId(inquiryId);
+    public void deleteInquiry(Long inquiryId, Long userId) {
+
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+
+        Long inquiryUserId = inquiry.getUser().getUserId();
+        if (!inquiryUserId.equals(userId)) {
+            throw new RuntimeException("User is not authorized to delete this inquiry");
+        }
+
+        List<InquiryResponse> inquiryResponses = responseRepository.findByInquiry_InquiryId(inquiryId);
         inquiryResponseRepository.deleteAll(inquiryResponses);
+
         inquiryRepository.deleteById(inquiryId);
+        log.info("Deleted inquiry with ID: {}", inquiryId);
     }
+
+
 
     // 1:1 문의 답변 등록
     @Override
@@ -108,6 +128,10 @@ public class InquiryServiceImpl implements InquiryService{
 
         Inquiry inquiry = inquiryRepository.findById(inquiryResponseDto.getInquiryId())
                 .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+
+        if (!user.isRole()) {
+            throw new RuntimeException("Only administrators can create responses");
+        }
 
         InquiryResponse inquiryResponse = InquiryResponse.builder()
                 .user(user)
@@ -128,10 +152,11 @@ public class InquiryServiceImpl implements InquiryService{
         );
     }
 
+
+
     // 1:1 문의 답변 삭제
     @Override
     public void deleteInquiryResponse(final long inquiryResponseId) {
         inquiryResponseRepository.deleteById(inquiryResponseId);
     }
-
 }

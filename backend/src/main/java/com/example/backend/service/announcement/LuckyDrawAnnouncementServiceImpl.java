@@ -88,11 +88,12 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
                 .nickname(nickname)
                 .build();
     }
+
     // 이벤트 공지사항 등록
     @Override
-    public LuckyDrawAnnouncement createLuckyDrawAnnouncement(LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto){
+    public LuckyDrawAnnouncement createLuckyDrawAnnouncement(LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto) {
         LuckyDraw luckyDraw = luckyDrawRepository.findById(luckyDrawAnnouncementListDto.getLuckyId())
-                .orElseThrow (() -> new RuntimeException("Lucky Draw Not Found"));
+                .orElseThrow(() -> new RuntimeException("Lucky Draw Not Found"));
 
         LuckyDrawAnnouncement luckyDrawAnnouncement = new LuckyDrawAnnouncement();
         luckyDrawAnnouncement.setLuckyTitle(luckyDrawAnnouncementListDto.getLuckyTitle());
@@ -104,7 +105,7 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
 
         return saved;
     }
-    // 이벤트 공지사항 수정
+
     @Override
     public LuckyDrawAnnouncementListDto updateLuckyDrawAnnouncement(Long luckyAnnouncementId, LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto) {
         LuckyDrawAnnouncement luckyDrawAnnouncement = luckyDrawAnnouncementRepository.findById(luckyAnnouncementId)
