@@ -39,7 +39,7 @@ public class AddressService {
                 .existsByZoneCodeAndRoadAddressAndUserUserId(addressReqDto.getZoneCode(), addressReqDto.getRoadAddress(), userId);
 
         if (existAddress) {
-            return null;
+            throw new IllegalStateException("이미 존재하는 주소지입니다.");
         } else {
             updateDefaultAddress(userId, addressReqDto);
 
