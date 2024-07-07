@@ -43,6 +43,9 @@ public interface DrawRepository extends JpaRepository<Draw, Long> {
     @Query("UPDATE Draw d SET d.luckyStatus = :luckyStatus WHERE d.drawId IN :drawIdList")
     void updateLuckyStatus(LuckyStatus luckyStatus, List<Long> drawIdList);
 
+    // 사용자가 이미 응모한 럭키드로우인지 확인
+    boolean existsByUserUserIdAndLuckyDrawLuckyId(Long userId, Long luckyId);
+
 
     Draw findByLuckyDrawAndLuckyStatus(LuckyDraw luckyDraw, LuckyStatus luckyStatus);
 

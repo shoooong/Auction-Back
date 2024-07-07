@@ -41,6 +41,7 @@ public class DrawService {
 
     /**
      * 럭키드로우 응모 내역 저장
+     * 중복 응모 불가
      */
     @Transactional
     public DrawDto saveDraw(Long userId, Long luckyDrawId) {
@@ -51,15 +52,19 @@ public class DrawService {
         LuckyDraw luckyDraw = luckyDrawRepository.findById(luckyDrawId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 럭키드로우입니다."));
 
+        if (drawRepository.existsByUserUserIdAndLuckyDrawLuckyId(userId, luckyDrawId)) {
+            throw new IllegalArgumentException("이미 응모한 럭키드로우입니다.");
+        }
+
         Draw draw = Draw.builder()
                 .luckyStatus(LuckyStatus.PROCESS)
                 .user(user)
                 .luckyDraw(luckyDraw)
                 .build();
 
-        DrawDto drawDTO = DrawDto.fromEntity(drawRepository.save(draw));
+        DrawDto drawDto = DrawDto.fromEntity(drawRepository.save(draw));
 
-        return drawDTO;
+        return drawDto;
     }
 
     /**
