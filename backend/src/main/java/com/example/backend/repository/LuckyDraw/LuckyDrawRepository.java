@@ -21,8 +21,8 @@ public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
     @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyEndDate <= :currentDate")
     List<LuckyDraw> findTodayEnd(LocalDateTime currentDate);
 
-    // 현재를 지난 당첨발표일인 럭키드로우 조회
-    @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyDate <= :currentDate")
+    // 응모가 마감되었고, 현재를 지난 당첨발표일인 럭키드로우 조회
+    @Query("SELECT ld FROM LuckyDraw ld WHERE ld.luckyProcessStatus = 'END' AND ld.luckyDate <= :currentDate")
     List<LuckyDraw> findTodayLucky(LocalDateTime currentDate);
 
     // luckyProcessStatus 상태 변경
