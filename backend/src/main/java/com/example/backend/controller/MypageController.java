@@ -11,6 +11,7 @@ import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
 import com.example.backend.dto.user.*;
 import com.example.backend.service.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +69,6 @@ public class MypageController {
     // 배송지 조회
     @GetMapping("/address")
     public List<AddressDto> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
-
         Long userId = userDTO.getUserId();
 
         return addressService.getAllAddress(userId);
@@ -76,10 +76,7 @@ public class MypageController {
 
     // 배송지 등록
     @PostMapping("/address")
-    public ResponseEntity<AddressDto> addAddress(@RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
-
-        log.info("AddressReqDto: {}", addressReqDto);
-
+    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
         AddressDto addressDto = addressService.addAddress(userId, addressReqDto);
@@ -89,10 +86,7 @@ public class MypageController {
 
     // 배송지 수정
     @PutMapping("/address")
-    public ResponseEntity<AddressDto> modifyAddress(@RequestParam Long addressId, @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO){
-
-        log.info("AddressReqDto: {}", addressReqDto);
-
+    public ResponseEntity<AddressDto> modifyAddress(@Valid @RequestBody AddressReqDto addressReqDto, @RequestParam Long addressId, @AuthenticationPrincipal UserDTO userDTO){
         Long userId = userDTO.getUserId();
 
         AddressDto addressDto = addressService.updateAddress(userId, addressId, addressReqDto);
