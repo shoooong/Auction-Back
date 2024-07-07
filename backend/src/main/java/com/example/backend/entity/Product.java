@@ -74,7 +74,7 @@ public class Product extends BaseEntity {
         this.productQuantity += productQuantity;
     }
 
-
-
-
+    public void updateLatestDate(LocalDateTime latestDate) {
+        this.latestDate = latestDate;
+    }
 }

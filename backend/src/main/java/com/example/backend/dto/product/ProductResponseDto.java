@@ -15,10 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductResponseDto {
 
+    private Long productId;
     private String productImg;
     private String productBrand;
     private String productName;
     private int productLike;
     private String modelNum;
+    private Long ProductMinPrice;
     private List<BuyingDto> buyingDto;
 }

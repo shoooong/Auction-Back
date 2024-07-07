@@ -14,5 +14,5 @@ import java.time.LocalDateTime;
 public class BuyingDto {
     private Long buyingId;
     private LocalDateTime buyingBiddingTime;
-    private Long buyingPrice;
+    private Long buyingBiddingPrice;
 }

@@ -4,8 +4,11 @@ package com.example.backend.repository.Product;
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +23,35 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     // 상품 모델번호에 따른 1개의 정보만 가져오기 - 모델번호가 똑같다는 것은 같은 상품이라는 것
     Optional<Product> findFirstByModelNum(String modelNum);
 
-    // 해당 상품 ID가 가지고 있는 최근 체결 가격 가져오기
+    // 최근에 실행시킨 서버 날짜 가져오기
     Optional<Product> findFirstByModelNumOrderByLatestDateDesc(String modelNum);
+
+    // 거래가 새롭게 체결된 날짜를 업데이트
+    Optional<Product> findProductsByProductId(Long productId);
+
+    // 이전 체결가 및 변동률이 없을 경우 0으로 초기화
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product p SET p.previousPrice = 0L, p.previousPercentage = 0.0 WHERE p.productId = :productId")
+    void resetPreviousPrice(Long productId);
+
+    // 신규 체결가 있을때 기존 신규 체결가 -> 신규 이전 체결가
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product p SET p.previousPrice = :previousContractPrice WHERE p.productId = :recentlyProductId")
+    void updatePreviousPrice(@Param("recentlyProductId") Long recentlyProductId, @Param("previousContractPrice") Long previousContractPrice);
+
+    // 해당 Id의 변동률 계산
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product p SET p.previousPercentage = :changePercentage WHERE p.productId = :recentlyProductId")
+    void updateRecentlyContractPercentage(@Param("recentlyProductId") Long recentlyProductId, @Param("changePercentage") Double changePercentage);
+
+    // 최근 체결 상품의 최근 체결 가격 저장
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product p SET p.latestPrice = :latestPrice WHERE p.productId = :productId")
+    void updateLatestPrice(@Param("productId") Long productId, @Param("latestPrice") Long latestPrice);
 
 
     // TODO: QueryDSL로 변경

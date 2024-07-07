@@ -2,6 +2,7 @@ package com.example.backend.repository.Bidding;
 
 import com.example.backend.entity.BuyingBidding;
 import com.example.backend.entity.Product;
+import com.example.backend.entity.enumData.BiddingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,4 +23,5 @@ public interface BuyingBiddingRepository extends JpaRepository<BuyingBidding, Lo
     @Query("SELECT MIN(b.buyingBiddingPrice) FROM BuyingBidding b WHERE b.product.productId IN :productIdList AND b.biddingStatus = 'PROCESS'")
     Long findLowPrice(List<Long> productIdList);
 
+    List<BuyingBidding> findByProductAndBiddingStatus(Product product, BiddingStatus biddingStatus);
 }

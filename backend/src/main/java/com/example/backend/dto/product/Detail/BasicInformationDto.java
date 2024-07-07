@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 @AllArgsConstructor
@@ -20,4 +22,12 @@ public class BasicInformationDto {
 
     private Long buyingBiddingPrice;
     private Long salesBiddingPrice;
+
+    private LocalDateTime latestDate;
+    private Long latestPrice;
+    private Long previousPrice;
+    private Double changePercentage;
+    private LocalDateTime recentlyContractDate;
+    private Long calculationValue;
+
 }

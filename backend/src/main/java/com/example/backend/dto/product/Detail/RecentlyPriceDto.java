@@ -11,14 +11,12 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalesBiddingDto {
-
-    private Long productId;
-    private String modelNum;
-    private String productSize;
+public class RecentlyPriceDto {
     private Long latestPrice;
+    private LocalDateTime latestDate;
     private Long previousPrice;
-    private Double previousPercentage;
+    private Double changePercentage;
     private LocalDateTime salesBiddingTime;
     private Long salesBiddingPrice;
+    private Long calculationValue;
 }
