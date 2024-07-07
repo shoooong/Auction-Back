@@ -2,7 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
-import com.example.backend.dto.mypage.addressSettings.AddressDTO;
+import com.example.backend.dto.mypage.addressSettings.AddressDto;
+import com.example.backend.dto.mypage.addressSettings.AddressReqDto;
 import com.example.backend.dto.mypage.main.BookmarkProductsDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
@@ -31,7 +32,6 @@ public class MypageController {
     private final SalesBiddingService salesBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
-//    private final AddressRepository addressRepository;
 
     /**
      * 마이페이지 메인
@@ -63,44 +63,42 @@ public class MypageController {
 
     /**
      * 내 정보 - 배송지
-     * 배송지 조회 및 등록(수정)
+     * 배송지 조회, 등록, 수정
      */
     // 배송지 조회
     @GetMapping("/address")
-    public List<AddressDTO> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
+    public List<AddressDto> getAddress(@AuthenticationPrincipal UserDTO userDTO) {
 
         Long userId = userDTO.getUserId();
 
         return addressService.getAllAddress(userId);
     }
 
-    // 배송지 수정
-//    @PutMapping("/address/{addressId}")
-//    public ResponseEntity<AddressDTO> modifyAddress(@PathVariable("addressId") Long addressId,
-//                                                    @RequestBody AddressDTO addressDTO, @AuthenticationPrincipal UserDTO userDTO){
-//
-//        Long userId = userDTO.getUserId();
-////        addressService.modifyAddress(addressId, addressDTO, userDTO.getUserId());
-//
-//        Optional<Address> otpAddress = addressRepository.findByAddressIdAndUserUserId(addressId, userId);
-//
-//        if (otpAddress.isPresent()) {
-//            Address address = otpAddress.get();
-//            address.updateAddress(addressDTO);
-//            Address updatedAddress = addressRepository.save(address);
-//
-//            AddressDTO updatedAddressDTO = AddressDTO.builder()
-//                    .zoneNo(updatedAddress.getZoneNo())
-//                    .addressName(updatedAddress.getAddressName())
-//                    .defaultAddress(updatedAddress.getDefaultAddress())
-//                    .build();
-//
-//            return ResponseEntity.ok(updatedAddressDTO);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    // 배송지 등록
+    @PostMapping("/address")
+    public ResponseEntity<AddressDto> addAddress(@RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
 
+        log.info("AddressReqDto: {}", addressReqDto);
+
+        Long userId = userDTO.getUserId();
+
+        AddressDto addressDto = addressService.addAddress(userId, addressReqDto);
+
+        return ResponseEntity.ok(addressDto);
+    }
+
+    // 배송지 수정
+    @PutMapping("/address")
+    public ResponseEntity<AddressDto> modifyAddress(@RequestParam Long addressId, @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO){
+
+        log.info("AddressReqDto: {}", addressReqDto);
+
+        Long userId = userDTO.getUserId();
+
+        AddressDto addressDto = addressService.updateAddress(userId, addressId, addressReqDto);
+
+        return ResponseEntity.ok(addressDto);
+    }
 
 
     /**
@@ -119,8 +117,8 @@ public class MypageController {
     }
 
     // 계좌 등록 및 수정
-    @PutMapping("/account")
-    public ResponseEntity<AccountDTO> registerOrModifyAccount(@AuthenticationPrincipal UserDTO userDTO, @RequestBody AccountReqDTO accountReqDTO) {
+    @PostMapping("/account")
+    public ResponseEntity<AccountDTO> registerOrModifyAccount(@RequestBody AccountReqDTO accountReqDTO, @AuthenticationPrincipal UserDTO userDTO) {
 
         log.info("AccountReqDTO: {}", accountReqDTO);
 
