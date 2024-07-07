@@ -5,23 +5,16 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+@Entity
+@Builder
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
 public class CouponIssue extends BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userCouponId;
-
-    @Column(updatable = false)
-    private LocalDate endDate;
-
-    @Column(nullable = false)
-    private boolean useStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
@@ -30,4 +23,10 @@ public class CouponIssue extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "couponId")
     private Coupon coupon;
+
+    @Column(updatable = false)
+    private LocalDate endDate;
+
+    @Column(nullable = false)
+    private boolean useStatus;
 }
