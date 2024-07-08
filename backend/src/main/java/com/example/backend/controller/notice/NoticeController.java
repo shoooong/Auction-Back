@@ -42,7 +42,6 @@ public class NoticeController {
         log.info("공지사항 생성: {}", createdNotice);
     }
 
-
     // 공지사항 조회
     @GetMapping("/noticeList")
     public List<NoticeDto> getAllNoticeLlist(){
@@ -83,7 +82,6 @@ public class NoticeController {
 
         noticeService.deleteNotice(noticeId);
     }
-
 
     // 공지사항 전체 조회
     @GetMapping("/combinedNoticeList")
