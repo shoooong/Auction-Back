@@ -21,22 +21,6 @@ public class LuckyDrawAnnouncementController {
     @Autowired
     private LuckyDrawAnnouncementService luckyDrawAnnouncementService;
 
-    // 이벤트 공지사항 조회
-    @GetMapping("/luckyDrawAnnouncementList")
-    public List<LuckyDrawAnnouncementListDto> luckyDrawAnnouncementList(){
-        List<LuckyDrawAnnouncementListDto> announcement = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
-        log.info("조회 완료{}", announcement);
-        return announcement;
-    }
-
-    // 이벤트 공지사항 상세 조회
-    @GetMapping("/luckyDrawAnnouncement/{announcementId}")
-    public LuckyDrawAnnouncementDto luckyDrawAnnouncement(@PathVariable Long announcementId){
-        LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findLuckyDrawAnnouncementById(announcementId);
-        log.info("이벤트 공지사항 상세조회 완료: {}", luckyDrawAnnouncementDto);
-        return luckyDrawAnnouncementDto;
-    }
-
     // 이벤트 공지사항 등록
     @PostMapping("/announcementRegistration")
     @ResponseStatus(HttpStatus.CREATED)
@@ -53,6 +37,21 @@ public class LuckyDrawAnnouncementController {
         return createLuckyAnnouncement;
     }
 
+    // 이벤트 공지사항 조회
+    @GetMapping("/luckyDrawAnnouncementList")
+    public List<LuckyDrawAnnouncementListDto> luckyDrawAnnouncementList(){
+        List<LuckyDrawAnnouncementListDto> announcement = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
+        log.info("조회 완료{}", announcement);
+        return announcement;
+    }
+
+    // 이벤트 공지사항 상세 조회
+    @GetMapping("/luckyDrawAnnouncement/{announcementId}")
+    public LuckyDrawAnnouncementDto luckyDrawAnnouncement(@PathVariable Long announcementId){
+        LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findLuckyDrawAnnouncementById(announcementId);
+        log.info("이벤트 공지사항 상세조회 완료: {}", luckyDrawAnnouncementDto);
+        return luckyDrawAnnouncementDto;
+    }
 
     // 이벤트 공지사항 수정
     @PutMapping("modifyAnnouncement/{announcementId}")
@@ -67,7 +66,6 @@ public class LuckyDrawAnnouncementController {
 
         return luckyDrawAnnouncementService.updateLuckyDrawAnnouncement(announcementId, luckyDrawAnnouncementListDto);
     }
-
 
     // 이벤트 공지사항 삭제
     @DeleteMapping("deleteAnnouncement/{announcementId}")

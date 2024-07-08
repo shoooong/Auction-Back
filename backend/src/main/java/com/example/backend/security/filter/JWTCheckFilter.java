@@ -14,6 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 
@@ -31,13 +33,14 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             return true;
         }
 
-        String path = request.getRequestURI();
+        String path = URLDecoder.decode(request.getRequestURI(), StandardCharsets.UTF_8);
 
         log.info("check uri............" + path);
 
         // 2) /user/ 로그인과 회원가입 호출 경로 제외
         // TODO: CustomSecurityConfig와 중복 설정, 추후에 하나 삭제할 것
-        if (path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
+        if (path.equals("/luckydraw") || path.matches("^/luckydraw/[^/]+$") ||
+                path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
             return true;
         }
 

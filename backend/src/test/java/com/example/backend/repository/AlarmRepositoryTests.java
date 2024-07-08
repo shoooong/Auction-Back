@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @SpringBootTest
 @Log4j2
@@ -26,9 +27,10 @@ public class AlarmRepositoryTests {
         Users users = userRepository.findById(1L).orElseThrow();
 
         Alarm alarm = Alarm.builder()
+                .alarmId(3L)
                 .alarmRead(false)
                 .alarmType(AlarmType.STYLE)
-                .alarmDate(LocalDate.now())
+                .alarmDate(LocalDateTime.now())
                 .users(users)
                 .build();
 

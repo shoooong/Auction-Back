@@ -21,6 +21,18 @@ public class StyleFeedController {
     @Autowired
     private StyleFeedService styleFeedService;
 
+    // 피드 등록
+    @PostMapping("/feedRegistration")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDto,
+                                @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+        styleFeedDto.setUserId(userId);
+
+        styleFeedService.createStyleFeed(styleFeedDto);
+        log.info("새로운 피드 생성: {}", styleFeedDto);
+    }
+
     // 최신순으로 피드 조회
     @GetMapping("/feedList")
     public List<StyleFeedDto> getAllStyleFeedList() {
@@ -45,18 +57,6 @@ public class StyleFeedController {
         return styleFeedDto;
     }
 
-    // 피드 등록
-    @PostMapping("/feedRegistration")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDto,
-                                @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-        styleFeedDto.setUserId(userId);
-
-        styleFeedService.createStyleFeed(styleFeedDto);
-        log.info("새로운 피드 생성: {}", styleFeedDto);
-    }
-
     // 피드 수정
     @PutMapping("modifyFeed/{feedId}")
     public StyleFeedDto updateStyleFeed(@PathVariable Long feedId,
@@ -78,16 +78,6 @@ public class StyleFeedController {
         styleFeedService.deleteStyleFeed(feedId, userId);
     }
 
-
-    // 관심피드 조회
-    @GetMapping("/feedBookmark")
-    public List<FeedBookmarkDto> getUserFeedBookmarks(@AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-        List<FeedBookmarkDto> feedBookmarks = styleFeedService.getUserFeedBookmarks(userId);
-        log.info("성공: {} 개의 북마크 가져옴", feedBookmarks.size());
-        return feedBookmarks;
-    }
-
     // 관심피드 저장
     @PostMapping("/saveFeedBookmark")
     @ResponseStatus(HttpStatus.CREATED)
@@ -100,9 +90,20 @@ public class StyleFeedController {
         log.info("새로운 북마크 생성: {}", createdFeedBookmark);
         return createdFeedBookmark;
     }
+
+    // 관심피드 조회
+    @GetMapping("/feedBookmark")
+    public List<FeedBookmarkDto> getUserFeedBookmarks(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+        List<FeedBookmarkDto> feedBookmarks = styleFeedService.getUserFeedBookmarks(userId);
+        log.info("성공: {} 개의 북마크 가져옴", feedBookmarks.size());
+        return feedBookmarks;
+    }
+
     // 관심피드 삭제
     @DeleteMapping("deleteFeedBookmark/{styleSavedId}")
-    public void deleteFeedBookmark(@PathVariable Long styleSavedId, @AuthenticationPrincipal UserDTO userDTO) {
+    public void deleteFeedBookmark(@PathVariable Long styleSavedId,
+                                   @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         styleFeedService.deleteFeedBookmark(styleSavedId, userId);
     }
