@@ -121,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
             basicInformationDto.setPreviousPrice(recentlyContractPrice.getPreviousPrice());
             basicInformationDto.setChangePercentage(recentlyContractPrice.getChangePercentage());
             basicInformationDto.setRecentlyContractDate(recentlyContractPrice.getSalesBiddingTime());
-            basicInformationDto.setCalculationValue(recentlyContractPrice.getCalculationValue());
+            basicInformationDto.setDifferenceContract(recentlyContractPrice.getDifferenceContract());
 
             log.info("상세상품 변환 완료 : {}", basicInformationDto);
             return basicInformationDto;
@@ -198,11 +198,12 @@ public class ProductServiceImpl implements ProductService {
 
             Long result = recentlyContractPrice - previousContractPrice;
             double changePercentage = (((recentlyContractPrice - previousContractPrice) / (double) previousContractPrice) * 100);
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat("#.#");
             String format = df.format(changePercentage);
             double finalChangePercentage = Double.parseDouble(format);
             productRepository.updateRecentlyContractPercentage(recentlyProductId, finalChangePercentage);
-            recentlyPriceDto.setCalculationValue(result);
+            productRepository.updateDifferenceContract(recentlyProductId, result);
+            recentlyPriceDto.setDifferenceContract(result);
             recentlyPriceDto.setChangePercentage(finalChangePercentage);
             recentlyPriceDto.setPreviousPrice(previousContractPrice);
 
@@ -213,6 +214,7 @@ public class ProductServiceImpl implements ProductService {
         } else {
             recentlyPriceDto.setLatestDate(oldContractValue.get().getLatestDate());
             recentlyPriceDto.setLatestPrice(oldContractValue.get().getLatestPrice());
+            recentlyPriceDto.setDifferenceContract(oldContractValue.get().getDifferenceContract());
             recentlyPriceDto.setPreviousPrice(oldContractValue.get().getPreviousPrice());
             recentlyPriceDto.setChangePercentage(oldContractValue.get().getPreviousPercentage());
             recentlyPriceDto.setSalesBiddingTime(oldContractValue.get().getLatestDate());

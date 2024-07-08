@@ -53,6 +53,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Query("UPDATE Product p SET p.latestPrice = :latestPrice WHERE p.productId = :productId")
     void updateLatestPrice(@Param("productId") Long productId, @Param("latestPrice") Long latestPrice);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
+    void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
+
 
     // TODO: QueryDSL로 변경
     // 회원의 관심상품 productIdList로 상품 상세 정보 조회

@@ -28,6 +28,6 @@ public class BasicInformationDto {
     private Long previousPrice;
     private Double changePercentage;
     private LocalDateTime recentlyContractDate;
-    private Long calculationValue;
+    private Long differenceContract;
 
 }

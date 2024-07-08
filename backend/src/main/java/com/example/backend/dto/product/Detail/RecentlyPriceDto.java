@@ -18,5 +18,5 @@ public class RecentlyPriceDto {
     private Double changePercentage;
     private LocalDateTime salesBiddingTime;
     private Long salesBiddingPrice;
-    private Long calculationValue;
+    private Long differenceContract;
 }

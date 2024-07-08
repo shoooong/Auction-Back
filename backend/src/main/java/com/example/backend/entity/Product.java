@@ -64,6 +64,9 @@ public class Product extends BaseEntity {
     @Column
     private Double previousPercentage;
 
+    @Column
+    private Long differenceContract;
+
 
     public void changeProductStatus(ProductStatus productStatus) {
         this.productStatus = productStatus;
