@@ -4,13 +4,11 @@ import com.example.backend.dto.inquiry.InquiryDto;
 import com.example.backend.dto.inquiry.InquiryListDto;
 import com.example.backend.dto.inquiry.InquiryResponseDto;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.Inquiry;
 import com.example.backend.service.inquiry.InquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,20 +41,6 @@ public class inquiryController {
         log.info("1:1 문의 상세 조회: {}", inquiryDto);
         return inquiryDto;
     }
-
-
-    // 1:1 문의 등록
-    @PostMapping("/inquiryRegistration")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Inquiry> createInquiry(@RequestBody InquiryDto inquiryDto,
-                                                 @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-
-        Inquiry createInquiry = inquiryService.createInquiry(userId, inquiryDto);
-        log.info("1:1문의 등록 완료: {}", createInquiry);
-        return new ResponseEntity<>(createInquiry, HttpStatus.CREATED);
-    }
-
 
     // 1:1 문의 삭제
     @DeleteMapping("/deleteInquiry/{inquiryId}")
