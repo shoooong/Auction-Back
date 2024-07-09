@@ -52,4 +52,12 @@ public class Users extends BaseEntity {
         this.phoneNum = userModifyDTO.getPhoneNum();
         this.profileImg = userModifyDTO.getProfileImg();
     }
+
+    public void updateUser(String password, UserModifyDTO userModifyDTO) {
+        this.email = userModifyDTO.getEmail();
+        this.password = password;
+        this.nickname = userModifyDTO.getNickname();
+        this.phoneNum = userModifyDTO.getPhoneNum();
+        this.profileImg = userModifyDTO.getProfileImg();
+    }
 }
