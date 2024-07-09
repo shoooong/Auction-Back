@@ -172,7 +172,13 @@ public class UserServiceImpl implements UserService {
         Users user = userRepository.findByEmail(userModifyDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        user.updateUser(userModifyDTO, passwordEncoder);
+        String password = userRepository.findPasswordByUserId(user.getEmail());
+
+        // TODO: 비밀번호는 수정 안했을 떄, 다른 방법 생각해보기
+        if (userModifyDTO.getPassword() != null) {
+            user.updateUser(userModifyDTO, passwordEncoder);
+        }
+        user.updateUser(password, userModifyDTO);
 
         userRepository.save(user);
     }

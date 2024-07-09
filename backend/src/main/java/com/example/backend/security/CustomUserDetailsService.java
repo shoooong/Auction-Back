@@ -35,8 +35,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getGrade(),
                 user.getNickname(),
                 user.getPhoneNum(),
-                user.isSocial(),
-                user.isRole()
+                user.getProfileImg(),
+                user.isRole(),
+                user.isSocial()
+
         );
 
         log.info(userDTO);

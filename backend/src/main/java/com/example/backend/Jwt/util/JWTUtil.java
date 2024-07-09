@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class JWTUtil {
         String jwtStr = null;
 
         try {
-            key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes("UTF-8"));
+            key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
             jwtStr = Jwts.builder()
                     .setHeader(Map.of("typ", "JWT"))
@@ -57,7 +58,7 @@ public class JWTUtil {
 
 
         try {
-            SecretKey key = Keys.hmacShaKeyFor(JWTUtil.SECRET_KEY.getBytes("UTF-8"));
+            SecretKey key = Keys.hmacShaKeyFor(JWTUtil.SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
             // JWT 검증 및 클레임 추출
             claims = Jwts.parserBuilder()

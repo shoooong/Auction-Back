@@ -16,13 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Log4j2
+@RequestMapping("/feed")
 public class StyleFeedController {
 
     @Autowired
     private StyleFeedService styleFeedService;
 
     // 피드 등록
-    @PostMapping("/feedRegistration")
+    @PostMapping("/user/feedRegistration")
     @ResponseStatus(HttpStatus.CREATED)
     public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDto,
                                 @AuthenticationPrincipal UserDTO userDTO) {
@@ -58,7 +59,7 @@ public class StyleFeedController {
     }
 
     // 피드 수정
-    @PutMapping("modifyFeed/{feedId}")
+    @PutMapping("/user/modifyFeed/{feedId}")
     public StyleFeedDto updateStyleFeed(@PathVariable Long feedId,
                                         @RequestBody StyleFeedDto styleFeedDto,
                                         @AuthenticationPrincipal UserDTO userDTO) {
@@ -70,7 +71,7 @@ public class StyleFeedController {
 
 
     // 피드 삭제
-    @DeleteMapping("deleteFeed/{feedId}")
+    @DeleteMapping("/user/deleteFeed/{feedId}")
     public void deleteStyleFeed(@PathVariable Long feedId,
                                 @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -79,7 +80,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 저장
-    @PostMapping("/saveFeedBookmark")
+    @PostMapping("/user/saveFeedBookmark")
     @ResponseStatus(HttpStatus.CREATED)
     public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO,
                                               @AuthenticationPrincipal UserDTO userDTO) throws IOException {
@@ -92,7 +93,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 조회
-    @GetMapping("/feedBookmark")
+    @GetMapping("/user/feedBookmark")
     public List<FeedBookmarkDto> getUserFeedBookmarks(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         List<FeedBookmarkDto> feedBookmarks = styleFeedService.getUserFeedBookmarks(userId);
@@ -101,7 +102,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 삭제
-    @DeleteMapping("deleteFeedBookmark/{styleSavedId}")
+    @DeleteMapping("/user/deleteFeedBookmark/{styleSavedId}")
     public void deleteFeedBookmark(@PathVariable Long styleSavedId,
                                    @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();

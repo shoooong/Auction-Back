@@ -54,7 +54,7 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 이벤트 공지사항 수정
-    @PutMapping("modifyAnnouncement/{announcementId}")
+    @PutMapping("/modifyAnnouncement/{announcementId}")
     public LuckyDrawAnnouncementListDto updateLuckyDrawAnnouncement(
             @PathVariable Long announcementId,
             @RequestBody LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto,
@@ -68,7 +68,7 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 이벤트 공지사항 삭제
-    @DeleteMapping("deleteAnnouncement/{announcementId}")
+    @DeleteMapping("/deleteAnnouncement/{announcementId}")
     public void deleteLuckyDrawAnnouncement(@PathVariable Long announcementId,
                                             @AuthenticationPrincipal UserDTO userDTO) {
 
