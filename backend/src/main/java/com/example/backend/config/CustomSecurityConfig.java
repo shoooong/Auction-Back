@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,14 +25,38 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
-@Log4j2
-//@EnableWebSecurity
 @RequiredArgsConstructor
+@EnableWebSecurity(debug = true)
+@Log4j2
 public class CustomSecurityConfig {
+
+    private final JWTCheckFilter jwtCheckFilter;
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomLoginFailHandler customLoginFailHandler;
+
+    private static final String[] AUTHENTICATED_ENDPOINTS = {
+            "/mypage/**",
+            "/luckydraw/{luckyId}/enter",
+            "/feed/user/**",
+            "/inquiry/{inquiryId}/delete",
+            "/requestProduct/user/**",
+            "/order/**",
+            "/coupon/{couponId}/issue"
+            // "/alarm/subscribe"
+    };
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return webSecurity -> {
+//
+//        }
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,28 +76,28 @@ public class CustomSecurityConfig {
 
         http.formLogin(config -> {
             config.loginPage("/user/login");
-            config.successHandler(new CustomLoginSuccessHandler());
-            config.failureHandler(new CustomLoginFailHandler());
+            config.successHandler(customLoginSuccessHandler);
+            config.failureHandler(customLoginFailHandler);
         });
 
         http.oauth2Login(config -> {
             config.loginPage("/oauth/authorize");
-            config.successHandler(new CustomLoginSuccessHandler());
+            config.successHandler(customLoginSuccessHandler);
         });
 
         // JWT 체크 필터 가장 먼저 실행되도록
-        http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 접근 제한 시 CustomAccessDeniedHandler 사용
         http.exceptionHandling(config -> {
-            config.accessDeniedHandler(new CustomAccessDeniedHandler());
+            config.accessDeniedHandler(customAccessDeniedHandler);
         });
 
         // 특정 경로에 대해 인증 없이 접근 가능하도록 설정
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/addressApi", "/luckydraw", "/luckydraw/{luckyId}", "/user/kakao","/user/login","/user/register", "/user/register/admin").permitAll();
-//            auth.requestMatchers("/*").permitAll();
-            auth.anyRequest().authenticated();
+            auth.requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated();
+            auth.requestMatchers("/admin/**").hasRole("ADMIN");
+            auth.anyRequest().permitAll();
         });
 
         // 시큐리티 전체 비활성화
