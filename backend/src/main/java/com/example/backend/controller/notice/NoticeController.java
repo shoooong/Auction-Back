@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Log4j2
+@RequestMapping("/notice")
 public class NoticeController {
 
     @Autowired
@@ -29,7 +30,7 @@ public class NoticeController {
     private LuckyDrawAnnouncementService luckyDrawAnnouncementService;
 
     // 공지사항 등록
-    @PostMapping("/noticeRegistration")
+    @PostMapping("/user/noticeRegistration")
     @ResponseStatus(HttpStatus.CREATED)
     public void createNotice(@RequestBody NoticeDto noticeDto,
                              @AuthenticationPrincipal UserDTO userDTO) {
@@ -60,7 +61,7 @@ public class NoticeController {
     }
 
     // 공지사항 수정
-    @PutMapping("/modifyNotice/{noticeId}")
+    @PutMapping("/user/modifyNotice/{noticeId}")
     public NoticeDto updateNotice(@PathVariable Long noticeId,
                                   @RequestBody NoticeDto noticeDto,
                                   @AuthenticationPrincipal UserDTO userDTO) {
@@ -73,7 +74,7 @@ public class NoticeController {
 
 
     // 공지사항 삭제
-    @DeleteMapping("/deleteNotice/{noticeId}")
+    @DeleteMapping("/user/deleteNotice/{noticeId}")
     public void deleteNotice(@PathVariable Long noticeId,
                              @AuthenticationPrincipal UserDTO userDTO) {
         if (!userDTO.isRole()) {
@@ -84,7 +85,7 @@ public class NoticeController {
     }
 
     // 공지사항 전체 조회
-    @GetMapping("/combinedNoticeList")
+    @GetMapping("/user/combinedNoticeList")
     public CombinedNoticeDto getCombinedNoticeList() {
         List<NoticeDto> notices = noticeService.getAllNoticeList();
         List<LuckyDrawAnnouncementListDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
