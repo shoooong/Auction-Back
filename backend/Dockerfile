@@ -8,7 +8,7 @@ ENTRYPOINT [ "java", "-jar", "backend.jar" ]
 
 FROM ubuntu
 
-WORKDIR /src/main/resources
+WORKDIR ./src/main/resources
 
-COPY application-db.yml /src/main/resources/application-db.yml
-COPY application.yml /src/main/resources/application.yml
+COPY application-db.yml ./src/main/resources/application-db.yml
+COPY application.yml ./src/main/resources/application.yml
