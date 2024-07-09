@@ -18,13 +18,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
+@RequestMapping("/inquiry")
 public class inquiryController {
 
     @Autowired
     private InquiryService inquiryService;
 
     // 1:1 문의 조회
-    @GetMapping("/inquiryList")
+    @GetMapping("")
     public List<InquiryListDto> getAllInquiryList(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         List<InquiryListDto> inquiryList = inquiryService.getAllInquiryList(userId);
@@ -34,7 +35,7 @@ public class inquiryController {
 
 
     // 1:1 문의 상세 조회
-    @GetMapping("/inquiry/{inquiryId}")
+    @GetMapping("/{inquiryId}")
     public InquiryDto getInquiry(@PathVariable Long inquiryId, @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         InquiryDto inquiryDto = inquiryService.getInquiryById(inquiryId, userId);
@@ -43,7 +44,7 @@ public class inquiryController {
     }
 
     // 1:1 문의 삭제
-    @DeleteMapping("/deleteInquiry/{inquiryId}")
+    @DeleteMapping("/{inquiryId}/delete")
     public void deleteInquiry(@PathVariable Long inquiryId,
                               @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -67,10 +68,8 @@ public class inquiryController {
         return createInquiryResponse;
     }
 
-
-
     // 1:1 문의 답변 삭제
-    @DeleteMapping("/deleteInquiryResponse/{responseId}")
+    @DeleteMapping("/delete/{responseId}")
     public void deleteInquiryResponse(@PathVariable Long responseId) {
         inquiryService.deleteInquiryResponse(responseId);
     }

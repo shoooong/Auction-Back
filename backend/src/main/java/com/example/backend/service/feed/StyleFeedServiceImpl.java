@@ -196,7 +196,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         );
     }
 
-
     // 관심피드 삭제
     @Override
     public void deleteFeedBookmark(final long styleSavedId, Long userId) {
@@ -207,7 +206,6 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         if (!feedBookmark.getUser().getUserId().equals(userId)) {
             throw new RuntimeException("Unauthorized: Cannot delete feed bookmark");
         }
-
         feedBookmarkRepository.deleteById(styleSavedId);
     }
 }
