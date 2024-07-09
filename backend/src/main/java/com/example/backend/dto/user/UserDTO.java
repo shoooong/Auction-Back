@@ -1,6 +1,5 @@
 package com.example.backend.dto.user;
 
-import com.example.backend.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,12 +19,13 @@ public class UserDTO extends User {
     private int grade;
     private String nickname;
     private String phoneNum;
-    private boolean social;
+    private String profileImg;
     private boolean role;
+    private boolean social;
 
-    public UserDTO(Long userId, String email, String password, int grade, String nickname, String phoneNum, boolean social, boolean role) {
+    public UserDTO(Long userId, String email, String password, int grade, String nickname, String phoneNum, String profileImg, boolean role, boolean social) {
 
-        super(email, password, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));
+        super(email, password, true, true, true, true, List.of(role ? new SimpleGrantedAuthority("ROLE_ADMIN") : new SimpleGrantedAuthority("ROLE_USER")));
 
         this.userId = userId;
         this.email = email;
@@ -33,8 +33,9 @@ public class UserDTO extends User {
         this.grade = grade;
         this.nickname = nickname;
         this.phoneNum = phoneNum;
-        this.social = social;
+        this.profileImg = profileImg;
         this.role = role;
+        this.social = social;
     }
 
     public Map<String, Object> getClaims() {
@@ -45,21 +46,10 @@ public class UserDTO extends User {
         claims.put("nickname", nickname);
         claims.put("grade", grade);
         claims.put("phone", phoneNum);
-        claims.put("social", social);
+        claims.put("profileImg", profileImg);
         claims.put("role", role);
+        claims.put("social", social);
 
         return claims;
-    }
-
-    public Users toEntity() {
-        return Users.builder()
-                .userId(this.userId)
-                .email(this.email)
-                .password(this.password)
-                .nickname(this.nickname)
-                .phoneNum(this.phoneNum)
-                .social(this.social)
-                .role(this.role)
-                .build();
     }
 }

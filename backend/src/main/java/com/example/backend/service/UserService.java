@@ -25,6 +25,7 @@ public interface UserService {
                user.getGrade(),
                user.getNickname(),
                user.getPhoneNum(),
+               user.getProfileImg(),
                user.isSocial(),
                user.isRole());
 
@@ -38,8 +39,6 @@ public interface UserService {
    Users makeSocialUser(List<String> socialAccountList);
 
    void modifyUser(UserModifyDTO userModifyDTO);
-
-//   Users validateUserEmail(String email);
 
    MypageMainDto getMyPageInfo(Long userId);
 }
