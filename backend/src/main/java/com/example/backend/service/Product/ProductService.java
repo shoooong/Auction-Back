@@ -1,9 +1,7 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
-import com.example.backend.dto.product.Detail.BasicInformationDto;
-import com.example.backend.dto.product.Detail.RecentlyPriceDto;
-import com.example.backend.entity.Product;
+import com.example.backend.dto.product.Detail.*;
 
 import java.util.List;
 
@@ -16,4 +14,20 @@ public interface ProductService {
     BasicInformationDto basicInformation(String modelNum);
 
     RecentlyPriceDto selectRecentlyPrice(String modelNum);
+
+    List<ProductsContractListDto> selectSalesContract(String modelNum);
+
+    List<SalesHopeDto> selectSalesHope(String modelNum);
+
+    List<BuyingHopeDto> selectBuyingHope(String modelNum);
+
+    void addPhotoReview(PhotoRequestDto photoRequestDto);
+    void updatePhotoReview(PhotoRequestDto photoRequestDto);
+    void deletePhotoReview(Long reviewId, Long userId);
+
+    List<PhotoReviewDto> selectPhotoReview(String modelNum);
+
+//    List<ContractInfoDto> selectContractValue(String modelNum);
+
+//    AveragePriceResponseDto getAveragePrices(String modelNum);
 }

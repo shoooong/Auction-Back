@@ -1,13 +1,15 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
-import com.example.backend.dto.product.Detail.BasicInformationDto;
-import com.example.backend.dto.product.Detail.RecentlyPriceDto;
-import com.example.backend.dto.product.Detail.SalesBiddingDto;
+import com.example.backend.dto.product.Detail.*;
+import com.example.backend.entity.PhotoReview;
 import com.example.backend.entity.Product;
+import com.example.backend.entity.Users;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
+import com.example.backend.repository.Product.PhotoReviewRepository;
 import com.example.backend.repository.Product.ProductRepository;
+import com.example.backend.repository.User.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,8 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +42,10 @@ public class ProductServiceImpl implements ProductService {
 
     private LocalDateTime lastCheckedTime;
     private boolean isUpdated = false;
+    @Autowired
+    private PhotoReviewRepository photoReviewRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     // 상품 소분류 조회
     @Override
@@ -99,29 +104,45 @@ public class ProductServiceImpl implements ProductService {
         // 망할 ModelMapper 이슈로
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
-            BasicInformationDto basicInformationDto = new BasicInformationDto();
-            basicInformationDto.setProductId(product.getProductId());
-            basicInformationDto.setProductImg(product.getProductImg());
-            basicInformationDto.setProductBrand(product.getProductBrand());
-            basicInformationDto.setModelNum(product.getModelNum());
-            basicInformationDto.setProductName(product.getProductName());
-            basicInformationDto.setOriginalPrice(product.getOriginalPrice());
-            basicInformationDto.setProductLike(product.getProductLike());
-
-            log.info("basicInformationDto DTO 변환 : {}", basicInformationDto);
 
             BasicInformationDto priceValue = productRepository.searchProductPrice(modelNum);
-            basicInformationDto.setBuyingBiddingPrice(priceValue.getBuyingBiddingPrice());
-            basicInformationDto.setSalesBiddingPrice(priceValue.getSalesBiddingPrice());
+
+            List<ProductsContractListDto> contractInfoList = selectSalesContract(modelNum);
+
+            List<SalesHopeDto> salesHopeDtoList = selectSalesHope(modelNum);
+
+            List<BuyingHopeDto> buyingHopeDtoList = selectBuyingHope(modelNum);
+
+            List<PhotoReviewDto> photoReviewDtoList = selectPhotoReview(modelNum);
+
 
             RecentlyPriceDto recentlyContractPrice = selectRecentlyPrice(modelNum);
-            log.info("recentlyContractPrice : {}", recentlyContractPrice);
-            basicInformationDto.setLatestDate(recentlyContractPrice.getLatestDate());
-            basicInformationDto.setLatestPrice(recentlyContractPrice.getLatestPrice());
-            basicInformationDto.setPreviousPrice(recentlyContractPrice.getPreviousPrice());
-            basicInformationDto.setChangePercentage(recentlyContractPrice.getChangePercentage());
-            basicInformationDto.setRecentlyContractDate(recentlyContractPrice.getSalesBiddingTime());
-            basicInformationDto.setDifferenceContract(recentlyContractPrice.getDifferenceContract());
+            BasicInformationDto basicInformationDto = BasicInformationDto.builder()
+                    .productId(product.getProductId())
+                    .productImg(product.getProductImg())
+                    .productBrand(product.getProductBrand())
+                    .modelNum(product.getModelNum())
+                    .productName(product.getProductName())
+                    .originalPrice(product.getOriginalPrice())
+                    .productLike(product.getProductLike())
+
+                    .buyingBiddingPrice(priceValue.getBuyingBiddingPrice())
+                    .salesBiddingPrice(priceValue.getSalesBiddingPrice())
+
+                    .latestDate(recentlyContractPrice.getLatestDate())
+                    .latestPrice(recentlyContractPrice.getLatestPrice())
+                    .previousPrice(recentlyContractPrice.getPreviousPrice())
+                    .changePercentage(recentlyContractPrice.getChangePercentage())
+                    .recentlyContractDate(recentlyContractPrice.getSalesBiddingTime())
+                    .differenceContract(recentlyContractPrice.getDifferenceContract())
+
+                    .contractInfoList(contractInfoList)
+                    .salesHopeList(salesHopeDtoList)
+                    .buyingHopeList(buyingHopeDtoList)
+
+                    .photoReviewList(photoReviewDtoList)
+
+                    .build();
 
             log.info("상세상품 변환 완료 : {}", basicInformationDto);
             return basicInformationDto;
@@ -144,6 +165,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    // 최근 체결가 계산
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RecentlyPriceDto selectRecentlyPrice(String modelNum) {
@@ -156,6 +178,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("!!! 서버가 마지막까지 유지했던 시간 : {}", lastCheckedTime);
 
         List<SalesBiddingDto> newAllContractSelect = productRepository.recentlyTransaction(modelNum);
+        log.info("최근 체결 내역 조회 : {} ", newAllContractSelect);
         if (newAllContractSelect.isEmpty()) {
             log.info("체결된 거래가 없습니다.");
             return new RecentlyPriceDto();
@@ -166,6 +189,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
         RecentlyPriceDto recentlyPriceDto = new RecentlyPriceDto();
+
         recentlyPriceDto.setLatestDate(recentlyContractTime);
         recentlyPriceDto.setLatestPrice(recentlyContractValue.getLatestPrice());
         recentlyPriceDto.setSalesBiddingTime(recentlyContractTime);
@@ -223,4 +247,214 @@ public class ProductServiceImpl implements ProductService {
         }
         return recentlyPriceDto;
     }
+
+    // 체결 내역 관리(리스트)
+    @Override
+    public List<ProductsContractListDto> selectSalesContract(String modelNum) {
+
+        List<SalesBiddingDto> temp = productRepository.recentlyTransaction(modelNum);
+
+        return temp.stream()
+                .map(contractValue -> ProductsContractListDto.builder()
+                        .productSize(contractValue.getProductSize())
+                        .productContractPrice(contractValue.getLatestPrice())
+                        .productContractDate(contractValue.getSalesBiddingTime())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 입찰 판매 희망 내역(리스트)
+    @Override
+    public List<SalesHopeDto> selectSalesHope(String modelNum) {
+        List<SalesHopeDto> temp = productRepository.SalesHopeInfo(modelNum);
+
+        // LinkedHashMap 사용하여 순서 보장
+        Map<String, SalesHopeDto> groupedResults = new LinkedHashMap<>();
+
+        for (SalesHopeDto hope : temp) {
+            // 동일한 사이즈와 가격을 기준으로 키 생성
+            String key = hope.getProductSize() + "-" + hope.getSalesBiddingPrice();
+
+            // 이미 존재하는 항목이면 수량 증가, 아니면 새로 추가
+            if (groupedResults.containsKey(key)) {
+                SalesHopeDto existing = groupedResults.get(key);
+                existing.setSalesQuantity(existing.getSalesQuantity() + hope.getSalesQuantity());
+            } else {
+                groupedResults.put(key, hope);
+            }
+        }
+        // 결과를 다시 리스트로 변환
+        List<SalesHopeDto> resultList = new ArrayList<>(groupedResults.values());
+
+        log.info("값 리스트로 변환 확인 : {}, ", resultList);
+        return resultList;
+    }
+
+    // 입찰 구매 희망 내역(리스트)
+    @Override
+    public List<BuyingHopeDto> selectBuyingHope(String modelNum) {
+        List<BuyingHopeDto> temp = productRepository.BuyingHopeInfo(modelNum);
+
+        log.info("구매 입찰 내역 확인 : {} ", temp);
+        Map<String, BuyingHopeDto> groupedResults = new LinkedHashMap<>();
+
+        for (BuyingHopeDto hope : temp) {
+            // 동일한 사이즈와 가격을 기준으로 키 생성
+            String key = hope.getProductSize() + "-" + hope.getBuyingBiddingPrice();
+
+            // 이미 존재하는 항목이면 수량 증가, 아니면 새로 추가
+            if (groupedResults.containsKey(key)) {
+                BuyingHopeDto existing = groupedResults.get(key);
+                existing.setBuyingQuantity(existing.getBuyingQuantity() + hope.getBuyingQuantity());
+            } else {
+                groupedResults.put(key, hope);
+            }
+        }
+        // 결과를 다시 리스트로 변환
+        List<BuyingHopeDto> resultList = new ArrayList<>(groupedResults.values());
+
+        log.info("리스트로 변환 : {}, ", resultList);
+
+        return resultList;
+    }
+
+    @Transactional
+    public void addPhotoReview(PhotoRequestDto photoRequestDto) {
+        Product product = productRepository.findFirstByModelNum(photoRequestDto.getModelNum())
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
+
+        Users user = userRepository.findById(photoRequestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
+
+        PhotoReview photoReview = PhotoReview.builder()
+                .products(product)
+                .user(user)
+                .reviewLike(0)
+                .reviewImg(photoRequestDto.getReviewImg())
+                .reviewContent(photoRequestDto.getReviewContent())
+                .build();
+
+        photoReviewRepository.save(photoReview);
+        log.info("성공!!");
+    }
+
+    @Transactional
+    public void updatePhotoReview(PhotoRequestDto photoRequestDto) {
+        PhotoReview review = photoReviewRepository.findById(photoRequestDto.getReviewId())
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + photoRequestDto.getReviewId()));
+
+        Product product = productRepository.findFirstByModelNum(photoRequestDto.getModelNum())
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
+
+        Users user = userRepository.findById(photoRequestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
+
+        if(!review.getUser().getUserId().equals(photoRequestDto.getUserId())) {
+            throw new IllegalArgumentException("해당 리뷰를 수정할 권한이 없습니다.");
+        }
+        // 리뷰 수정
+        PhotoReview photoReview = PhotoReview.builder()
+                .products(product)
+                .user(user)
+                .reviewId(review.getReviewId())
+                .reviewLike(0)
+                .reviewImg(photoRequestDto.getReviewImg())
+                .reviewContent(photoRequestDto.getReviewContent())
+                .build();
+
+        photoReviewRepository.save(photoReview);
+        log.info("리뷰가 성공적으로 수정되었습니다.");
+
+        log.info("해당 리뷰를 찾을 수 없습니다.");
+    }
+
+    @Override
+    public void deletePhotoReview(Long reviewId, Long userId) {
+        PhotoReview photoReview = photoReviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+
+        if(!photoReview.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 리뷰를 삭제할 권한이 없습니다.");
+        }
+            photoReviewRepository.delete(photoReview);
+    }
+
+    // 해당 상품에 대한 스타일 리뷰 조회(리스트)
+    @Override
+    public List<PhotoReviewDto> selectPhotoReview(String modelNum) {
+        List<PhotoReview> photoReviewList = photoReviewRepository.findProductStyleReview(modelNum);
+
+        return photoReviewList.stream()
+                .map(productStyleReview -> PhotoReviewDto.builder()
+                        .userId(productStyleReview.getUser().getUserId())
+                        .reviewImg(productStyleReview.getReviewImg())
+                        .reviewContent(productStyleReview.getReviewContent())
+                        .reviewLike(productStyleReview.getReviewLike())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
+//    @Transactional
+//    public List<PhotoReviewDto> (String modelNum, Long userId) {
+//        Product product = productRepository.findFirstByModelNum(modelNum)
+//                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + modelNum));
+//
+//        Users user = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
+//
+//        PhotoReview photoReview = PhotoReview.builder()
+//                .user(user)
+//                .reviewImg(photoReviewDto.getReviewImg())
+//                .reviewContent(photoReviewDto.getReviewContent())
+//                .reviewLike(photoReviewDto.getReviewLike())
+//                .products(product)
+//                .build();
+//
+//        photoReviewRepository.save(photoReview);
+//    }
+
+//    @Override
+//    public List<ContractInfoDto> selectContractValue(String modelNum) {
+//        List<Product> productList = productRepository.findProductByModelNumOrderByLatestDateDesc(modelNum);
+//
+//        return productList.stream()
+//                .map(product -> ContractInfoDto.builder()
+//                        .productSize(product.getProductSize())
+//                        .contractPrice(product.getLatestPrice())
+//                        .contractDate(product.getLatestDate().toLocalDate())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
+
+//    public AveragePriceResponseDto getAveragePrices(String modelNum) {
+//        LocalDateTime now = LocalDateTime.of(2024, 7, 9, 0, 1);
+//        AveragePriceResponseDto responseDto = new AveragePriceResponseDto();
+//
+//        responseDto.setOneDayPrices(getPrices(modelNum, now.minusDays(1), now, 2));
+//        responseDto.setThreeDayPrices(getPrices(modelNum, now.minusDays(3), now, 6));
+//        responseDto.setSevenDayPrices(getPrices(modelNum, now.minusDays(7), now, 12));
+//        responseDto.setFifteenDayPrices(getPrices(modelNum, now.minusDays(15), now, 24));
+//        responseDto.setThirtyDayPrices(getPrices(modelNum, now.minusDays(30), now, 48));
+//
+//        return responseDto;
+//    }
+//
+//    private List<AveragePriceDto> getPrices(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
+//        List<AveragePriceDto> averagePrices = new ArrayList<>();
+//        LocalDateTime current = startDate;
+//
+//        while (current.isBefore(endDate)) {
+//            LocalDateTime next = current.plusHours(intervalHours);
+//            List<Tuple> tuples = productRepository.findHourlyAveragePricesByModelNumAndDateRange(modelNum, current, next);
+//
+//            for (Tuple tuple : tuples) {
+//                String dateTime = tuple.get(0, String.class);
+//                Double averagePrice = tuple.get(1, Double.class);
+//                averagePrices.add(new AveragePriceDto(dateTime, averagePrice));
+//            }
+//            current = next;
+//        }
+//
+//        return averagePrices;
+//    }
 }

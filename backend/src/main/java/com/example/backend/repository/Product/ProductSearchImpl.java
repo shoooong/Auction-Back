@@ -1,7 +1,9 @@
 package com.example.backend.repository.Product;
 
 import com.example.backend.dto.product.Detail.BasicInformationDto;
+import com.example.backend.dto.product.Detail.BuyingHopeDto;
 import com.example.backend.dto.product.Detail.SalesBiddingDto;
+import com.example.backend.dto.product.Detail.SalesHopeDto;
 import com.example.backend.entity.*;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.SalesStatus;
@@ -18,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -100,7 +103,7 @@ public class ProductSearchImpl implements ProductSearch {
     @Override
     public List<SalesBiddingDto> recentlyTransaction(String modelNum) {
 
-        return queryFactory.select(Projections.bean(SalesBiddingDto.class,
+         List<SalesBiddingDto> salesBiddingDtoList = queryFactory.select(Projections.bean(SalesBiddingDto.class,
                 product.productId,
                 product.modelNum,
                 product.productSize,
@@ -118,5 +121,46 @@ public class ProductSearchImpl implements ProductSearch {
                         .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .orderBy(sales.salesBiddingTime.desc())
                 .fetch();
+
+        return salesBiddingDtoList.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SalesHopeDto> SalesHopeInfo(String modelNum) {
+
+        List<SalesHopeDto> salesHopeDtoList =  queryFactory.select(Projections.bean(SalesHopeDto.class,
+                        sales.salesBiddingPrice,
+                        product.productSize,
+                        sales.salesQuantity))
+                .from(product)
+                .leftJoin(sales).on(sales.product.eq(product))
+                .where(product.modelNum.eq(modelNum)
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .orderBy(sales.salesBiddingPrice.asc())
+                .fetch();
+
+        return salesHopeDtoList.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BuyingHopeDto> BuyingHopeInfo(String modelNum) {
+        List<BuyingHopeDto> buyingHopeDtoList =  queryFactory.select(Projections.bean(BuyingHopeDto.class,
+                        buying.buyingBiddingPrice,
+                        product.productSize,
+                        buying.buyingQuantity))
+                .from(product)
+                .leftJoin(buying).on(buying.product.eq(product))
+                .where(product.modelNum.eq(modelNum)
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS)))
+                .orderBy(buying.buyingBiddingPrice.desc())
+                .fetch();
+
+        return buyingHopeDtoList.stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
