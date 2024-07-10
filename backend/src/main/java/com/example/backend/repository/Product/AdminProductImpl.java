@@ -73,11 +73,15 @@ public class AdminProductImpl implements AdminProduct {
         return queryFactory.select(
 //                순서 중요
                         Projections.constructor(AdminProductDto.class,
+
                                 product.productId,
                                 product.productName,
-                                product.productBrand,
                                 product.modelNum,
-                                product.productSize)
+                                product.productBrand,
+                                product.productSize,
+                                product.mainDepartment,
+                                product.subDepartment
+                        )
                 ).from(product)
                 .where(
                         eqMain(mainDepartment).and(isRegistered()),
@@ -87,8 +91,91 @@ public class AdminProductImpl implements AdminProduct {
                 .fetch();
     }
 
-
-    //상품상세 조회(모델명 + 사이즈) 기준으로 구분, 사이즈별 구매입찰, 판매입찰 상태 조회,
+    //
+//    //상품상세 조회(모델명 + 사이즈) 기준으로 구분, 사이즈별 구매입찰, 판매입찰 상태 조회,
+//    @Override
+//    public List<AdminProductRespDto> getDetailedProduct(String modelNum, String productSize) {
+//        QProduct product = QProduct.product;
+//        QBuyingBidding buyingBidding = QBuyingBidding.buyingBidding;
+//        QSalesBidding salesBidding = QSalesBidding.salesBidding;
+//        QUsers buyer = new QUsers("buyer");
+//        QUsers seller = new QUsers("seller");
+//        log.info("modelNum {} productSize {}", modelNum, productSize);
+//
+//        BooleanExpression modelNumCondition = product.modelNum.eq(modelNum);
+//        BooleanExpression sizeCondition = productSize != null ? product.productSize.eq(productSize) : null;
+//        BooleanExpression saleCondition1 = salesBidding.salesStatus.eq(SalesStatus.PROCESS);
+//        BooleanExpression saleCondition2 = salesBidding.salesStatus.eq(SalesStatus.INSPECTION);
+//        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS );
+//
+//        List<AdminProductDetailDto> productDetails = queryFactory
+//                .select(Projections.fields(
+//                        AdminProductDetailDto.class,
+//                        product.productId.as("productId"),
+//                        product.productImg.as("productImg"),
+//                        product.productBrand.as("productBrand"),
+//                        product.productName.as("productName"),
+//                        product.modelNum,
+//                        product.originalPrice,
+//                        product.productQuantity.as("productQuantity"),
+//                        product.productSize.as("productSize")
+//                ))
+//                .from(product)
+//                .where(modelNumCondition.and(sizeCondition != null ? sizeCondition : null).and(isRegistered()))
+//                .fetch();
+//
+//        List<BuyinBiddingDto> buyingBiddings = queryFactory
+//                .select(Projections.fields(
+//                        BuyinBiddingDto.class,
+//                        buyingBidding.buyingBiddingId.as("buyingBiddingId"),
+//                        buyingBidding.buyingBiddingPrice.as("buyingBiddingPrice"),
+//                        Projections.fields(
+//                                AdminUserDto.class,
+//                                buyer.email.as("email"),
+//                                buyer.nickname.as("nickname")
+//                        ).as("buyer")
+//                ))
+//        .from(buyingBidding)
+//                .innerJoin(buyingBidding.user, buyer)
+//                .where(buyingBidding.product.modelNum.eq(modelNum)
+//                        .and(sizeCondition != null ? buyingBidding.product.productSize.eq(productSize) : modelNumCondition).and(isRegistered()).and(buyingCondition))
+//                .fetch();
+////                .where(buyingBidding.product.modelNum.eq(modelNum))
+////                .fetch();
+//
+//        List<SalesBiddingDto> sales = queryFactory
+//                .select(Projections.fields(
+//                        SalesBiddingDto.class,
+//                        salesBidding.salesBiddingId.as("salesBiddingId"),
+//                        salesBidding.salesBiddingPrice.as("salesBiddingPrice"),
+//                        salesBidding.salesStatus.as("salesStatus"),
+//                        Projections.fields(
+//                                AdminUserDto.class,
+//                                seller.email.as("email"),
+//                                seller.nickname.as("nickname")
+//                        ).as("seller")
+//                ))
+//                .from(salesBidding)
+//                .innerJoin(salesBidding.user, seller)
+//                .where(salesBidding.product.modelNum.eq(modelNum)
+//                        .and(sizeCondition != null ? salesBidding.product.productSize.eq(productSize) : modelNumCondition).and(isRegistered()).and(saleCondition1).or(saleCondition2))
+//                .fetch();
+////                .where(salesBidding.product.modelNum.eq(modelNum))
+////                .fetch();
+//
+////        return productDetails.stream().map(detail -> AdminProductRespDto.builder()
+////                .adminProductDetailDto(detail)
+////                .buyingBiddingDtoList(buyingBiddings)
+////                .salesBiddingDtoList(sales)
+////                .build()).collect(Collectors.toList());
+//
+//        return productDetails.stream().map(detail -> AdminProductRespDto.builder()
+//                .adminProductDetailDto(detail)
+//                .buyingBiddingDtoList(buyingBiddings)
+//                .salesBiddingDtoList(sales)
+//                .build()).collect(Collectors.toList());
+//
+//    }
     @Override
     public List<AdminProductRespDto> getDetailedProduct(String modelNum, String productSize) {
         QProduct product = QProduct.product;
@@ -102,7 +189,7 @@ public class AdminProductImpl implements AdminProduct {
         BooleanExpression sizeCondition = productSize != null ? product.productSize.eq(productSize) : null;
         BooleanExpression saleCondition1 = salesBidding.salesStatus.eq(SalesStatus.PROCESS);
         BooleanExpression saleCondition2 = salesBidding.salesStatus.eq(SalesStatus.INSPECTION);
-        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS );
+        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS);
 
         List<AdminProductDetailDto> productDetails = queryFactory
                 .select(Projections.fields(
@@ -120,51 +207,56 @@ public class AdminProductImpl implements AdminProduct {
                 .where(modelNumCondition.and(sizeCondition != null ? sizeCondition : null).and(isRegistered()))
                 .fetch();
 
-        List<BuyinBiddingDto> buyingBiddings = queryFactory
-                .select(Projections.fields(
-                        BuyinBiddingDto.class,
-                        buyingBidding.buyingBiddingId.as("buyingBiddingId"),
-                        buyingBidding.buyingBiddingPrice.as("buyingBiddingPrice"),
-                        Projections.fields(
-                                AdminUserDto.class,
-                                buyer.email.as("email"),
-                                buyer.nickname.as("nickname")
-                        ).as("buyer")
-                ))
-        .from(buyingBidding)
-                .innerJoin(buyingBidding.user, buyer)
-                .where(buyingBidding.product.modelNum.eq(modelNum)
-                        .and(sizeCondition != null ? buyingBidding.product.productSize.eq(productSize) : modelNumCondition).and(isRegistered()).and(buyingCondition))
-                .fetch();
-//                .where(buyingBidding.product.modelNum.eq(modelNum))
-//                .fetch();
+        // 각 상품에 대해 해당 사이즈의 입찰 정보 필터링
+        return productDetails.stream().map(detail -> {
+            List<BuyinBiddingDto> filteredBuyingBiddings = queryFactory
+                    .select(Projections.fields(
+                            BuyinBiddingDto.class,
+                            buyingBidding.buyingBiddingId.as("buyingBiddingId"),
+                            buyingBidding.buyingBiddingPrice.as("buyingBiddingPrice"),
+                            Projections.fields(
+                                    AdminUserDto.class,
+                                    buyer.email.as("email"),
+                                    buyer.nickname.as("nickname")
+                            ).as("buyer")
+                    ))
+                    .from(buyingBidding)
+                    .innerJoin(buyingBidding.user, buyer)
+                    .where(buyingBidding.product.modelNum.eq(modelNum)
+                            .and(buyingBidding.product.productSize.eq(detail.getProductSize()))
+                            .and(isRegistered())
+                            .and(buyingCondition))
+                    .fetch();
 
-        List<SalesBiddingDto> sales = queryFactory
-                .select(Projections.fields(
-                        SalesBiddingDto.class,
-                        salesBidding.salesBiddingId.as("salesBiddingId"),
-                        salesBidding.salesBiddingPrice.as("salesBiddingPrice"),
-                        salesBidding.salesStatus.as("salesStatus"),
-                        Projections.fields(
-                                AdminUserDto.class,
-                                seller.email.as("email"),
-                                seller.nickname.as("nickname")
-                        ).as("seller")
-                ))
-                .from(salesBidding)
-                .innerJoin(salesBidding.user, seller)
-                .where(salesBidding.product.modelNum.eq(modelNum)
-                        .and(sizeCondition != null ? salesBidding.product.productSize.eq(productSize) : modelNumCondition).and(isRegistered()).and(saleCondition1).or(saleCondition2))
-                .fetch();
-//                .where(salesBidding.product.modelNum.eq(modelNum))
-//                .fetch();
+            List<SalesBiddingDto> filteredSalesBiddings = queryFactory
+                    .select(Projections.fields(
+                            SalesBiddingDto.class,
+                            salesBidding.salesBiddingId.as("salesBiddingId"),
+                            salesBidding.salesBiddingPrice.as("salesBiddingPrice"),
+                            salesBidding.salesStatus.as("salesStatus"),
+                            Projections.fields(
+                                    AdminUserDto.class,
+                                    seller.email.as("email"),
+                                    seller.nickname.as("nickname")
+                            ).as("seller")
+                    ))
+                    .from(salesBidding)
+                    .innerJoin(salesBidding.user, seller)
+                    .where(salesBidding.product.modelNum.eq(modelNum)
+                            .and(salesBidding.product.productSize.eq(detail.getProductSize()))
+                            .and(isRegistered())
+                            .and(saleCondition1.or(saleCondition2)))
+                    .fetch();
 
-        return productDetails.stream().map(detail -> AdminProductRespDto.builder()
-                .adminProductDetailDto(detail)
-                .buyingBiddingDtoList(buyingBiddings)
-                .salesBiddingDtoList(sales)
-                .build()).collect(Collectors.toList());
+            return AdminProductRespDto.builder()
+                    .adminProductDetailDto(detail)
+                    .buyingBiddingDtoList(filteredBuyingBiddings)
+                    .salesBiddingDtoList(filteredSalesBiddings)
+                    .build();
+        }).collect(Collectors.toList());
     }
+
+
 
 }
 

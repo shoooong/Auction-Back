@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 
 import com.example.backend.dto.admin.*;
+import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
@@ -26,8 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,17 +79,18 @@ public class AdminService {
         }
     }
 
-    //판매상품 관리(카테고리별)
-    public List<AdminProductDto> getProducts(String mainDepartment, String subDepartment) {
+    //판매상품 관리(카테고리별)조회
+    public AdminRespDto.AdminProductResponseDto getProducts(String mainDepartment, String subDepartment) {
+//        List<AdminProductDto> adminProductDto = productRepository.getProductsByDepartment(mainDepartment, subDepartment);
         List<AdminProductDto> adminProductDto = productRepository.getProductsByDepartment(mainDepartment, subDepartment);
 
         log.info("productId" + adminProductDto.get(0).getProductId());
-        return adminProductDto;
+        return new AdminRespDto.AdminProductResponseDto(mainDepartment,subDepartment,adminProductDto);
 
     }
 
     //상품상세 조회 + 판매입찰 + 구매입찰 정보
-    public List<AdminProductRespDto> getDetailProduct(String modelNum, String productSize) {
+    public AdminRespDto.AdminProductDetailRespDto getDetailProduct(String modelNum, String productSize) {
 
         log.info("modelNum{} productSize{}", modelNum, productSize);
         /*
@@ -96,8 +100,9 @@ public class AdminService {
         List<AdminProductRespDto> detailedProduct = productRepository.getDetailedProduct(modelNum,productSize);
 
 
-        return detailedProduct;
+//        return detailedProduct;
 
+        return new AdminRespDto.AdminProductDetailRespDto(modelNum, productSize, detailedProduct);
     }
 
     //검수 승인 처리
@@ -141,11 +146,6 @@ public class AdminService {
 
     }
 
-    public void registerLucky(){
-
-
-    }
-
     //test
     //매주 첫째주 11시에 시작
 //    @Scheduled(cron = "0 0 11 ? * MON")
@@ -170,6 +170,15 @@ public class AdminService {
         }
 
 
+
+    }
+
+    //관리자 페이지 럭키드로우 상품 다건 조회
+    public AdminRespDto.LuckyDrawsRespDto getLuckyDraws(LuckyProcessStatus luckyProcessStatus) {
+
+        List<LuckyDraw> luckyDrawList = luckyDrawRepository.findByLuckyProcessStatus(luckyProcessStatus);
+
+        return new AdminRespDto.LuckyDrawsRespDto(luckyProcessStatus,luckyDrawList);
 
     }
 
