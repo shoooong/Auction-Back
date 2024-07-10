@@ -10,12 +10,15 @@ import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
 import com.example.backend.dto.user.*;
+import com.example.backend.entity.Users;
+import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +36,7 @@ public class MypageController {
     private final SalesBiddingService salesBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
+    private final UserRepository userRepository;
 
     /**
      * 마이페이지 메인
@@ -51,6 +55,16 @@ public class MypageController {
      * 내 정보 - 프로필 관리
      * 회원 정보 수정
      */
+    @GetMapping("/modify")
+    public ResponseEntity<UserDTO> getUser(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        return ResponseEntity.ok(userService.entityToDTO(user));
+    }
+
     @PutMapping("/modify")
     public ResponseEntity<String> modifyUser(@RequestBody UserModifyDTO userModifyDTO) {
         log.info("UserModifyDTO: {}", userModifyDTO);
