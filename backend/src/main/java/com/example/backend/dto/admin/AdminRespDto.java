@@ -1,7 +1,9 @@
 package com.example.backend.dto.admin;
 
+import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
+import com.example.backend.entity.enumData.LuckyProcessStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,11 +30,12 @@ public class AdminRespDto {
             private Long productId;
             private String productName;
             private String productBrand;
-
+            private ProductStatus productStatus;
             public ProductDto(Product product) {
                 this.productId = product.getProductId();
                 this.productName = product.getProductName();
                 this.productBrand = product.getProductBrand();
+                this.productStatus = product.getProductStatus();
             }
         }
     }
@@ -98,6 +101,65 @@ public class AdminRespDto {
         }
     }
 
+    //럭키드로우 상태별로 전체 조회
+    @Getter
+    @Setter
+    public static class LuckyDrawsRespDto{
+        private LuckyProcessStatus luckyProcessStatus;
+        private List<LuckyDrawDto> luckyDraws = new ArrayList<>();
+
+        public LuckyDrawsRespDto(LuckyProcessStatus luckyProcessStatus,List<LuckyDraw> luckyDraws) {
+            this.luckyProcessStatus = luckyProcessStatus;
+            this.luckyDraws = luckyDraws.stream().map(LuckyDrawDto::new).collect(Collectors.toList());
+        }
+        @Setter
+        @Getter
+        public class LuckyDrawDto {
+
+            private Long luckyId;
+            private String luckyName;
+            private LuckyProcessStatus luckyProcessStatus;
+
+            public LuckyDrawDto(LuckyDraw luckyDraw) {
+                this.luckyId = luckyDraw.getLuckyId();
+                this.luckyName = luckyDraw.getLuckyName();
+                this.luckyProcessStatus = luckyDraw.getLuckyProcessStatus();
+            }
+        }
+
+    }
+
+    //상품 전체 대분류 소분류별 조회 응답 Dto
+    @Getter
+    @Setter
+    public static class AdminProductResponseDto {
+        private String mainDepartment;
+        private String subDepartment;
+        private List<AdminProductDto> products;
+
+        public AdminProductResponseDto(String mainDepartment, String subDepartment, List<AdminProductDto> products) {
+            this.mainDepartment = mainDepartment;
+            this.subDepartment = subDepartment;
+            this.products = products;
+        }
+    }
+
+    //상품 상세 응답 Dto
+    @Getter
+    @Setter
+    public static class AdminProductDetailRespDto {
+        private String modelNum;
+        private String productSize;
+        private List<AdminProductRespDto> detailedProducts;
+
+        public AdminProductDetailRespDto(String modelNum, String productSize, List<AdminProductRespDto> detailedProducts) {
+            this.modelNum = modelNum;
+            this.productSize = productSize;
+            this.detailedProducts = detailedProducts;
+        }
+
+        // getter, setter, etc.
+    }
 
 
 
