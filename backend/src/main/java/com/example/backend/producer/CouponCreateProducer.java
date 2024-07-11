@@ -14,7 +14,7 @@ public class CouponCreateProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void create(String couponPolicyId, String userId) {
+    public void create(Long couponPolicyId, Long userId) {
         String key = "coupon:time-attack:" + couponPolicyId + ":user:" + userId;
         kafkaTemplate.send("CouponIssueTopic", key);
     }
