@@ -25,8 +25,11 @@ public class CouponIssue extends BaseEntity{
     private Coupon coupon;
 
     @Column(updatable = false)
-    private LocalDate endDate;
+    private LocalDate endDate; // 만료날짜
 
     @Column(nullable = false)
-    private boolean useStatus;
+    private boolean useStatus; // 쿠폰 사용 여부
+
+    @Column
+    private LocalDate useDate; // 쿠폰 사용 날짜
 }

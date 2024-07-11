@@ -1,8 +1,10 @@
 package com.example.backend.entity;
 
+import com.example.backend.dto.coupon.CouponCreateDto;
 import com.example.backend.entity.enumData.DiscountType;
 import com.example.backend.entity.enumData.SalesStatus;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -17,27 +19,37 @@ public class Coupon extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long couponId;
+    private Long couponId; // 쿠폰 PK
 
     @Column(nullable = false, length = 150)
-    private String couponTitle;
+    private String couponTitle; // 쿠폰 이름
 
     @Column(nullable = false)
-    private Long couponQuantity;
+    private Long couponQuantity; // 쿠폰 수량
 
     @Column(nullable = false)
-    private Long maxQuantity;
+    private Long maxQuantity; // 최대 발급 수량
 
     @Column(nullable = false, length = 1000)
-    private String couponCode;
+    private String couponCode; // 쿠폰 발급 코드
 
     @Column(nullable = false)
-    private Long expDay;
+    private Long expDay; // 쿠폰 유효기간
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DiscountType discountType;
+    private DiscountType discountType; //  PERCENT, FIXED
 
     @Column(nullable = false)
-    private Long amount;
+    private Long amount; // 할인 금액
+
+    @Column(nullable = false)
+    private LocalDateTime startDate; // 쿠폰 발급 시작 날짜, 시간 "2024-07-31T18:00:00"
+
+    @Column(nullable = false)
+    private LocalDateTime endDate; // 쿠폰 발급 종료 날짜 시간 "2024-07-31T18:00:00"
+
+    @Column(length = 2000)
+    private String content; // 쿠폰 설명
+
 }

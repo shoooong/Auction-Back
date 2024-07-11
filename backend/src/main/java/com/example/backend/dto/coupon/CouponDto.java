@@ -1,14 +1,13 @@
 package com.example.backend.dto.coupon;
+
 import com.example.backend.entity.Coupon;
 import com.example.backend.entity.enumData.DiscountType;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Builder
@@ -16,7 +15,8 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CouponCreateDto {
+public class CouponDto {
+    private Long couponId;
     private String couponTitle;
     private Long couponQuantity;
     private Long maxQuantity;
@@ -30,6 +30,7 @@ public class CouponCreateDto {
 
     public Coupon toEntity() {
         return Coupon.builder()
+            .couponId(this.couponId)
             .couponTitle(this.couponTitle)
             .couponQuantity(this.couponQuantity)
             .maxQuantity(this.maxQuantity)
