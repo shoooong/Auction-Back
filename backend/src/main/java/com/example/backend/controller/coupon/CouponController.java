@@ -2,12 +2,20 @@ package com.example.backend.controller.coupon;
 
 
 import com.example.backend.dto.coupon.CouponCreateDto;
+import com.example.backend.dto.coupon.CouponDto;
 import com.example.backend.dto.coupon.CouponIssueDto;
+import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.coupon.CouponIssueService;
 import com.example.backend.service.coupon.CouponService;
+import java.util.List;
+import jdk.jfr.Timestamp;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,16 +39,27 @@ public class CouponController {
 
         couponService.createCoupon(couponCreateDto);
 
-        return ResponseEntity.ok(200);
+        return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
     }
 
-    @PostMapping("/{couponId}")
-    public ResponseEntity<?> couponIssue(@PathVariable String couponId, @RequestParam String userId){
+    @PostMapping("/{couponId}/issue")
+    public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
+        System.out.println("couponId = " + couponId);
+        System.out.println("userDTO = " + userDTO);
         log.info(couponId);
-        log.info(userId);
+        log.info(userDTO);
 
-        couponIssueService.issueCoupon(couponId, userId);
+        couponIssueService.issueCoupon(couponId, userDTO.getUserId());
 
         return ResponseEntity.ok(200);
     }
+
+    @GetMapping("/time-attack")
+    public ResponseEntity<List<CouponDto>> timeAttack(){
+        List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
+
+        return new ResponseEntity<>(couponDto, HttpStatus.OK);
+    }
+
+
 }

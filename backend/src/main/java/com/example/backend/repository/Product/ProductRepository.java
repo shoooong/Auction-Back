@@ -2,6 +2,7 @@ package com.example.backend.repository.Product;
 
 
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
+import com.example.backend.dto.product.Detail.SalesHopeDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.transaction.Transactional;
@@ -57,6 +58,18 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Transactional
     @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
     void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
+
+
+//    @Query("SELECT FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00') as dateTime, AVG(p.latestPrice) as averagePrice " +
+//            "FROM Product p " +
+//            "WHERE p.modelNum = :modelNum AND p.latestDate >= :startDate AND p.latestDate < :endDate " +
+//            "GROUP BY FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00')")
+//    List<Tuple> findHourlyAveragePricesByModelNumAndDateRange(
+//            @Param("modelNum") String modelNum,
+//            @Param("startDate") LocalDateTime startDate,
+//            @Param("endDate") LocalDateTime endDate
+//    );
+
 
 
     // TODO: QueryDSL로 변경

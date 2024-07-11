@@ -1,6 +1,7 @@
 package com.example.backend.repository.Bidding;
 
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
+import com.example.backend.dto.product.Detail.SalesHopeDto;
 import com.example.backend.entity.SalesBidding;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,5 +46,4 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
             "ORDER BY s.salesBiddingTime DESC")
     List<SaleDetailsDto> findRecentSaleDetailsByUserId(Long userId, Pageable pageable);
 
-    Optional<SalesBidding> findTopByProductModelNumOrderBySalesBiddingTimeDesc(String modelNum);
 }
