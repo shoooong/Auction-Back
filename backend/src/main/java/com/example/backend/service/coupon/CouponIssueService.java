@@ -4,6 +4,7 @@ import com.example.backend.dto.coupon.CouponIssueDto;
 import com.example.backend.entity.Coupon;
 import com.example.backend.entity.CouponIssue;
 import com.example.backend.entity.Users;
+import com.example.backend.entity.enumData.CouponCondition;
 import com.example.backend.producer.CouponCreateProducer;
 import com.example.backend.repository.CouponIssue.CouponIssueRepository;
 import com.example.backend.repository.CouponIssue.RedisRepository;
@@ -11,8 +12,10 @@ import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.coupon.CouponRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,38 +28,68 @@ public class CouponIssueService {
     private final CouponCreateProducer couponCreateProducer;
     private final RedisRepository redisRepository;
 
-    @Transactional
-    public void couponIssue(String couponPolicyId, String userId){
 
+    @Transactional
+    public void couponIssue(String couponId, String userId){
+
+
+        /* MySQL에 Coupon 저장
+        * */
         Users user = userRepository.findById(Long.valueOf(userId))
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Coupon coupon = couponRepository.findById(Long.valueOf(couponPolicyId))
+        Coupon coupon = couponRepository.findById(Long.valueOf(couponId))
             .orElseThrow(() -> new RuntimeException("Coupon not found"));
 
         CouponIssueDto couponIssueDto = new CouponIssueDto();
         CouponIssue couponIssue = couponIssueDto.toEntity(user, coupon);
 
         couponIssueRepository.save(couponIssue);
+
+        /* Redis에 Coupon 발급조건 저장
+        *  발급 수량, 발급 시작 날짜&시간 , 발급 종료 날짜&시간, 쿠폰 발급코드
+        * */
+
+
     }
 
-    public void issueCoupon(String couponPolicyId, String userId) {
+
+    public void issueCoupon(Long couponId, Long userId) {
 
         // 해당 쿠폰 정책 발급수 INCR
-        Long issuedCount = redisRepository.couponIssuedCount(couponPolicyId);
+        Long issuedCount = redisRepository.couponIssuedCount(couponId);
+        Long MAX_QUANTITY = Long.valueOf(
+            redisRepository.getCouponCondition(couponId, CouponCondition.MAX_QUANTITY.name()));
 
-        if (issuedCount != null && issuedCount > 100) { //
-            redisRepository.issuedCancel(couponPolicyId);
+        if (issuedCount != null && issuedCount > MAX_QUANTITY) { //
+            redisRepository.issuedCancel(couponId);
             System.out.println("쿠폰 발급 수 초과");
             return;
         }
 
-        boolean isUserAdded = redisRepository.add(couponPolicyId, userId);
-        if (!isUserAdded) {
-            System.out.println("이미 발급 받음");
-            redisRepository.issuedCancel(couponPolicyId);
+
+        String startDate = redisRepository.getCouponCondition(couponId, CouponCondition.START_DATE.name());
+        String endDate = redisRepository.getCouponCondition(couponId, CouponCondition.END_DATE.name());
+        LocalDateTime startDateTime = LocalDateTime.parse(startDate);
+        LocalDateTime endDateTime = LocalDateTime.parse(endDate);
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        System.out.println("startDateTime = " + startDateTime);
+        System.out.println("endDateTime = " + endDateTime);
+        System.out.println("currentDateTime = " + currentDateTime);
+
+        if (currentDateTime.isBefore(startDateTime) || currentDateTime.isAfter(endDateTime)) {
+            System.out.println("쿠폰 발급 시간이 아닙니다.");
             return;
         }
-        couponCreateProducer.create(couponPolicyId, userId);
+
+        Long apply = redisRepository.registerCouponUser(couponId, userId);
+        if (apply != 1) {
+            System.out.println("이미 발급 받음");
+            redisRepository.issuedCancel(couponId);
+            return;
+        }
+        couponCreateProducer.create(couponId, userId);
     }
 //
 //    public void issuedCoupon(CouponIssueDto couponIssueDto){
