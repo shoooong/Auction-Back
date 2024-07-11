@@ -3,7 +3,6 @@ package com.example.backend.consumer;
 
 import com.example.backend.service.coupon.CouponIssueService;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
