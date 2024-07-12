@@ -9,7 +9,7 @@ import lombok.Getter;
 public class AddressDto {
 
     private Long addressId;
-    private String zoneCode;
+    private String zonecode;
     private String roadAddress;
     private String jibunAddress;
     private String detailAddress;
@@ -21,7 +21,7 @@ public class AddressDto {
     public static AddressDto fromEntity(Address address){
         return AddressDto.builder()
                 .addressId(address.getAddressId())
-                .zoneCode(address.getZoneCode())
+                .zonecode(address.getZonecode())
                 .roadAddress(address.getRoadAddress())
                 .jibunAddress(address.getJibunAddress())
                 .detailAddress(address.getDetailAddress())

@@ -92,7 +92,7 @@ public class MypageController {
     @PostMapping("/address")
     public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
-
+        log.info("addAddress AddressReqDto: {}", addressReqDto);
         AddressDto addressDto = addressService.addAddress(userId, addressReqDto);
 
         return ResponseEntity.ok(addressDto);
@@ -102,7 +102,7 @@ public class MypageController {
     @PutMapping("/address")
     public ResponseEntity<AddressDto> modifyAddress(@Valid @RequestBody AddressReqDto addressReqDto, @RequestParam Long addressId, @AuthenticationPrincipal UserDTO userDTO){
         Long userId = userDTO.getUserId();
-
+        log.info("modifyAddress AddressReqDto: {}", addressReqDto);
         AddressDto addressDto = addressService.updateAddress(userId, addressId, addressReqDto);
 
         return ResponseEntity.ok(addressDto);
