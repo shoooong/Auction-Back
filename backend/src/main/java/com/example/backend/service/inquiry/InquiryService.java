@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface InquiryService {
 
-//    // 1:1 문의 조회
-    List<InquiryListDto> getAllInquiryList(Long userId);
-
     // 1:1 문의 등록
-    Inquiry createInquiry(Long userId, InquiryDto inquiryDto);
+    Inquiry createInquiry(InquiryDto inquiryDto);
+
+    // 1:1 문의 조회
+    List<InquiryDto> getAllInquiryList(Long userId);
 
     // 1:1 문의 상세 조회
     InquiryDto getInquiryById(Long inquiryId, Long userId);
