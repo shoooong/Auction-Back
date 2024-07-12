@@ -66,8 +66,7 @@ public class AddressService {
     @Transactional
     public AddressDto updateAddress(Long userId, Long addressId, AddressReqDto addressReqDto) {
 
-        Address address = addressRepository.findByAddressIdAndUserUserId(addressId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 배송지 입니다."));
+        Address address = validationAddress(userId, addressId);
 
         updateDefaultAddress(userId, addressReqDto);
 
@@ -79,6 +78,16 @@ public class AddressService {
     }
 
     /**
+     * 배송지 삭제
+     */
+    @Transactional
+    public void deleteAddress(Long userId, Long addressId) {
+        Address address = validationAddress(userId, addressId);
+
+        addressRepository.delete(address);
+    }
+
+    /**
      * 기본 배송지를 선택했는지 확인
      * 기존 기본 배송지에서 새로 입력한 배송지로 기본 배송지 변경
      */
@@ -87,5 +96,13 @@ public class AddressService {
         if (addressReqDto.isDefaultAddress()) {
             addressRepository.updateDefaultAddress(userId);
         }
+    }
+
+    /**
+     * 존재하는 배송지인지 확인
+     */
+    public Address validationAddress(Long userId, Long addressId) {
+        return addressRepository.findByAddressIdAndUserUserId(addressId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 배송지 입니다."));
     }
 }
