@@ -20,9 +20,9 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     List<Address> findAllByUserId(Long userId);
 
     /**
-     * zoneCode와 roadAddress, userId로 Address 존재 여부 확인
+     * zonecode와 roadAddress, userId로 Address 존재 여부 확인
      */
-    boolean existsByZoneCodeAndRoadAddressAndUserUserId(String zoneCode, String roadAddress, Long userId);
+    boolean existsByZonecodeAndRoadAddressAndUserUserId(String zonecode, String roadAddress, Long userId);
 
     /**
      * addressId와 userId로 Address 조회
