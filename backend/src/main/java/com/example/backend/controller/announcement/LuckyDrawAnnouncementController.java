@@ -45,7 +45,7 @@ public class LuckyDrawAnnouncementController {
         return announcement;
     }
 
-    // 이벤트 공지사항 상세 조회
+    // 이벤트 공지사항 상세조회
     @GetMapping("/luckyDrawAnnouncement/{announcementId}")
     public LuckyDrawAnnouncementDto luckyDrawAnnouncement(@PathVariable Long announcementId){
         LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findLuckyDrawAnnouncementById(announcementId);

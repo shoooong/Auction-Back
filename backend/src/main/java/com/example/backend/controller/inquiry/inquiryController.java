@@ -24,19 +24,30 @@ public class inquiryController {
     @Autowired
     private InquiryService inquiryService;
 
-    // 1:1 문의 조회
-    @GetMapping("")
-    public List<InquiryListDto> getAllInquiryList(@AuthenticationPrincipal UserDTO userDTO) {
+    // 1:1 문의 등록
+    @PostMapping("/user/registration")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createInquiry(@RequestBody InquiryDto inquiryDto,
+                              @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
-        List<InquiryListDto> inquiryList = inquiryService.getAllInquiryList(userId);
+        inquiryDto.setUserId(userId);
+
+        inquiryService.createInquiry(inquiryDto);
+    }
+
+    // 1:1 문의 조회
+    @GetMapping("/inquiryList")
+    public List<InquiryDto> getAllInquiryList(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+        List<InquiryDto> inquiryList = inquiryService.getAllInquiryList(userId);
         log.info("조회 완료 {}", inquiryList);
         return inquiryList;
     }
 
-
-    // 1:1 문의 상세 조회
+    // 1:1 문의 상세조회
     @GetMapping("/{inquiryId}")
-    public InquiryDto getInquiry(@PathVariable Long inquiryId, @AuthenticationPrincipal UserDTO userDTO) {
+    public InquiryDto getInquiry(@PathVariable Long inquiryId,
+                                 @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         InquiryDto inquiryDto = inquiryService.getInquiryById(inquiryId, userId);
         log.info("1:1 문의 상세 조회: {}", inquiryDto);
@@ -50,8 +61,6 @@ public class inquiryController {
         Long userId = userDTO.getUserId();
         inquiryService.deleteInquiry(inquiryId, userId);
     }
-
-
 
     // 1:1 문의 답변 등록
     @PostMapping("/inquiryResponseRegistration")

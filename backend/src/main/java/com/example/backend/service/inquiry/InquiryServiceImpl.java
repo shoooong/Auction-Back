@@ -31,24 +31,35 @@ public class InquiryServiceImpl implements InquiryService{
     @Autowired
     private InquiryResponseRepository inquiryResponseRepository;
 
-
     // 1:1 문의 조회
     @Override
-    public List<InquiryListDto> getAllInquiryList(Long userId) {
+    public List<InquiryDto> getAllInquiryList(Long userId) {
         List<Inquiry> inquiryList = inquiryRepository.findByUser_UserId(userId);
-        log.info("Found {} inquiryList for user {}", inquiryList.size(), userId);
+        log.info("Found {} inquiries for user {}", inquiryList.size(), userId);
 
         return inquiryList.stream()
-                .map(inquiry -> new InquiryListDto(
-                        inquiry.getInquiryId(),
-                        inquiry.getInquiryTitle(),
-                        inquiry.getInquiryContent(),
-                        inquiry.getCreateDate(),
-                        inquiry.getModifyDate(),
-                        inquiry.getUser().getUserId()
-                ))
+                .map(inquiry -> {
+                    InquiryDto dto = new InquiryDto();
+                    dto.setInquiryId(inquiry.getInquiryId());
+                    dto.setInquiryTitle(inquiry.getInquiryTitle());
+                    dto.setInquiryContent(inquiry.getInquiryContent());
+                    dto.setCreatedDate(inquiry.getCreateDate());
+                    dto.setModifyDate(inquiry.getModifyDate());
+                    dto.setUserId(inquiry.getUser().getUserId());
+
+                    // Fetch InquiryResponse if exists
+                    InquiryResponse response = inquiryResponseRepository.findByInquiry_InquiryId(inquiry.getInquiryId());
+                    if (response != null) {
+                        dto.setResponse(response.getResponse());
+                    }
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
+
+
+
 
     // 1:1 문의 상세 조회
     @Override
@@ -56,7 +67,7 @@ public class InquiryServiceImpl implements InquiryService{
         Inquiry inquiry = (Inquiry) inquiryRepository.findByInquiryIdAndUser_UserId(inquiryId, userId)
                 .orElseThrow(() -> new RuntimeException("해당 문의를 찾을 수 없습니다."));
 
-        List<InquiryResponse> responses = inquiryResponseRepository.findByInquiry_inquiryId(inquiryId);
+        List<InquiryResponse> responses = (List<InquiryResponse>) inquiryResponseRepository.findByInquiry_InquiryId(inquiryId);
 
         List<InquiryResponseDto> responseDtos = responses.stream()
                 .map(response -> InquiryResponseDto.builder()
@@ -77,14 +88,12 @@ public class InquiryServiceImpl implements InquiryService{
 
     @Override
     public void deleteInquiry(long inquiryId, Long userId) {
-
     }
-
 
     // 1:1 문의 등록
     @Override
-    public Inquiry createInquiry(Long userId, InquiryDto inquiryDto) {
-        Users user = userRepository.findById(userId)
+    public Inquiry createInquiry(InquiryDto inquiryDto) {
+        Users user = userRepository.findById(inquiryDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Inquiry inquiry = new Inquiry();
@@ -98,7 +107,6 @@ public class InquiryServiceImpl implements InquiryService{
         return savedInquiry;
     }
 
-
     // 1:1 문의 삭제
     @Override
     public void deleteInquiry(Long inquiryId, Long userId) {
@@ -111,14 +119,12 @@ public class InquiryServiceImpl implements InquiryService{
             throw new RuntimeException("User is not authorized to delete this inquiry");
         }
 
-        List<InquiryResponse> inquiryResponses = responseRepository.findByInquiry_InquiryId(inquiryId);
+        List<InquiryResponse> inquiryResponses = (List<InquiryResponse>) responseRepository.findByInquiry_InquiryId(inquiryId);
         inquiryResponseRepository.deleteAll(inquiryResponses);
 
         inquiryRepository.deleteById(inquiryId);
         log.info("Deleted inquiry with ID: {}", inquiryId);
     }
-
-
 
     // 1:1 문의 답변 등록
     @Override
@@ -151,8 +157,6 @@ public class InquiryServiceImpl implements InquiryService{
                 savedInquiryResponse.getResponse()
         );
     }
-
-
 
     // 1:1 문의 답변 삭제
     @Override

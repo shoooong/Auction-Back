@@ -93,7 +93,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 조회
-    @GetMapping("/user/feedBookmark")
+    @GetMapping("/feedBookmark")
     public List<FeedBookmarkDto> getUserFeedBookmarks(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         List<FeedBookmarkDto> feedBookmarks = styleFeedService.getUserFeedBookmarks(userId);
