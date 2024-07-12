@@ -1,10 +1,10 @@
-package com.example.backend.service;
+package com.example.backend.service.mypage;
 
 import com.example.backend.dto.mypage.addressSettings.AddressDto;
 import com.example.backend.dto.mypage.addressSettings.AddressReqDto;
 import com.example.backend.entity.Address;
 import com.example.backend.entity.Users;
-import com.example.backend.repository.Address.AddressRepository;
+import com.example.backend.repository.mypage.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

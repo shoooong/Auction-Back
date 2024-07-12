@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.luckyDraw;
 
 import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
 import com.example.backend.entity.LuckyDraw;

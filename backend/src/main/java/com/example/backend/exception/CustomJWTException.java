@@ -1,4 +1,4 @@
-package com.example.backend.Jwt.util;
+package com.example.backend.exception;
 
 public class CustomJWTException extends RuntimeException {
 

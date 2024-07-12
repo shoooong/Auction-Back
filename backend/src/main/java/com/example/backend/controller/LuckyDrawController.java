@@ -1,14 +1,11 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.alarm.RequestAlarmDto;
-import com.example.backend.dto.alarm.ResponseAlarmDto;
 import com.example.backend.dto.luckyDraw.DrawDto;
 import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.Alarm;
 import com.example.backend.entity.enumData.AlarmType;
-import com.example.backend.service.DrawService;
-import com.example.backend.service.LuckyDrawService;
+import com.example.backend.service.luckyDraw.DrawService;
+import com.example.backend.service.luckyDraw.LuckyDrawService;
 import com.example.backend.service.alarm.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor

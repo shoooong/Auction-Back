@@ -1,9 +1,9 @@
-package com.example.backend.service;
+package com.example.backend.service.mypage;
 
 import com.example.backend.dto.mypage.main.BookmarkProductsDto;
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
-import com.example.backend.repository.BookmarkProduct.BookmarkProductRepository;
+import com.example.backend.repository.mypage.BookmarkProductRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

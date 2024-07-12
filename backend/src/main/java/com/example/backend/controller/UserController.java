@@ -1,10 +1,10 @@
 package com.example.backend.controller;
 
-import com.example.backend.Jwt.util.CustomJWTException;
-import com.example.backend.Jwt.util.JWTUtil;
+import com.example.backend.exception.CustomJWTException;
+import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
-import com.example.backend.service.UserService;
+import com.example.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +58,7 @@ public class UserController {
     }
 
 
+    // TODO: 중복 가입 예외처리 (닉네임, 비밀번호)
     // 일반회원 회원가입
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {

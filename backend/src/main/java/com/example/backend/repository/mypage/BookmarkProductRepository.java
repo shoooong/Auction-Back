@@ -1,4 +1,4 @@
-package com.example.backend.repository.BookmarkProduct;
+package com.example.backend.repository.mypage;
 
 import com.example.backend.entity.BookmarkProduct;
 import org.springframework.data.domain.Pageable;

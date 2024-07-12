@@ -1,10 +1,10 @@
-package com.example.backend.service;
+package com.example.backend.service.mypage;
 
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import com.example.backend.entity.Account;
 import com.example.backend.entity.Users;
-import com.example.backend.repository.User.AccountRepository;
+import com.example.backend.repository.mypage.AccountRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,10 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    // 등록 계좌 조회
+    /**
+     * 등록된 계좌 조회
+     * 1 : 1
+     */
     public AccountDTO getAccount(Long userId){
         Account account = accountRepository.findByUserUserId(userId);
 
@@ -25,7 +28,9 @@ public class AccountService {
         return AccountDTO.fromEntity(account);
     }
 
-    // 계좌 등록 및 변경
+    /**
+     * 계좌 등록 및 변경
+     */
     @Transactional
     public AccountDTO updateAccount(Long userId, AccountReqDTO accountReqDTO){
         Account account = accountRepository.findByUserUserId(userId);
