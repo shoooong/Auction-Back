@@ -18,14 +18,14 @@ public class Address {
 
     // 우편 번호
     @Column(length = 20, nullable = false)
-    private String zoneCode;
+    private String zonecode;
 
     // 도로명 주소
-    @Column(length = 255, nullable = false)
+    @Column(length = 255)
     private String roadAddress;
 
     // 지번 주소
-    @Column(length = 255, nullable = false)
+    @Column(length = 255)
     private String jibunAddress;
 
     // 상세 주소
@@ -50,7 +50,7 @@ public class Address {
 
 
     public void updateAddress(AddressReqDto addressReqDto) {
-        this.zoneCode = addressReqDto.getZoneCode();
+        this.zonecode = addressReqDto.getZonecode();
         this.roadAddress = addressReqDto.getRoadAddress();
         this.jibunAddress = addressReqDto.getJibunAddress();
         this.detailAddress = addressReqDto.getDetailAddress();

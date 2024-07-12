@@ -36,7 +36,7 @@ public class AddressService {
     public AddressDto addAddress(Long userId, AddressReqDto addressReqDto) {
 
         boolean existAddress = addressRepository
-                .existsByZoneCodeAndRoadAddressAndUserUserId(addressReqDto.getZoneCode(), addressReqDto.getRoadAddress(), userId);
+                .existsByZonecodeAndRoadAddressAndUserUserId(addressReqDto.getZonecode(), addressReqDto.getRoadAddress(), userId);
 
         if (existAddress) {
             throw new IllegalStateException("이미 존재하는 주소지입니다.");
@@ -45,7 +45,7 @@ public class AddressService {
 
             Address address = Address.builder()
                     .user(Users.builder().userId(userId).build())
-                    .zoneCode(addressReqDto.getZoneCode())
+                    .zonecode(addressReqDto.getZonecode())
                     .roadAddress(addressReqDto.getRoadAddress())
                     .jibunAddress(addressReqDto.getJibunAddress())
                     .detailAddress(addressReqDto.getDetailAddress())

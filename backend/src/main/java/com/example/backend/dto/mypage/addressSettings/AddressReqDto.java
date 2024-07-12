@@ -9,18 +9,14 @@ import lombok.Getter;
 public class AddressReqDto {
 
     @NotBlank
-    private String zoneCode;
+    private String zonecode;
 
-    @NotBlank
     private String roadAddress;
 
-    @NotBlank
     private String jibunAddress;
 
-    @NotBlank
     private String detailAddress;
 
-    @NotBlank
     private String extraAddress;
 
     @NotBlank
