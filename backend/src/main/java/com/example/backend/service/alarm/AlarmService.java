@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import static com.example.backend.entity.QAlarm.alarm;
-
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -36,11 +34,18 @@ public class AlarmService {
         eventCache.put(eventId, emitter);
         userEmitters.put(userId, emitter);
 
+        // 상황별 emitter 삭제 처리
         emitter.onCompletion(() -> userEmitters.remove(userId));
         emitter.onTimeout(() -> userEmitters.remove(userId));
         emitter.onError(e -> userEmitters.remove(userId));
 
-        sendAlarmNotification(userId, emitter, eventId);
+        // 더미데이터 전송
+        sendAlarmNotification(userId, emitter, "event");
+
+//        List<Alarm> list = alarmRepository.findByUsersUserId(userId);
+//        for (Alarm alarm : list){
+//            sendNotification(alarm);
+//        }
 
         return emitter;
 
@@ -48,32 +53,19 @@ public class AlarmService {
 
     // 알림들 가져오기
     @Async
-    public void sendAlarmNotification(Long userId, SseEmitter emitter, Object eventId) {
-//        List<Alarm> sseEmitters = alarmRepository.findByAlarmId(responseAlarmDto.getAlarmId());
-//        for (Alarm sseEmitter : sseEmitters) {
-//            try{
-//                alarmRepository.save(sseEmitter);
-//                sendAlarmNotification(userId, responseAlarmDto);
-//            } catch (Exception e) {
-//                alarmRepository.delete(sseEmitter);
-//            }
-//        }
-//        SseEmitter emitter = userEmitters.get(userId);
-
+    public void sendAlarmNotification(Long userId, SseEmitter emitter, String eventData) {
         try {
-            if (emitter != null) {
-                emitter.send(SseEmitter.event()
-                        .name("alarm")
-                        .id(String.valueOf(userId))
-                        .data(eventId));
-            }
+            emitter.send(SseEmitter.event()
+                    .name("alarm")
+                    .id(String.valueOf(userId))
+                    .data(eventData));
         } catch (IOException e) {
             emitter.completeWithError(e);
         }
     }
 
     // 알람 저장
-    @Transactional
+//    @Transactional
     public void saveAlarm(Long userId, AlarmType alarmType) {
         Alarm newAlarm = alarmRepository.save(RequestAlarmDto.toEntity(userId, alarmType));
         sendNotification(newAlarm);
@@ -86,7 +78,10 @@ public class AlarmService {
 
         try {
             if (emitter != null) {
-                emitter.send(SseEmitter.event().name("alarm").id(String.valueOf(alarm.getUsers().getUserId())).data(alarm));
+                emitter.send(SseEmitter.event()
+                        .name("alarm")
+                        .id(String.valueOf(alarm.getUsers().getUserId()))
+                        .data(alarm));
             }
         } catch (IOException e) {
             emitter.completeWithError(e);
