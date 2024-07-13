@@ -1,11 +1,9 @@
 package com.example.backend.controller;
 
 
-import com.example.backend.dto.admin.AdminProductDto;
-import com.example.backend.dto.admin.AdminProductRespDto;
-import com.example.backend.dto.admin.AdminReqDto;
-import com.example.backend.dto.admin.AdminRespDto;
+import com.example.backend.dto.admin.*;
 import com.example.backend.entity.LuckyDraw;
+import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.LuckyProcessStatus;
 import com.example.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +62,6 @@ public class AdminController {
         //modelnum을 이용해서 상품 상세 조회, size에 따라 카테고리 조회하듯이 입찰 정보 불러오기
         AdminRespDto.AdminProductDetailRespDto detailedProduct =  adminService.getDetailProduct(modelNum, productSize);
         return new ResponseEntity<>(detailedProduct,HttpStatus.OK);
-
     }
 
     //판매입찰(검수중) 상품 검수 승인
@@ -81,8 +78,6 @@ public class AdminController {
     //관리자 럭키드로우 LuckDrawStatus로 다건 조회
     @GetMapping("/luckyList")
     public ResponseEntity<?> findLuckydarwList(@RequestParam(defaultValue = "READY") LuckyProcessStatus luckyProcessStatus) {
-
-
         AdminRespDto.LuckyDrawsRespDto luckyDrawList = adminService.getLuckyDraws(luckyProcessStatus);
         return new ResponseEntity<>(luckyDrawList,HttpStatus.OK);
     }
@@ -100,12 +95,16 @@ public class AdminController {
     }
 
 
+    @GetMapping("/product/{mainDepartment}")
+    public ResponseEntity<?> findProductsByDepartment(@PathVariable String mainDepartment) {
 
+        //판매중인 상품 대분류별 조회
+        //상품 이미지, 브랜드, 상품명, 모델명
+        //즉시구매가 = salesBiddingTable의 상품중 PROCESS 인 상품중 최저가(모든 사이즈별)
+        List<ProductRespDto> 범수야 = adminService.findProductsByDepartment(mainDepartment);
 
-
-
-
-
+        return new ResponseEntity<>(범수야,HttpStatus.OK);
+    }
 
 
 
