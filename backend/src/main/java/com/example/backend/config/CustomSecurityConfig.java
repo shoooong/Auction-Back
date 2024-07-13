@@ -93,12 +93,12 @@ public class CustomSecurityConfig {
             config.accessDeniedHandler(customAccessDeniedHandler);
         });
 
-//        // 특정 경로에 대해 인증 없이 접근 가능하도록 설정
-//        http.authorizeHttpRequests(auth -> {
-//            auth.requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated();
+        // 특정 경로에 대해 인증 없이 접근 가능하도록 설정
+        http.authorizeHttpRequests(auth -> {
+            auth.requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated();
 //            auth.requestMatchers("/admin/**").hasRole("ADMIN");
-//            auth.anyRequest().permitAll();
-//        });
+            auth.anyRequest().permitAll();
+        });
 
         // 시큐리티 전체 비활성화
 //        http.csrf().disable()
