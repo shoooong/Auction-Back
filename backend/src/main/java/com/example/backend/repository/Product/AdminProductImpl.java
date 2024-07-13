@@ -260,9 +260,9 @@ public class AdminProductImpl implements AdminProduct {
     @Override
     public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
         QProduct product = new QProduct("product");
-        QSalesBidding salesBidding = new QSalesBidding("salesBidding");
+        QBuyingBidding buyingBidding = new QBuyingBidding("buyingBidding");
 
-        BooleanExpression saleCondition = salesBidding.salesStatus.eq(SalesStatus.PROCESS);
+        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS);
         BooleanExpression eqMainDepartment = product.mainDepartment.eq(mainDepartment);
         BooleanExpression productCondition = product.productStatus.eq(ProductStatus.REGISTERED);
 //        BooleanExpression eqSubDepartment = product.subDepartment.eq(subDepartment);
@@ -278,14 +278,14 @@ public class AdminProductImpl implements AdminProduct {
                                 product.mainDepartment,  // 대분류
                                 product.subDepartment,  // 소분류
                                 product.productSize,
-                                salesBidding.salesBiddingPrice.min().as("최저가")  // 최저가
+                                buyingBidding.buyingBiddingPrice.min().as("최저가")  // 최저가
                         )
                 )
                 .from(product)
                 // salesBidding 테이블과 LEFT JOIN
-                .leftJoin(salesBidding)
-                .on(salesBidding.product.modelNum.eq(product.modelNum)
-                        .and(saleCondition))  // LEFT JOIN의 ON 절에 조건 추가
+                .leftJoin(buyingBidding)
+                .on(buyingBidding.product.modelNum.eq(product.modelNum)
+                        .and(buyingCondition))  // LEFT JOIN의 ON 절에 조건 추가
                 // 조건 결합
                 .where(eqMainDepartment.and(productCondition))
                 // 모델명을 기준으로 그룹화
