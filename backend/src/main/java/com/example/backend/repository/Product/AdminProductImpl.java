@@ -6,6 +6,7 @@ import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -68,8 +69,6 @@ public class AdminProductImpl implements AdminProduct {
     public List<AdminProductDto> getProductsByDepartment(String mainDepartment, String subDepartment) {
         QProduct product = new QProduct("product");
         log.info("mainDepartment {} subDepartment from 쿼리디에셀", mainDepartment, subDepartment);
-
-
         return queryFactory.select(
 //                순서 중요
                         Projections.constructor(AdminProductDto.class,
@@ -256,9 +255,52 @@ public class AdminProductImpl implements AdminProduct {
         }).collect(Collectors.toList());
     }
 
+    //범수
+    //판매 상품 대분류 조회
+    @Override
+    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
+        QProduct product = new QProduct("product");
+        QSalesBidding salesBidding = new QSalesBidding("salesBidding");
 
+        BooleanExpression saleCondition = salesBidding.salesStatus.eq(SalesStatus.PROCESS);
+        BooleanExpression eqMainDepartment = product.mainDepartment.eq(mainDepartment);
+        BooleanExpression productCondition = product.productStatus.eq(ProductStatus.REGISTERED);
+//        BooleanExpression eqSubDepartment = product.subDepartment.eq(subDepartment);
 
+        // 쿼리 실행 및 결과를 DTO로 매핑
+        return queryFactory.select(
+                        Projections.constructor(ProductRespDto.class,
+                                product.productId,  // 상품 ID
+                                product.productBrand,  // 상품 브랜드
+                                product.productName,  // 상품 이름
+                                product.modelNum,  // 모델명
+                                product.productImg,  // 상품 이미지
+                                product.mainDepartment,  // 대분류
+                                product.subDepartment,  // 소분류
+                                product.productSize,
+                                salesBidding.salesBiddingPrice.min().as("최저가")  // 최저가
+                        )
+                )
+                .from(product)
+                // salesBidding 테이블과 LEFT JOIN
+                .leftJoin(salesBidding)
+                .on(salesBidding.product.modelNum.eq(product.modelNum)
+                        .and(saleCondition))  // LEFT JOIN의 ON 절에 조건 추가
+                // 조건 결합
+                .where(eqMainDepartment.and(productCondition))
+                // 모델명을 기준으로 그룹화
+                .groupBy(
+                        product.modelNum
+                )
+                // 결과를 리스트로 반환
+                .fetch();
+    }
 }
+
+
+
+
+
 
 
 

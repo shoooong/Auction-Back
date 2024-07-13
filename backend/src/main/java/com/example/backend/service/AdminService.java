@@ -149,7 +149,7 @@ public class AdminService {
     //test
     //매주 첫째주 11시에 시작
 //    @Scheduled(cron = "0 0 11 ? * MON")
-    @Scheduled(cron = "2 00 17 * * *")
+    @Scheduled(cron = "2 20 15 * * *")
     @Transactional
     public void cronJob(){
         //스케줄 실행시, 데이터 베이스에 저장되어 있는 럭키드로우 데이터 startDate, endDate, LuckDate 등록
@@ -183,5 +183,12 @@ public class AdminService {
     }
 
 
+    //실제 판매중인 상품 대분류별 조회
+    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
 
+        List<ProductRespDto> 범수야 = productRepository.findProductsByDepartment(mainDepartment);
+        return 범수야;
+
+
+    }
 }
