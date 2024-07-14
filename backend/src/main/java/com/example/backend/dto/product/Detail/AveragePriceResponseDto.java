@@ -12,9 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AveragePriceResponseDto {
-    private List<AveragePriceDto> oneDayPrices;
     private List<AveragePriceDto> threeDayPrices;
-    private List<AveragePriceDto> sevenDayPrices;
-    private List<AveragePriceDto> fifteenDayPrices;
-    private List<AveragePriceDto> thirtyDayPrices;
+    private List<AveragePriceDto> oneMonthPrices;
+    private List<AveragePriceDto> sixMonthPrices;
+    private List<AveragePriceDto> oneYearPrices;
+    private List<AveragePriceDto> TotalExecutionPrice;
 }

@@ -1,7 +1,7 @@
 package com.example.backend.repository;
 
-import com.example.backend.dto.product.Detail.BasicInformationDto;
-import com.example.backend.dto.product.Detail.RecentlyPriceDto;
+import com.example.backend.dto.product.Detail.ProductDetailDto;
+import com.example.backend.dto.product.Detail.GroupByBuyingDto;
 import com.example.backend.dto.product.Detail.SalesBiddingDto;
 import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.entity.*;
@@ -135,15 +135,30 @@ public class ProductsTests {
     @Transactional
         // 해당 모델번호가 가지고 있는 구매(최저), 판매(최고) 입찰 희망가격 조회
     void selectModelPrice() {
-        BasicInformationDto priceResponseDto = productRepository.searchProductPrice("NIKE-1");
+        ProductDetailDto priceResponseDto = productRepository.searchProductPrice("NIKE-1");
         log.info("상품 정보 : {}", priceResponseDto);
     }
 
     @Test
-    // 해당 productId를 통해 최근 체결과 가져오기
+    // 해당 productId를 통해 최근 체결가격 가져오기
     public void testFind() {
         Optional<Product> price = productRepository.findFirstByModelNumOrderByLatestDateDesc("NIKE-1");
         assertNotNull(price);
         System.out.println("Latest Sales Bidding: " + price);
     }
+    @Test
+    public void testFindGroupByBuying() {
+        List<GroupByBuyingDto> temp = productRepository.GroupByBuyingInfo("NIKE-1");
+        assertNotNull(temp);
+    }
+    @Test
+    // 해당 productId를 통해 최근 체결가격 가져오기
+    public void testFindLatestBiddingDate() {
+        List<SalesBidding> temp = salesBiddingRepository.findFirstByOriginalContractDate("NIKE-1");
+        SalesBidding salesBidding = temp.get(0);
+        log.info("salesBidding: {}", salesBidding);
+    }
+
+
+
 }
