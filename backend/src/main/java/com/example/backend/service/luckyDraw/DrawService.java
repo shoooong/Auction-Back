@@ -28,8 +28,6 @@ public class DrawService {
     private final UserRepository userRepository;
     private final LuckyDrawRepository luckyDrawRepository;
 
-    private final AlarmRepository alarmRepository;
-
     /**
      * 럭키드로우 응모 내역 저장
      * 중복 응모 불가

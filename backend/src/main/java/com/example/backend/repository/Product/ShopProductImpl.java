@@ -3,11 +3,9 @@ package com.example.backend.repository.Product;
 import com.example.backend.dto.product.TotalProductDto;
 import com.example.backend.entity.QBuyingBidding;
 import com.example.backend.entity.QProduct;
-import com.example.backend.entity.QSalesBidding;
-import com.nimbusds.oauth2.sdk.util.StringUtils;
-import com.querydsl.core.BooleanBuilder;
+import com.example.backend.entity.enumData.BiddingStatus;
+import com.example.backend.entity.enumData.ProductStatus;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQueryFactory;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -66,6 +62,8 @@ public class ShopProductImpl implements ShopProduct {
                         ))
                 .from(product)
                 .leftJoin(buyingBidding).on(product.productId.eq(buyingBidding.product.productId))
+                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED"))
+                        .and(buyingBidding.biddingStatus.eq(BiddingStatus.valueOf("PROCESS"))))
                 .groupBy(product.modelNum)
                 .offset(pageable.getOffset())
                 .limit(pageSize + 1)

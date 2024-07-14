@@ -54,7 +54,7 @@ public class LuckyDrawController {
         DrawDto drawDTO = drawService.saveDraw(userId, luckyId);
 
         // 알림 전송
-        alarmService.saveAlarm(userId, AlarmType.LUCKYAPPLY);
+        alarmService.sendNotification(userId, AlarmType.LUCKYAPPLY);
 
         return ResponseEntity.ok().body(drawDTO);
     }
