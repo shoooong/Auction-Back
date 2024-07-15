@@ -8,6 +8,7 @@ import com.example.backend.repository.alarm.AlarmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -27,12 +28,20 @@ public class AlarmService {
 
     private final static Long DEFAULT_TIMEOUT = 3600000L;
     private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
-    private final List<SseEmitter> emitters = new ArrayList<>();
+
+    private final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
     public SseEmitter subscribe(Long userId){
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         userEmitters.put(userId, emitter);
-        emitters.add(emitter);
+
+        if (userEmitters.containsKey(userId)){
+            SseEmitter existingEmitter = userEmitters.get(userId);
+            if (existingEmitter != null) {
+                existingEmitter.complete();
+                userEmitters.remove(userId);
+            }
+        }
+
 
         // 상황별 emitter 삭제 처리
         emitter.onCompletion(() -> userEmitters.remove(userId));
@@ -44,20 +53,30 @@ public class AlarmService {
         return emitter;
     }
 
+    @Scheduled(fixedRate = 45 * 1000)
+    public void sendHeartBeat(){
+        try {
+            emitter.send(SseEmitter.event()
+                    .comment("alarm beat"));
+            log.info("슬기 alarm beat");
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+    }
+
     // 알림들 가져오기
     @Async
     public void sendAlarmNotification(Long userId) {
         List<ResponseAlarmDto> list = alarmRepository.findByUsersUserId(userId).stream().map(ResponseAlarmDto::fromEntity).collect(toList());
+        SseEmitter emitter = userEmitters.get(userId);
 
-        for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .id(String.valueOf(userId))
-                        .name("alarm-list")
-                        .data(list));
-            } catch (IOException e) {
-                emitters.remove(emitter);
-            }
+        try {
+            emitter.send(SseEmitter.event()
+                    .id(String.valueOf(userId))
+                    .name("alarm-list")
+                    .data(list));
+        } catch (IOException e) {
+            userEmitters.remove(userId,emitter);
         }
 
 
