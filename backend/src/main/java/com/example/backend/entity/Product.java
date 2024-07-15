@@ -80,4 +80,6 @@ public class Product extends BaseEntity {
     public void updateLatestDate(LocalDateTime latestDate) {
         this.latestDate = latestDate;
     }
+
+
 }

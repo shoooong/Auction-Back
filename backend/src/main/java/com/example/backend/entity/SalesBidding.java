@@ -39,7 +39,7 @@ public class SalesBidding extends BaseEntity{
     private Product product;
 
     // 판매 입찰 상태 변경
-    public void chageSalesStatus(SalesStatus salesStatus){
+    public void changeSalesStatus(SalesStatus salesStatus){
         this.salesStatus = salesStatus;
     }
 }

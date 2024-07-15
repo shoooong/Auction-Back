@@ -2,10 +2,16 @@ package com.example.backend.service.coupon;
 
 import com.example.backend.dto.coupon.CouponCreateDto;
 import com.example.backend.dto.coupon.CouponDto;
+import com.example.backend.dto.coupon.CouponIssueDto;
 import com.example.backend.entity.Coupon;
+import com.example.backend.entity.CouponIssue;
+import com.example.backend.entity.Users;
 import com.example.backend.entity.enumData.CouponCondition;
+import com.example.backend.entity.enumData.DiscountType;
+import com.example.backend.repository.CouponIssue.CouponIssueRepository;
 import com.example.backend.repository.CouponIssue.RedisRepository;
 import com.example.backend.repository.coupon.CouponRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +25,7 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final RedisRepository redisRepository;
+    private final CouponIssueRepository couponIssueRepository;
 
     public void createCoupon(CouponCreateDto couponCreateDto) {
         Coupon coupon = couponCreateDto.toEntity();
@@ -51,6 +58,29 @@ public class CouponService {
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }
+
+    public BigDecimal applyCoupon(Users user, Coupon coupon, BigDecimal originalAmount) {
+        CouponIssue couponIssue = couponIssueRepository.findByUsersAndCouponAndUseStatusFalse(user, coupon)
+            .orElseThrow(() -> new RuntimeException("Coupon not valid"));
+
+        // 쿠폰 타입에 따라 할인 계산
+        Coupon userCoupon = couponIssue.getCoupon();
+        if (userCoupon.getDiscountType() == DiscountType.FIXED) {
+            // 고정 할인
+            return originalAmount.subtract(coupon.getAmount());
+        } else if (userCoupon.getDiscountType() == DiscountType.PERCENT) {
+            // 퍼센트 할인
+            BigDecimal discount = originalAmount.multiply(userCoupon.getAmount().divide(BigDecimal.valueOf(100)));
+            return originalAmount.subtract(discount);
+        }
+
+
+
+        return originalAmount;
+    }
+
+
+
 
     private CouponDto convertToDto(Coupon coupon) {
         return CouponDto.builder()

@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -25,11 +26,19 @@ public class CouponIssue extends BaseEntity{
     private Coupon coupon;
 
     @Column(updatable = false)
-    private LocalDate endDate; // 만료날짜
+    private LocalDateTime endDate; // 만료날짜
 
     @Column(nullable = false)
     private boolean useStatus; // 쿠폰 사용 여부
 
     @Column
-    private LocalDate useDate; // 쿠폰 사용 날짜
+    private LocalDateTime useDate; // 쿠폰 사용 날짜
+
+    public void useCoupon(boolean useStatus){
+        this.useStatus = useStatus;
+    }
+
+    public void useDate(){
+        this.useDate = LocalDateTime.now();
+    }
 }

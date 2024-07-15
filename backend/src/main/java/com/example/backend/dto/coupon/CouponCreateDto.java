@@ -1,6 +1,7 @@
 package com.example.backend.dto.coupon;
 import com.example.backend.entity.Coupon;
 import com.example.backend.entity.enumData.DiscountType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -23,7 +24,7 @@ public class CouponCreateDto {
     private String couponCode;
     private Long expDay;
     private DiscountType discountType;
-    private Long amount;
+    private BigDecimal amount;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String content;
