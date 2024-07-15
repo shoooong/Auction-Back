@@ -1,7 +1,6 @@
 package com.example.backend.repository.Bidding;
 
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
-import com.example.backend.dto.product.Detail.SalesHopeDto;
 import com.example.backend.entity.SalesBidding;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long> {
@@ -46,4 +44,6 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
             "ORDER BY s.salesBiddingTime DESC")
     List<SaleDetailsDto> findRecentSaleDetailsByUserId(Long userId, Pageable pageable);
 
+    @Query("SELECT s FROM SalesBidding s LEFT JOIN Product p on s.product.productId = p.productId WHERE p.modelNum = :modelNum ORDER BY s.salesBiddingTime desc")
+    List<SalesBidding> findFirstByOriginalContractDate(@Param("modelNum") String modelNum);
 }

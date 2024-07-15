@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.user;
 
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
@@ -9,6 +9,10 @@ import com.example.backend.dto.user.UserModifyDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
+import com.example.backend.service.OrdersService;
+import com.example.backend.service.SalesBiddingService;
+import com.example.backend.service.UserCouponService;
+import com.example.backend.service.mypage.BookmarkProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

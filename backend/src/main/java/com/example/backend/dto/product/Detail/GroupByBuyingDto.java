@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContractInfoDto {
+public class GroupByBuyingDto {
+    private String productImg;
+    private String productName;
+    private String modelNum;
     private String productSize;
-    private Long contractPrice;
-    private LocalDate contractDate;
-//    List<SalesBidding> salesBiddingList;
+    private Long buyingBiddingPrice;
 }

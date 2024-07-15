@@ -11,7 +11,7 @@ public interface ProductService {
     List<ProductResponseDto> selectCategoryValue(String subDepartment);
 
     // 상세 상품 기본 정보 조회
-    BasicInformationDto basicInformation(String modelNum);
+    ProductDetailDto productDetailInfo(String modelNum);
 
     RecentlyPriceDto selectRecentlyPrice(String modelNum);
 
@@ -22,10 +22,18 @@ public interface ProductService {
     List<BuyingHopeDto> selectBuyingHope(String modelNum);
 
     void addPhotoReview(PhotoRequestDto photoRequestDto);
+
     void updatePhotoReview(PhotoRequestDto photoRequestDto);
+
     void deletePhotoReview(Long reviewId, Long userId);
 
     List<PhotoReviewDto> selectPhotoReview(String modelNum);
+
+    BuyingBidResponseDto selectBuyingBid(BuyingBidRequestDto buyingBidRequestDto);
+
+    void saveTemporaryBid(BidRequestDto bidRequestDto);
+
+    AveragePriceResponseDto getAveragePrices(String modelNum);
 
 //    List<ContractInfoDto> selectContractValue(String modelNum);
 

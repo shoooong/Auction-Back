@@ -13,12 +13,16 @@ import com.example.backend.dto.user.*;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.*;
+import com.example.backend.service.luckyDraw.DrawService;
+import com.example.backend.service.mypage.AccountService;
+import com.example.backend.service.mypage.AddressService;
+import com.example.backend.service.mypage.BookmarkProductService;
+import com.example.backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -78,7 +82,7 @@ public class MypageController {
 
     /**
      * 내 정보 - 배송지
-     * 배송지 조회, 등록, 수정
+     * 배송지 조회, 등록, 수정, 삭제
      */
     // 배송지 조회
     @GetMapping("/address")
@@ -106,6 +110,16 @@ public class MypageController {
         AddressDto addressDto = addressService.updateAddress(userId, addressId, addressReqDto);
 
         return ResponseEntity.ok(addressDto);
+    }
+
+    // 배송지 삭제
+    @DeleteMapping("/address")
+    public ResponseEntity<String> deleteAddress(@RequestParam Long addressId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        addressService.deleteAddress(userId, addressId);
+
+        return ResponseEntity.ok("Address deleted successfully!");
     }
 
 

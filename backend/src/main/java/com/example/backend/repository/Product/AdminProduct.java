@@ -2,6 +2,7 @@ package com.example.backend.repository.Product;
 
 import com.example.backend.dto.admin.AdminProductDto;
 import com.example.backend.dto.admin.AdminProductRespDto;
+import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.entity.Product;
 import org.springframework.data.repository.query.Param;
 
@@ -14,4 +15,7 @@ public interface AdminProduct {
 
     //싱품 상세 조회
     List<AdminProductRespDto> getDetailedProduct(@Param("modelNum") String modelNum, @Param("productSize") String productSize);
+
+    //범수
+    List<ProductRespDto> findProductsByDepartment(@Param("mainDepartment")String mainDepartment);
 }

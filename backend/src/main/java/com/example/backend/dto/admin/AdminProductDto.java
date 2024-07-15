@@ -16,6 +16,7 @@ public class AdminProductDto {
     private String mainDepartment;
     private String subDepartment;
 
+
     public AdminProductDto(Long productId,String productName, String modelNum, String productBrand, String productSize,String mainDepartment,String subDepartment) {
         this.productId = productId;
         this.productName = productName;

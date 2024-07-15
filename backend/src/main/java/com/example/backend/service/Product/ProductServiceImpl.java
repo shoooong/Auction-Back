@@ -2,11 +2,10 @@ package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
-import com.example.backend.entity.PhotoReview;
-import com.example.backend.entity.Product;
-import com.example.backend.entity.Users;
+import com.example.backend.entity.*;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.repository.Bidding.BuyingBiddingRepository;
+import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Product.PhotoReviewRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import com.example.backend.repository.User.UserRepository;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 
 import java.text.DecimalFormat;
@@ -46,15 +44,16 @@ public class ProductServiceImpl implements ProductService {
     private PhotoReviewRepository photoReviewRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private SalesBiddingRepository salesBiddingRepository;
+
 
     // 상품 소분류 조회
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDto> selectCategoryValue(String subDepartment) {
-        log.info("subDepartment : {}", subDepartment);
 
         List<Product> subProduct = productRepository.subProductInfo(subDepartment);
-        log.info("subProduct : {}", subProduct);
 
         return subProduct.stream()
                 .map(this::convertProductDto)
@@ -70,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
         productDto.setProductLike(product.getProductLike());
         productDto.setModelNum(product.getModelNum());
 
-        // Product 와 연관된 BuyingBidding 엔티티들을 BuyingDto로 변환
+        // Product 와 연관된 BuyingBidding 엔티티들을 BuyingDto 로 변환
         List<BuyingDto> buyingDtoList = buyingBiddingRepository.findByProductAndBiddingStatus(product, BiddingStatus.PROCESS).stream()
                 .map(buyingBidding -> {
                     BuyingDto buyingDto = new BuyingDto();
@@ -97,15 +96,15 @@ public class ProductServiceImpl implements ProductService {
     // 상품의 기본정보 조회
     @Override
     @Transactional
-    public BasicInformationDto basicInformation(String modelNum) {
+    public ProductDetailDto productDetailInfo(String modelNum) {
         log.info("modelNum : {}", modelNum);
 
-        Optional<Product> productOptional = productRepository.findFirstByModelNum(modelNum);
-        // 망할 ModelMapper 이슈로
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
+        List<Product> products = productRepository.findAllByModelNumAndStatus(modelNum);
+        if (!products.isEmpty()) {
+            // 가장 먼저 나온 결과를 사용하거나, 추가 조건을 통해 단일 결과 선택
+            Product product = products.get(0);
 
-            BasicInformationDto priceValue = productRepository.searchProductPrice(modelNum);
+            ProductDetailDto priceValue = productRepository.searchProductPrice(modelNum);
 
             List<ProductsContractListDto> contractInfoList = selectSalesContract(modelNum);
 
@@ -115,9 +114,15 @@ public class ProductServiceImpl implements ProductService {
 
             List<PhotoReviewDto> photoReviewDtoList = selectPhotoReview(modelNum);
 
+            List<GroupByBuyingDto> groupByBuyingDtoList = productRepository.GroupByBuyingInfo(modelNum);
+
+            List<GroupBySalesDto> groupBySalesDtoList = productRepository.GroupBySalesInfo(modelNum);
+
+            AveragePriceResponseDto averagePriceResponseDtoList =  getAveragePrices(modelNum);
+
 
             RecentlyPriceDto recentlyContractPrice = selectRecentlyPrice(modelNum);
-            BasicInformationDto basicInformationDto = BasicInformationDto.builder()
+            ProductDetailDto productDetailDto = ProductDetailDto.builder()
                     .productId(product.getProductId())
                     .productImg(product.getProductImg())
                     .productBrand(product.getProductBrand())
@@ -142,10 +147,13 @@ public class ProductServiceImpl implements ProductService {
 
                     .photoReviewList(photoReviewDtoList)
 
+                    .groupByBuyingList(groupByBuyingDtoList)
+                    .groupBySalesList(groupBySalesDtoList)
+
                     .build();
 
-            log.info("상세상품 변환 완료 : {}", basicInformationDto);
-            return basicInformationDto;
+            log.info("상세상품 변환 완료 : {}", productDetailDto);
+            return productDetailDto;
         }
         return null;
     }
@@ -298,24 +306,41 @@ public class ProductServiceImpl implements ProductService {
         log.info("구매 입찰 내역 확인 : {} ", temp);
         Map<String, BuyingHopeDto> groupedResults = new LinkedHashMap<>();
 
+        Optional<BuyingHopeDto> lowestPrice = temp.stream()
+                .min(Comparator.comparing(BuyingHopeDto::getBuyingBiddingPrice));
+
+        if (lowestPrice.isPresent()) {
+            BuyingHopeDto lowest = lowestPrice.get();
+            log.info("최저가 항목 : {}", lowest);
+        }
+
         for (BuyingHopeDto hope : temp) {
             // 동일한 사이즈와 가격을 기준으로 키 생성
             String key = hope.getProductSize() + "-" + hope.getBuyingBiddingPrice();
 
             // 이미 존재하는 항목이면 수량 증가, 아니면 새로 추가
-            if (groupedResults.containsKey(key)) {
-                BuyingHopeDto existing = groupedResults.get(key);
-                existing.setBuyingQuantity(existing.getBuyingQuantity() + hope.getBuyingQuantity());
-            } else {
-                groupedResults.put(key, hope);
-            }
+            groupedResults.merge(key, hope, (existing, newHope) -> {
+                existing.setBuyingQuantity(existing.getBuyingQuantity() + newHope.getBuyingQuantity());
+                return existing;
+            });
         }
         // 결과를 다시 리스트로 변환
         List<BuyingHopeDto> resultList = new ArrayList<>(groupedResults.values());
 
         log.info("리스트로 변환 : {}, ", resultList);
 
-        return resultList;
+
+        return resultList.stream()
+                .map(this::convertBuyingDto)
+                .collect(Collectors.toList());
+    }
+
+    private BuyingHopeDto convertBuyingDto(BuyingHopeDto hope) {
+        return BuyingHopeDto.builder()
+                .productSize(hope.getProductSize())
+                .buyingQuantity(hope.getBuyingQuantity())
+                .buyingBiddingPrice(hope.getBuyingBiddingPrice())
+                .build();
     }
 
     @Transactional
@@ -349,7 +374,7 @@ public class ProductServiceImpl implements ProductService {
         Users user = userRepository.findById(photoRequestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
 
-        if(!review.getUser().getUserId().equals(photoRequestDto.getUserId())) {
+        if (!review.getUser().getUserId().equals(photoRequestDto.getUserId())) {
             throw new IllegalArgumentException("해당 리뷰를 수정할 권한이 없습니다.");
         }
         // 리뷰 수정
@@ -364,18 +389,16 @@ public class ProductServiceImpl implements ProductService {
 
         photoReviewRepository.save(photoReview);
         log.info("리뷰가 성공적으로 수정되었습니다.");
-
-        log.info("해당 리뷰를 찾을 수 없습니다.");
     }
 
     @Override
     public void deletePhotoReview(Long reviewId, Long userId) {
         PhotoReview photoReview = photoReviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
 
-        if(!photoReview.getUser().getUserId().equals(userId)) {
+        if (!photoReview.getUser().getUserId().equals(userId)) {
             throw new IllegalArgumentException("해당 리뷰를 삭제할 권한이 없습니다.");
         }
-            photoReviewRepository.delete(photoReview);
+        photoReviewRepository.delete(photoReview);
     }
 
     // 해당 상품에 대한 스타일 리뷰 조회(리스트)
@@ -393,68 +416,80 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    // 상세 상품의 거래 체결 조회
+    @Override
+    public BuyingBidResponseDto selectBuyingBid(BuyingBidRequestDto buyingBidRequestDto) {
 
-//    @Transactional
-//    public List<PhotoReviewDto> (String modelNum, Long userId) {
-//        Product product = productRepository.findFirstByModelNum(modelNum)
-//                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + modelNum));
-//
-//        Users user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-//
-//        PhotoReview photoReview = PhotoReview.builder()
-//                .user(user)
-//                .reviewImg(photoReviewDto.getReviewImg())
-//                .reviewContent(photoReviewDto.getReviewContent())
-//                .reviewLike(photoReviewDto.getReviewLike())
-//                .products(product)
-//                .build();
-//
-//        photoReviewRepository.save(photoReview);
-//    }
+        Long userId = buyingBidRequestDto.getUserId();
+        boolean check = userRepository.existsByUserId(userId);
+        if (check) {
+            log.info("해당 계정은 합격");
+            // 상품 기본정보 뽑기
+            Optional<Product> products = productRepository.findBidProductInfo(buyingBidRequestDto.getModelNum(), buyingBidRequestDto.getProductSize());
+            log.info("상품의 기본 정보 확인 : {}", products);
 
-//    @Override
-//    public List<ContractInfoDto> selectContractValue(String modelNum) {
-//        List<Product> productList = productRepository.findProductByModelNumOrderByLatestDateDesc(modelNum);
-//
-//        return productList.stream()
-//                .map(product -> ContractInfoDto.builder()
-//                        .productSize(product.getProductSize())
-//                        .contractPrice(product.getLatestPrice())
-//                        .contractDate(product.getLatestDate().toLocalDate())
-//                        .build())
-//                .collect(Collectors.toList());
-//    }
+            if (products.isEmpty()) {
+                log.info("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
+                throw new IllegalArgumentException("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
 
-//    public AveragePriceResponseDto getAveragePrices(String modelNum) {
-//        LocalDateTime now = LocalDateTime.of(2024, 7, 9, 0, 1);
-//        AveragePriceResponseDto responseDto = new AveragePriceResponseDto();
-//
-//        responseDto.setOneDayPrices(getPrices(modelNum, now.minusDays(1), now, 2));
-//        responseDto.setThreeDayPrices(getPrices(modelNum, now.minusDays(3), now, 6));
-//        responseDto.setSevenDayPrices(getPrices(modelNum, now.minusDays(7), now, 12));
-//        responseDto.setFifteenDayPrices(getPrices(modelNum, now.minusDays(15), now, 24));
-//        responseDto.setThirtyDayPrices(getPrices(modelNum, now.minusDays(30), now, 48));
-//
-//        return responseDto;
-//    }
-//
-//    private List<AveragePriceDto> getPrices(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
-//        List<AveragePriceDto> averagePrices = new ArrayList<>();
-//        LocalDateTime current = startDate;
-//
-//        while (current.isBefore(endDate)) {
-//            LocalDateTime next = current.plusHours(intervalHours);
-//            List<Tuple> tuples = productRepository.findHourlyAveragePricesByModelNumAndDateRange(modelNum, current, next);
-//
-//            for (Tuple tuple : tuples) {
-//                String dateTime = tuple.get(0, String.class);
-//                Double averagePrice = tuple.get(1, Double.class);
-//                averagePrices.add(new AveragePriceDto(dateTime, averagePrice));
-//            }
-//            current = next;
-//        }
-//
-//        return averagePrices;
-//    }
+            }
+            // 해당 상품의 사이즈에 대한 가격 뽑기, 구매 / 판매 둘다
+            BuyingBidResponseDto buyingBidResponseDto = productRepository.BuyingBidResponse(buyingBidRequestDto);
+            if (buyingBidResponseDto == null) {
+                log.info("해당 상품의 가격이 존재하지 않습니다.");
+                throw new IllegalArgumentException("해당 상품의 가격이 존재하지 않습니다.");
+            }
+            log.info("해당 사이즈에 대한 가격 뽑기 : {}", buyingBidResponseDto);
+
+
+            return BuyingBidResponseDto.builder()
+                    .productImg(products.get().getProductImg())
+                    .productName(products.get().getProductName())
+                    .productSize(products.get().getProductSize())
+                    .productBuyPrice(buyingBidResponseDto.getProductBuyPrice())
+                    .productSalePrice(buyingBidResponseDto.getProductSalePrice())
+                    .build();
+        }
+        return null;
+    }
+
+    @Override
+    public void saveTemporaryBid(BidRequestDto bidRequestDto) {
+        Users user = userRepository.findById(bidRequestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
+        Product product = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getSize())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 상품 ID 입니다."));
+
+        if (bidRequestDto.getType().equals("buy")) {
+            BuyingBidding buyingBidding = bidRequestDto.toBuyingBidding(user, product);
+            buyingBiddingRepository.save(buyingBidding);
+        } else if (bidRequestDto.getType().equals("sale")) {
+            SalesBidding salesBidding = bidRequestDto.toSalesBidding(user, product);
+            salesBiddingRepository.save(salesBidding);
+        }
+
+        log.info("뭔가 오류인듯");
+
+    }
+
+    @Override
+    public AveragePriceResponseDto getAveragePrices(String modelNum) {
+        LocalDateTime now = LocalDateTime.of(2024, 7, 10, 0, 1);
+        List<SalesBidding> temp = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
+        SalesBidding salesBidding = temp.get(0);
+
+        return AveragePriceResponseDto.builder()
+                .threeDayPrices(getPrices(modelNum, now.minusDays(3), now, 3))
+                .oneMonthPrices(getPrices(modelNum, now.minusMonths(1), now, 24))
+                .sixMonthPrices(getPrices(modelNum, now.minusMonths(6), now, 168))
+                .oneYearPrices(getPrices(modelNum, now.minusYears(1), now, 7200))
+                .TotalExecutionPrice(getPrices(modelNum, salesBidding.getSalesBiddingTime(), now, 0))
+                .build();
+    }
+
+    private List<AveragePriceDto> getPrices(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
+
+
+        return null;
+    }
 }

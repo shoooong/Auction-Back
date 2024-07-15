@@ -1,5 +1,6 @@
-package com.example.backend.Jwt.util;
+package com.example.backend.security;
 
+import com.example.backend.exception.CustomJWTException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;

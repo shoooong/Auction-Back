@@ -42,8 +42,8 @@ public class CustomSecurityConfig {
             "/inquiry/{inquiryId}/delete",
             "/requestProduct/user/**",
             "/order/**",
-            "/coupon/{couponId}/issue"
-            // "/alarm/subscribe"
+            "/coupon/{couponId}/issue",
+            "/alarm/subscribe"
     };
 
     @Bean
@@ -96,7 +96,7 @@ public class CustomSecurityConfig {
         // 특정 경로에 대해 인증 없이 접근 가능하도록 설정
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated();
-            auth.requestMatchers("/admin/**").hasRole("ADMIN");
+//            auth.requestMatchers("/admin/**").hasRole("ADMIN");
             auth.anyRequest().permitAll();
         });
 

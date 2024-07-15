@@ -1,6 +1,6 @@
 package com.example.backend.security.filter;
 
-import com.example.backend.Jwt.util.JWTUtil;
+import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
 import jakarta.servlet.FilterChain;
@@ -33,8 +33,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/inquiry/*/delete",
             "/requestProduct/user/**",
             "/order/**",
-            "/coupon/*/issue"
-            // "/alarm/subscribe"
+            "/coupon/*/issue",
+            "/alarm/subscribe"
     );
 
     /**

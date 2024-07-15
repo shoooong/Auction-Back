@@ -1,8 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.product.*;
-import com.example.backend.dto.product.Detail.BasicInformationDto;
-import com.example.backend.dto.product.Detail.PhotoRequestDto;
+import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.Product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 //userId를 못가져오면 null값이라는거니까 로그인을 안한상태
 @RestController
 @Log4j2
@@ -34,14 +34,59 @@ public class ProductController {
 
     // 해당 상품(상세) 기본 정보 가져오기
     @GetMapping("/details/{modelNum}")
-    public BasicInformationDto productDetailSelect(@PathVariable String modelNum) {
+    public ProductDetailDto productDetailSelect(@PathVariable String modelNum) {
 
         // (상품의 기본 정보) && (해당 상품의 구매(최저) / 판매(최고)가 조회) && (해당 상품에 대한 최근 체결 정보) && 상품 체결 / 구매 / 판매 내역 리스트
-        BasicInformationDto basicInformationDto = productService.basicInformation(modelNum);
+        ProductDetailDto basicInformationDto = productService.productDetailInfo(modelNum);
         log.info("basicInformationDto : " + basicInformationDto);
 
         return basicInformationDto;
     }
+
+    @GetMapping("/details/{modelNum}/bid")
+    public ResponseEntity<?> buyingBidSelect(
+            @PathVariable String modelNum,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String type,
+            @AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null) {
+            log.info("로그인이 되어있지 않습니다.");
+        }
+        Long userId = userDTO.getUserId();
+        BuyingBidRequestDto bidRequestDto = BuyingBidRequestDto.builder()
+                .modelNum(modelNum)
+                .productSize(size)
+                .type(type)
+                .userId(userId)
+                .build();
+        BuyingBidResponseDto buyingBidResponseDto = productService.selectBuyingBid(bidRequestDto);
+
+        return new ResponseEntity<>(buyingBidResponseDto, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/details/{modelNum}/bid")
+    public ResponseEntity<?> bidApplication(
+            @PathVariable String modelNum,
+            @RequestBody BidRequestDto bidRequestDto,
+            @AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null) {
+            log.info("로그인이 되어있지 않습니다.");
+        }
+        Long userId = userDTO.getUserId();
+        bidRequestDto.setUserId(userId);
+        bidRequestDto.setModelNum(modelNum);
+        productService.saveTemporaryBid(bidRequestDto);
+        return ResponseEntity.ok("값이 정상적으로 저장되었습니다.");
+    }
+
+//    @PutMapping("/details/{modelNum}/bid/{buyingBiddingId}")
+//    public ResponseEntity<?> updateBid(
+//            @PathVariable String modelNum,
+//            @PathVariable Long buyingBiddingId,
+//            @RequestBody
+//    )
+
     // 리뷰 작성
     @PostMapping("/details/{modelNum}/review")
     public ResponseEntity<?> productDetailReview(@PathVariable String modelNum, @RequestBody PhotoRequestDto photoRequestDto, @AuthenticationPrincipal UserDTO userDTO) {
