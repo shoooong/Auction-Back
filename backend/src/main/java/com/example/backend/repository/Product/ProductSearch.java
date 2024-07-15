@@ -4,6 +4,7 @@ package com.example.backend.repository.Product;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.entity.Product;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductSearch {
@@ -26,4 +27,10 @@ public interface ProductSearch {
     List<GroupBySalesDto> GroupBySalesInfo(String modelNum);
 
     BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto);
+
+
+    List<AveragePriceDto> AveragePriceInfo(String modelNum);
+
+    List<AveragePriceDto> AveragePriceInfo(String modelNum, LocalDateTime startDate, LocalDateTime endDate);
+
 }

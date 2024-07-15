@@ -93,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
-    // 상품의 기본정보 조회
+    // 상품의 상세정보 조회
     @Override
     @Transactional
     public ProductDetailDto productDetailInfo(String modelNum) {
@@ -467,29 +467,55 @@ public class ProductServiceImpl implements ProductService {
             SalesBidding salesBidding = bidRequestDto.toSalesBidding(user, product);
             salesBiddingRepository.save(salesBidding);
         }
-
-        log.info("뭔가 오류인듯");
-
     }
 
     @Override
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
         LocalDateTime now = LocalDateTime.of(2024, 7, 10, 0, 1);
-        List<SalesBidding> temp = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
-        SalesBidding salesBidding = temp.get(0);
+        List<AveragePriceDto> temp = productRepository.AveragePriceInfo(modelNum);
+        LocalDateTime OriginalContractDate = temp.get(0).getContractDateTime();
+        log.info("OriginalContractDate : {}", OriginalContractDate.toString());
 
         return AveragePriceResponseDto.builder()
-                .threeDayPrices(getPrices(modelNum, now.minusDays(3), now, 3))
-                .oneMonthPrices(getPrices(modelNum, now.minusMonths(1), now, 24))
-                .sixMonthPrices(getPrices(modelNum, now.minusMonths(6), now, 168))
-                .oneYearPrices(getPrices(modelNum, now.minusYears(1), now, 7200))
-                .TotalExecutionPrice(getPrices(modelNum, salesBidding.getSalesBiddingTime(), now, 0))
+                .threeDayPrices(calculateAveragePrice(modelNum, now.minusDays(3), now, 3))
+                .oneMonthPrices(calculateAveragePrice(modelNum, now.minusMonths(1), now, 24))
+                .sixMonthPrices(calculateAveragePrice(modelNum, now.minusMonths(6), now, 168))
+                .oneYearPrices(calculateAveragePrice(modelNum, now.minusYears(1), now, 7200))
+                .TotalExecutionPrice(calculateAveragePrice(modelNum, OriginalContractDate, now, 0))
                 .build();
     }
 
-    private List<AveragePriceDto> getPrices(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
+    @Override
+    public List<AveragePriceDto> calculateAveragePrice(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
+        List<AveragePriceDto> result = new ArrayList<>();
+        // 현재 체결된 가격
+        Long latsContractPrice = 0L;
 
+        while (startDate.isBefore(endDate)) {
+            // 최초 체결된 날짜 = startDate 현재 날짜 = endDate
+            // 차라리 해당 시간대에 가격을 계속해서 뽑아오는거라면?
+            LocalDateTime nextInterval = startDate.plusHours(intervalHours);
 
+            List<AveragePriceDto> avgPrice = productRepository.AveragePriceInfo(modelNum, startDate, nextInterval);
+
+            if(avgPrice.isEmpty()) {
+                // 최근에 체결되었던 거래가를 가져옴
+                result.add(new AveragePriceDto(startDate, latsContractPrice));
+            }else {
+                // 해당 시간대에 전부 다 더해지는 값
+                Long sum = 0L;
+                for (AveragePriceDto alpha : avgPrice) {
+                    sum += alpha.getAveragePrice();
+                }
+                Long average = sum / avgPrice.size();
+                result.add(new AveragePriceDto(startDate, average));
+                latsContractPrice = average;
+            }
+
+            startDate = nextInterval;
+            log.info("현재 확인 시간 : {}",startDate);
+            log.info("result : {}", result);
+        }
         return null;
     }
 }

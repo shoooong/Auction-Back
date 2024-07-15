@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -234,4 +235,42 @@ public class ProductSearchImpl implements ProductSearch {
         return priceValue;
     }
 
+    @Override
+    public List<AveragePriceDto> AveragePriceInfo(String modelNum) {
+
+        List<AveragePriceDto> averagePriceDtoList = queryFactory.select(Projections.bean(AveragePriceDto.class,
+                sales.salesBiddingTime.as("contractDateTime"),
+                sales.salesBiddingPrice.as("averagePrice")))
+                .from(product)
+                .leftJoin(sales).on(sales.product.eq(product))
+                .leftJoin(buying).on(buying.product.eq(product))
+                .where(product.modelNum.eq(modelNum)
+                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
+                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
+                .orderBy(sales.salesBiddingTime.asc())
+                .fetch();
+
+        return averagePriceDtoList.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AveragePriceDto> AveragePriceInfo(String modelNum, LocalDateTime startDate, LocalDateTime endDate) {
+        List<AveragePriceDto> averagePriceDto = queryFactory.select(Projections.bean(AveragePriceDto.class,
+                sales.salesBiddingTime.as("contractDateTime"),
+                sales.salesBiddingPrice.as("averagePrice")))
+                .from(product)
+                .leftJoin(sales).on(sales.product.eq(product))
+                .where(product.latestDate.between(startDate, endDate)
+                        .and(product.modelNum.eq(modelNum))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
+                .fetch();
+
+        return averagePriceDto.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
 }
