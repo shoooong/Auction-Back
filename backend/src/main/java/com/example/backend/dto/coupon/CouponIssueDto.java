@@ -4,6 +4,7 @@ import com.example.backend.entity.Coupon;
 import com.example.backend.entity.CouponIssue;
 import com.example.backend.entity.Users;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class CouponIssueDto {
         return CouponIssue.builder()
             .user(user)
             .coupon(coupon)
-            .endDate(LocalDate.now().plusDays(coupon.getExpDay()))
+            .endDate(LocalDateTime.now().plusDays(coupon.getExpDay()))
             .build();
     }
 }

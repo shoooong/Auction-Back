@@ -114,7 +114,7 @@ public class AdminService {
         SalesBidding acceptSales = salesBidding.orElseThrow();
 
         //판매입찰 상태 검수 -> 판매중으로 변경
-        acceptSales.chageSalesStatus(SalesStatus.PROCESS);
+        acceptSales.changeSalesStatus(SalesStatus.PROCESS);
 
         //판매입찰의 상품아이디 가져오기
         Long productId = acceptSales.getProduct().getProductId();

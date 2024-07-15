@@ -1,6 +1,8 @@
 package com.example.backend.service.coupon;
 
+import com.example.backend.dto.coupon.CouponDto;
 import com.example.backend.dto.coupon.CouponIssueDto;
+import com.example.backend.dto.coupon.UserCouponDto;
 import com.example.backend.entity.Coupon;
 import com.example.backend.entity.CouponIssue;
 import com.example.backend.entity.Users;
@@ -13,6 +15,8 @@ import com.example.backend.repository.coupon.CouponRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -44,10 +48,6 @@ public class CouponIssueService {
         CouponIssue couponIssue = couponIssueDto.toEntity(user, coupon);
 
         couponIssueRepository.save(couponIssue);
-
-        /* Redis에 Coupon 발급조건 저장
-        *  발급 수량, 발급 시작 날짜&시간 , 발급 종료 날짜&시간, 쿠폰 발급코드
-        * */
 
 
     }
@@ -90,6 +90,28 @@ public class CouponIssueService {
             return;
         }
         couponCreateProducer.create(couponId, userId);
+    }
+//    public List<CouponIssueDto> userCoupons(Long userId) {
+//        List<CouponIssue> coupon = couponIssueRepository.findUnusedCouponsByUserId(userId);
+//        for(CouponIssue couponIssue : coupon) {
+//            convertToDto(couponIssue)
+//        }
+//
+//
+//    }
+
+    public List<UserCouponDto> userCoupons(Long userId) {
+        List<CouponIssue> coupons = couponIssueRepository.findUnusedCouponsByUserId(userId);
+        return coupons.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
+    public UserCouponDto convertToDto(CouponIssue couponIssue) {
+        return UserCouponDto.builder()
+            .coupon(couponIssue.getCoupon())
+            .userId(couponIssue.getUser().getUserId())
+            .build();
     }
 //
 //    public void issuedCoupon(CouponIssueDto couponIssueDto){

@@ -2,7 +2,9 @@ package com.example.backend.entity;
 
 
 import com.example.backend.entity.enumData.BiddingStatus;
+import com.example.backend.entity.enumData.SalesStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -35,5 +37,11 @@ public class BuyingBidding extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private BiddingStatus biddingStatus;
+
+    // 구매 입찰 상태 변경
+
+    public void changeBiddingStatus(BiddingStatus biddingStatus){
+        this.biddingStatus = biddingStatus;
+    }
 
 }

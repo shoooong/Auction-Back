@@ -19,6 +19,6 @@ public class ProductResponseDto {
     private String productName;
     private int productLike;
     private String modelNum;
-    private Long ProductMinPrice;
+    private BigDecimal ProductMinPrice;
     private List<BuyingDto> buyingDto;
 }
