@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.product.Detail.AveragePriceDto;
 import com.example.backend.dto.product.Detail.ProductDetailDto;
 import com.example.backend.dto.product.Detail.GroupByBuyingDto;
 import com.example.backend.dto.product.Detail.SalesBiddingDto;
@@ -151,14 +152,12 @@ public class ProductsTests {
         List<GroupByBuyingDto> temp = productRepository.GroupByBuyingInfo("NIKE-1");
         assertNotNull(temp);
     }
+
     @Test
-    // 해당 productId를 통해 최근 체결가격 가져오기
     public void testFindLatestBiddingDate() {
-        List<SalesBidding> temp = salesBiddingRepository.findFirstByOriginalContractDate("NIKE-1");
-        SalesBidding salesBidding = temp.get(0);
-        log.info("salesBidding: {}", salesBidding);
+        List<AveragePriceDto> temp = productRepository.AveragePriceInfo("NIKE-1");
+        AveragePriceDto averagePriceDto = temp.get(0);
+        log.info("최초에 체결된 거래 날짜 : {}", averagePriceDto.toString());
     }
-
-
 
 }
