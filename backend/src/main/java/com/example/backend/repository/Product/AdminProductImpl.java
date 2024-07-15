@@ -9,6 +9,7 @@ import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -86,7 +87,7 @@ public class AdminProductImpl implements AdminProduct {
                         eqMain(mainDepartment).and(isRegistered()),
                         eqSub(subDepartment)
                 )
-                .distinct() //중복 제거
+                .groupBy(product.modelNum)
                 .fetch();
     }
 
@@ -270,15 +271,17 @@ public class AdminProductImpl implements AdminProduct {
         // 쿼리 실행 및 결과를 DTO로 매핑
         return queryFactory.select(
                         Projections.constructor(ProductRespDto.class,
-                                product.productId,  // 상품 ID
                                 product.productBrand,  // 상품 브랜드
                                 product.productName,  // 상품 이름
                                 product.modelNum,  // 모델명
                                 product.productImg,  // 상품 이미지
                                 product.mainDepartment,  // 대분류
-                                product.subDepartment,  // 소분류
-                                product.productSize,
-                                buyingBidding.buyingBiddingPrice.min().as("최저가")  // 최저가
+                                // coalesce 함수 사용 부분
+                                Expressions.numberTemplate(Long.class, "coalesce({0}, {1})", // coalesce 함수 사용, Long 타입으로 반환
+                                                buyingBidding.buyingBiddingPrice.min(), // 첫 번째 인자: 최소 입찰 가격
+                                                product.originalPrice) // 두 번째 인자: 원래 가격
+                                        .as("최저가") // 결과를 "최저가"로 이름 붙임
+//                                buyingBidding.buyingBiddingPrice.min().as("최저가")  // 최저가
                         )
                 )
                 .from(product)
