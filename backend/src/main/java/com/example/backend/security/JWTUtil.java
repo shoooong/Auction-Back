@@ -23,12 +23,14 @@ public class JWTUtil {
     /**
      * JWT 생성 (claim, 유효기간)
      */
-    public static String generateToken(Map<String, Object> valueMap, int min) {
+    public String generateToken(Map<String, Object> valueMap, int min) {
         SecretKey key;
         String jwtStr = null;
 
         try {
             key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+//            valueMap.put("category", category);
 
             jwtStr = Jwts.builder()
                     .setHeader(Map.of("typ", "JWT"))
@@ -51,10 +53,23 @@ public class JWTUtil {
         return jwtStr;
     }
 
+
+//    public static String getCategory(String token) {
+//        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+//
+//        Claims claims = Jwts.parserBuilder()
+//                .setSigningKey(key)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//
+//        return claims.get("category", String.class);
+//    }
+
     /**
      * JWT 유효성 검증 및 claims 반환
      */
-    public static Map<String, Object> validateToken(String token) {
+    public Map<String, Object> validateToken(String token) {
         Map<String, Object> claims;
 
 
@@ -67,13 +82,13 @@ public class JWTUtil {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (MalformedJwtException malformedJwtException) {
+        } catch (MalformedJwtException e) {
             throw new CustomJWTException("MalFormed");
-        } catch (ExpiredJwtException expiredJwtException) {
+        } catch (ExpiredJwtException e) {
             throw new CustomJWTException("Expired");
-        } catch (InvalidClaimException invalidClaimException) {
+        } catch (InvalidClaimException e) {
             throw new CustomJWTException("Invalid");
-        } catch (JwtException jwtException) {
+        } catch (JwtException e) {
             throw new CustomJWTException("JWTError");
         } catch (Exception e) {
             throw new CustomJWTException("Error");
@@ -84,9 +99,24 @@ public class JWTUtil {
     }
 
     /**
+     * 토큰의 Expiration 추출
+     */
+    public Long getExpiration(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration().getTime() / 1000;
+    }
+
+    /**
      * 토큰 잔여 유효시간 검사
      */
-    public static boolean checkTime(Integer exp) {
+    public boolean checkTime(Integer exp) {
 
         Date expDate = new Date((long) exp * 1000);
 
@@ -100,7 +130,7 @@ public class JWTUtil {
     /**
      * 토큰 유효성 검사 (만료 여부)
      */
-    public static boolean checkExpiredToken(String token) {
+    public boolean checkExpiredToken(String token) {
         try {
             validateToken(token);
         } catch (CustomJWTException e) {
