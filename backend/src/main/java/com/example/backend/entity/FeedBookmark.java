@@ -14,7 +14,7 @@ import lombok.*;
 public class FeedBookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long feedBookmarkId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
