@@ -43,7 +43,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                 userDTO.getUsername(),
                 refreshToken,
                 jwtUtil.getExpiration(refreshToken),
-                TimeUnit.MINUTES
+                TimeUnit.SECONDS
         );
         log.info("redis set key: {}, value: {}", userDTO.getUsername(), refreshToken);
 
