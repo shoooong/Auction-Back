@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     List<Inquiry> findByUser_UserId(Long userId);
 
-    Optional<Object> findByInquiryIdAndUser_UserId(Long inquiryId, Long userId);
-
+    Optional<Inquiry> findByInquiryIdAndUser_UserId(Long inquiryId, Long userId);
 }

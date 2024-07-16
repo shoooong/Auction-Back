@@ -67,7 +67,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
     void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
 
-    // 3일, 1개월, 3개월 6개월, 전체 평균값 산출
+    // 3일, 1개월, 6개월 1개월, 전체 기간 종합 평균값 산출
     @Query("SELECT FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00') as dateTime, AVG(p.latestPrice) as averagePrice " +
             "FROM Product p " +
             "WHERE p.modelNum = :modelNum AND p.latestDate >= :startDate AND p.latestDate < :endDate " +

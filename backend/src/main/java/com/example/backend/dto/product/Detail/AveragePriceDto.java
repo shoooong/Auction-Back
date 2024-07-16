@@ -1,18 +1,27 @@
 package com.example.backend.dto.product.Detail;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class AveragePriceDto {
-    private String dateTime;
-    private Double averagePrice;
+    private LocalDateTime contractDateTime;
+    private Long averagePrice;
 
-    public AveragePriceDto(String dateTime, Double averagePrice) {
-        this.dateTime = dateTime;
+    public AveragePriceDto(LocalDateTime contractDateTime, Long averagePrice) {
+        this.contractDateTime = this.contractDateTime;
         this.averagePrice = averagePrice;
+    }
+
+    @Override
+    public String toString() {
+        return "AveragePriceDto{" +
+                "contractDateTime=" + contractDateTime +
+                ", averagePrice=" + averagePrice +
+                '}';
     }
 }

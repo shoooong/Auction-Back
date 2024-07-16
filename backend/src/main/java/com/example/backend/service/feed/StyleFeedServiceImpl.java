@@ -99,6 +99,17 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         return styleFeedRepository.save(styleFeed);
     }
 
+    // 특정 피드의 좋아요 수 증가
+    @Override
+    public void increaseLikeCount(Long feedId) {
+        StyleFeed styleFeed = styleFeedRepository.findById(feedId)
+                .orElseThrow(() -> new RuntimeException("StyleFeed not found"));
+
+        styleFeed.setLikeCount(styleFeed.getLikeCount() + 1);
+        styleFeedRepository.save(styleFeed);
+        log.info("피드 좋아요 수 증가: {}", feedId);
+    }
+
     // 피드 수정
     @Override
     public StyleFeedDto updateStyleFeed(Long feedId, StyleFeedDto styleFeedDTO) {

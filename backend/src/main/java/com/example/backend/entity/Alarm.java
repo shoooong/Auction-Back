@@ -7,12 +7,12 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@Entity
+@ToString
 public class Alarm {
 
     @Id

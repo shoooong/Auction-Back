@@ -15,8 +15,14 @@ public interface InquiryService {
     // 1:1 문의 조회
     List<InquiryDto> getAllInquiryList(Long userId);
 
-    // 1:1 문의 상세 조회
+    // 1:1 문의 조회 - 관리자
+    List<InquiryDto> getAllInquiryListAdmin();
+
+    // 1:1 문의 상세조회
     InquiryDto getInquiryById(Long inquiryId, Long userId);
+
+    // 1:1 문의 상세조회 - 관리자
+    InquiryDto getInquiryByIdForAdmin(Long inquiryId);
 
     // 1:1 문의 삭제
     void deleteInquiry(final long inquiryId, Long userId);

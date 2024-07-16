@@ -4,6 +4,7 @@ import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -31,7 +32,7 @@ public class Product extends BaseEntity {
     private String modelNum;
 
     @Column(nullable = false)
-    private Long originalPrice;
+    private BigDecimal originalPrice;
 
     @Column(nullable = false)
     @Builder.Default
@@ -53,13 +54,13 @@ public class Product extends BaseEntity {
     private ProductStatus productStatus;
 
     @Column
-    private Long latestPrice;
+    private BigDecimal latestPrice;
 
     @Column
     private LocalDateTime latestDate;
 
     @Column
-    private Long previousPrice;
+    private BigDecimal previousPrice;
 
     @Column
     private Double previousPercentage;
@@ -80,4 +81,6 @@ public class Product extends BaseEntity {
     public void updateLatestDate(LocalDateTime latestDate) {
         this.latestDate = latestDate;
     }
+
+
 }

@@ -1,6 +1,5 @@
 package com.example.backend.entity;
 
-
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import jakarta.persistence.*;
 import lombok.*;
