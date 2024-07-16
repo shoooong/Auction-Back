@@ -18,5 +18,4 @@ public class StyleFeedDto {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     private Long userId;
-
 }
