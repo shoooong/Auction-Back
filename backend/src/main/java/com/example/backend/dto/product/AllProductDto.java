@@ -1,6 +1,5 @@
 package com.example.backend.dto.product;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -10,7 +9,7 @@ import java.math.BigDecimal;
 @Builder
 @ToString(callSuper = true)
 @AllArgsConstructor
-public class TotalProductDto {
+public class AllProductDto {
 
     private String modelNum;
     private Long productId;
