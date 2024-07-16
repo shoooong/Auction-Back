@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 public class BuyinBiddingDto {
 
     private Long buyingBiddingId;
-    private Long buyingPrice;
-    private Long buyingBiddingPrice;
+    private BigDecimal buyingPrice;
+    private BigDecimal buyingBiddingPrice;
     private LocalDateTime buyingBiddingTime;
     private AdminUserDto buyer;
 
