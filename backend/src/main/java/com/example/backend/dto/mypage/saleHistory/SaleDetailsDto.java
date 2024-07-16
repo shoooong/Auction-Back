@@ -4,6 +4,8 @@ import com.example.backend.entity.enumData.SalesStatus;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 public class SaleDetailsDto {
@@ -12,11 +14,11 @@ public class SaleDetailsDto {
     private String productName;
     private String productSize;
 
-    private Long saleBiddingPrice;
+    private BigDecimal saleBiddingPrice;
     private SalesStatus salesStatus;
 
 
-    public SaleDetailsDto(String productImg, String productName, String productSize, Long saleBiddingPrice, SalesStatus salesStatus) {
+    public SaleDetailsDto(String productImg, String productName, String productSize, BigDecimal saleBiddingPrice, SalesStatus salesStatus) {
         this.productImg = productImg;
         this.productName = productName;
         this.productSize = productSize;
