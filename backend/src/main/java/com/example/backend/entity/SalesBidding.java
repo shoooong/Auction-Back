@@ -4,6 +4,7 @@ import com.example.backend.entity.enumData.SalesStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ public class SalesBidding extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long salesBiddingId;
 
-    private Long salesBiddingPrice;
+    private BigDecimal salesBiddingPrice;
 
     private int salesQuantity;
 

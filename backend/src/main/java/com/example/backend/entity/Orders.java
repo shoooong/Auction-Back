@@ -43,7 +43,7 @@ public class Orders extends BaseEntity {
     @JoinColumn(name = "salesBiddingId")
     private SalesBidding salesBidding;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "couponID")
     private Coupon coupon;
 }
