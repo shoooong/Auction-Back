@@ -3,6 +3,8 @@ package com.example.backend.dto.product;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
@@ -18,6 +20,6 @@ public class TotalProductDto {
     private String productImg;
 
     // 즉시 구매가를 위함
-    private Long buyingBiddingPrice;
+    private BigDecimal buyingBiddingPrice;
 
 }
