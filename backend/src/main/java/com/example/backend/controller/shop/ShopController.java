@@ -20,16 +20,14 @@ public class ShopController {
 
     private final ShopService shopService;
 
-    @GetMapping("/all")
+    @GetMapping
     public Slice<AllProductDto> getTotalProduct(@RequestParam("pageNumber") int pageNumber) {
 
         Pageable pageable = PageRequest.of(pageNumber, 10);
         return shopService.getTotalProduct(pageable);
     }
 
-//    @GetMapping("/{subDepartment}")
-    @GetMapping
-//    public Slice<AllProductDto> getFilterProducts(@RequestParam("pageNumber") int pageNumber, @PathVariable String subDepartment) {
+    @GetMapping("/all")
     public Slice<AllProductDto> getFilterProducts(@RequestParam("pageNumber") int pageNumber, @RequestParam("subDepartment") String subDepartment) {
 
         String[] subDepartments = null;
