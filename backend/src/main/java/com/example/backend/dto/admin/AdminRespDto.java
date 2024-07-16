@@ -8,6 +8,7 @@ import com.example.backend.entity.enumData.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,11 +32,13 @@ public class AdminRespDto {
             private String productName;
             private String productBrand;
             private ProductStatus productStatus;
+            private String modelNum;
             public ProductDto(Product product) {
                 this.productId = product.getProductId();
                 this.productName = product.getProductName();
                 this.productBrand = product.getProductBrand();
                 this.productStatus = product.getProductStatus();
+                this.modelNum = product.getModelNum();
             }
         }
     }
@@ -48,7 +51,7 @@ public class AdminRespDto {
         private String productBrand;
         private String productImg;
         private String modelNum;
-        private Long originalPrice;
+        private BigDecimal originalPrice;
         private String productSize;
 
         public ReqProductRespDto(Product product) {
@@ -70,7 +73,7 @@ public class AdminRespDto {
         private String productBrand;
         private String productImg;
         private String modelNum;
-        private Long originalPrice;
+        private BigDecimal originalPrice;
         private String productSize;
         private ProductStatus productStatus;
         public RegProductRespDto(Product product) {
