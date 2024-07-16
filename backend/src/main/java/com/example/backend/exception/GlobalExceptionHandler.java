@@ -1,5 +1,6 @@
 package com.example.backend.exception;
 
+import com.google.gson.Gson;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +36,17 @@ public class GlobalExceptionHandler {
         Map<String, String> error = Map.of("error", e.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(CustomJWTException.class)
+    public ResponseEntity<?> handleJWTException(CustomJWTException e) {
+        String message = e.getMessage();
+
+        if ("Expired".equals(message)) { message = "ERROR_ACCESS_TOKEN"; }
+        else { message = "INVALID_ACCESS_TOKEN"; }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new Gson().toJson(Map.of("error", message)));
     }
 
     @ExceptionHandler(RuntimeException.class)
