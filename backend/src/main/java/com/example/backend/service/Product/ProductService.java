@@ -36,5 +36,5 @@ public interface ProductService {
 
     AveragePriceResponseDto getAveragePrices(String modelNum);
 
-    List<AveragePriceDto> calculateAveragePrice(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours);
+    List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours);
 }

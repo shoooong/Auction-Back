@@ -1,7 +1,9 @@
 package com.example.backend.dto.product.Detail;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -9,11 +11,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class AveragePriceDto {
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime contractDateTime;
-    private Long averagePrice;
+    private BigDecimal averagePrice;
 
-    public AveragePriceDto(LocalDateTime contractDateTime, Long averagePrice) {
-        this.contractDateTime = this.contractDateTime;
+    public AveragePriceDto(LocalDateTime contractDateTime, BigDecimal averagePrice) {
+        this.contractDateTime = contractDateTime;
         this.averagePrice = averagePrice;
     }
 

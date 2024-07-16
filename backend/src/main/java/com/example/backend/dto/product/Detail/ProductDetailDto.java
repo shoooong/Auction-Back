@@ -3,6 +3,7 @@ package com.example.backend.dto.product.Detail;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,16 +18,16 @@ public class ProductDetailDto {
     private String productBrand;
     private String modelNum;
     private String productName;
-    private Long originalPrice;
+    private BigDecimal originalPrice;
     private int productLike;
 
-    private Long buyingBiddingPrice;
-    private Long salesBiddingPrice;
+    private BigDecimal buyingBiddingPrice;
+    private BigDecimal salesBiddingPrice;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime latestDate;
-    private Long latestPrice;
-    private Long previousPrice;
+    private BigDecimal latestPrice;
+    private BigDecimal previousPrice;
     private Double changePercentage;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime recentlyContractDate;

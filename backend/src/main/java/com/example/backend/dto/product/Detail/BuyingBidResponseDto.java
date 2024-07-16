@@ -2,6 +2,7 @@ package com.example.backend.dto.product.Detail;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -13,6 +14,6 @@ public class BuyingBidResponseDto {
     private String productImg;
     private String productName;
     private String productSize;
-    private Long productBuyPrice;   // 즉시 구매가
-    private Long productSalePrice;  // 즉시 판매가
+    private BigDecimal productBuyPrice;   // 즉시 구매가
+    private BigDecimal productSalePrice;  // 즉시 판매가
 }

@@ -9,6 +9,7 @@ import com.example.backend.entity.enumData.SalesStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -22,7 +23,7 @@ public class BidRequestDto {
     private String modelNum;
     private String size;
     private String type;
-    private Long price;
+    private BigDecimal price;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime duration;
 

@@ -2,6 +2,8 @@ package com.example.backend.dto.product.Detail;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Builder
 @Getter
 @Setter
@@ -12,5 +14,5 @@ public class GroupBySalesDto {
     private String productName;
     private String modelNum;
     private String productSize;
-    private Long productMaxPrice;
+    private BigDecimal productMaxPrice;
 }

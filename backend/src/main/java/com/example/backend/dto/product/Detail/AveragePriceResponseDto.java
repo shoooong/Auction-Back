@@ -14,5 +14,5 @@ public class AveragePriceResponseDto {
     private List<AveragePriceDto> oneMonthPrices;
     private List<AveragePriceDto> sixMonthPrices;
     private List<AveragePriceDto> oneYearPrices;
-    private List<AveragePriceDto> TotalExecutionPrice;
+    private List<AveragePriceDto> totalExecutionPrice;
 }

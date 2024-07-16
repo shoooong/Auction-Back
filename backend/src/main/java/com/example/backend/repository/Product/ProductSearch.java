@@ -31,6 +31,6 @@ public interface ProductSearch {
 
     List<AveragePriceDto> AveragePriceInfo(String modelNum);
 
-    List<AveragePriceDto> AveragePriceInfo(String modelNum, LocalDateTime startDate, LocalDateTime endDate);
+    List<AveragePriceDto> getAllContractData(String modelNum, LocalDateTime startDate, LocalDateTime endDate);
 
 }

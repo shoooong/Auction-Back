@@ -2,6 +2,8 @@ package com.example.backend.dto.product.Detail;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Builder
 @Getter
 @Setter
@@ -9,6 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 public class SalesHopeDto {
     private String productSize;
-    private Long salesBiddingPrice;
+    private BigDecimal salesBiddingPrice;
     private int salesQuantity;
 }
