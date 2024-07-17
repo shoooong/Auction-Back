@@ -60,7 +60,7 @@ public class NoticeServiceImpl implements NoticeService {
     // 공지사항 문의 리스트조회-관리자
     @Override
     public List<NoticeDto> getAllNoticeListForAdmin() {
-        List<Notice> notices = noticeRepository.findAll();
+        List<Notice> notices = noticeRepository.findAllByOrderByCreateDateDesc();
         return notices.stream()
                 .map(notice -> new NoticeDto(
                         notice.getNoticeId(),
