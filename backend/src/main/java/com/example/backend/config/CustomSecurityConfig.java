@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,8 +31,8 @@ public class CustomSecurityConfig {
 
     private final JWTCheckFilter jwtCheckFilter;
     private final CustomLoginSuccessHandler customLoginSuccessHandler;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomLoginFailHandler customLoginFailHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     private static final String[] AUTHENTICATED_ENDPOINTS = {
             "/mypage/**",
@@ -116,9 +115,12 @@ public class CustomSecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // TODO: 추후 도메인 변경
+//        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://www.sho0ong.com"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+//        configuration.addExposedHeader("Set-Cookie");
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
