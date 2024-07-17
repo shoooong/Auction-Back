@@ -4,6 +4,7 @@ package com.example.backend.controller.coupon;
 import com.example.backend.dto.coupon.CouponCreateDto;
 import com.example.backend.dto.coupon.CouponDto;
 import com.example.backend.dto.coupon.CouponIssueDto;
+import com.example.backend.dto.coupon.UserCouponDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.coupon.CouponIssueService;
 import com.example.backend.service.coupon.CouponService;
@@ -34,9 +35,6 @@ public class CouponController {
 
     @PostMapping("/create")
     public ResponseEntity<?> couponCreate(@RequestBody CouponCreateDto couponCreateDto){
-
-        log.info(couponCreateDto);
-
         couponService.createCoupon(couponCreateDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
@@ -44,11 +42,6 @@ public class CouponController {
 
     @PostMapping("/{couponId}/issue")
     public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
-        System.out.println("couponId = " + couponId);
-        System.out.println("userDTO = " + userDTO);
-        log.info(couponId);
-        log.info(userDTO);
-
         couponIssueService.issueCoupon(couponId, userDTO.getUserId());
 
         return ResponseEntity.ok(200);
@@ -59,6 +52,13 @@ public class CouponController {
         List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
 
         return new ResponseEntity<>(couponDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<UserCouponDto>> userCoupons(@AuthenticationPrincipal UserDTO userDTO){
+        List<UserCouponDto> userCoupons= couponIssueService.userCoupons(userDTO.getUserId());
+
+        return new ResponseEntity<>(userCoupons, HttpStatus.OK);
     }
 
 

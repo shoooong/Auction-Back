@@ -1,14 +1,15 @@
 package com.example.backend.dto.product;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
 @Builder
 @ToString(callSuper = true)
 @AllArgsConstructor
-public class TotalProductDto {
+public class AllProductDto {
 
     private String modelNum;
     private Long productId;
@@ -18,6 +19,6 @@ public class TotalProductDto {
     private String productImg;
 
     // 즉시 구매가를 위함
-    private Long buyingBiddingPrice;
+    private BigDecimal buyingBiddingPrice;
 
 }

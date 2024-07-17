@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,30 +74,34 @@ public class ProductSearchImpl implements ProductSearch {
     public ProductDetailDto searchProductPrice(String modelNum) {
 
         log.info("ModelNum : {}", modelNum);
-        JPAQuery<Long> lowPrice = queryFactory.select(buying.buyingBiddingPrice.min())
+        JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.min().castToNum(Long.class))
                 .from(buying)
                 .where(buying.biddingStatus.eq(BiddingStatus.PROCESS)
                         .and(buying.product.modelNum.eq(modelNum))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED)));
 
-        JPAQuery<Long> topPrice = queryFactory.select(sales.salesBiddingPrice.max())
+        JPAQuery<Long> topPriceQuery = queryFactory.select(sales.salesBiddingPrice.max().castToNum(Long.class))
                 .from(sales)
                 .where(sales.salesStatus.eq(SalesStatus.PROCESS)
                         .and(sales.product.modelNum.eq(modelNum))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED)));
 
-        Long lowestPrice = lowPrice.fetchOne();
-        Long highestPrice = topPrice.fetchOne();
+        Long lowestPriceLong = lowPriceQuery.fetchOne();
+        Long highestPriceLong = topPriceQuery.fetchOne();
+
+        // Long 값을 BigDecimal로 변환
+        BigDecimal lowestPrice = (lowestPriceLong != null) ? BigDecimal.valueOf(lowestPriceLong) : BigDecimal.ZERO;
+        BigDecimal highestPrice = (highestPriceLong != null) ? BigDecimal.valueOf(highestPriceLong) : BigDecimal.ZERO;
 
         log.info("Lowest Price: {}", lowestPrice);
         log.info("Highest Price: {}", highestPrice);
 
-        // PriceResponseDto 생성 및 설정
+        // ProductDetailDto 생성 및 설정
         ProductDetailDto priceValue = new ProductDetailDto();
         priceValue.setBuyingBiddingPrice(lowestPrice);
         priceValue.setSalesBiddingPrice(highestPrice);
 
-        log.info("PriceResponseDto: {}", priceValue);
+        log.info("ProductDetailDto: {}", priceValue);
 
         return priceValue;
     }
@@ -206,32 +212,76 @@ public class ProductSearchImpl implements ProductSearch {
     @Override
     public BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto) {
 
-        JPAQuery<Long> lowPrice = queryFactory.select(buying.buyingBiddingPrice.min())
+        JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.min().castToNum(Long.class))
                 .from(buying)
                 .where(buying.biddingStatus.eq(BiddingStatus.PROCESS)
                         .and(buying.product.modelNum.eq(bidRequestDto.getModelNum()))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
                         .and(product.productSize.eq(bidRequestDto.getProductSize())));
 
-        JPAQuery<Long> topPrice = queryFactory.select(sales.salesBiddingPrice.max())
+        JPAQuery<Long> topPriceQuery = queryFactory.select(sales.salesBiddingPrice.max().castToNum(Long.class))
                 .from(sales)
                 .where(sales.salesStatus.eq(SalesStatus.PROCESS)
                         .and(sales.product.modelNum.eq(bidRequestDto.getModelNum()))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
                         .and(product.productSize.eq(bidRequestDto.getProductSize())));
 
-        Long lowestPrice = lowPrice.fetchOne();
-        Long highestPrice = topPrice.fetchOne();
+        Long lowestPriceLong = lowPriceQuery.fetchOne();
+        Long highestPriceLong = topPriceQuery.fetchOne();
 
-        // PriceResponseDto 생성 및 설정
+        // Long 값을 BigDecimal로 변환
+        BigDecimal lowestPrice = (lowestPriceLong != null) ? BigDecimal.valueOf(lowestPriceLong) : BigDecimal.ZERO;
+        BigDecimal highestPrice = (highestPriceLong != null) ? BigDecimal.valueOf(highestPriceLong) : BigDecimal.ZERO;
+
+        // BuyingBidResponseDto 생성 및 설정
         BuyingBidResponseDto priceValue = BuyingBidResponseDto.builder()
                 .productBuyPrice(lowestPrice)
                 .productSalePrice(highestPrice)
                 .build();
 
-        log.info("PriceResponseDto: {}", priceValue);
+        log.info("BuyingBidResponseDto: {}", priceValue);
 
         return priceValue;
     }
 
+    @Override
+    public List<AveragePriceDto> AveragePriceInfo(String modelNum) {
+
+        List<AveragePriceDto> averagePriceDtoList = queryFactory.select(Projections.bean(AveragePriceDto.class,
+                sales.salesBiddingTime.as("contractDateTime"),
+                sales.salesBiddingPrice.as("averagePrice")))
+                .from(product)
+                .leftJoin(sales).on(sales.product.eq(product))
+                .leftJoin(buying).on(buying.product.eq(product))
+                .where(product.modelNum.eq(modelNum)
+                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
+                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
+                .orderBy(sales.salesBiddingTime.asc())
+                .fetch();
+
+        return averagePriceDtoList.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AveragePriceDto> getAllContractData(String modelNum, LocalDateTime startDate, LocalDateTime endDate) {
+        List<AveragePriceDto> averagePriceDto = queryFactory.select(Projections.bean(AveragePriceDto.class,
+                sales.salesBiddingTime.as("contractDateTime"),
+                sales.salesBiddingPrice.as("averagePrice")))
+                .from(product)
+                .leftJoin(sales).on(sales.product.eq(product))
+                .leftJoin(buying).on(buying.product.eq(product))
+                .where(product.latestDate.between(startDate, endDate)
+                        .and(product.modelNum.eq(modelNum))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
+                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
+                .fetch();
+
+        return averagePriceDto.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
 }

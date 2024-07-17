@@ -3,6 +3,7 @@ package com.example.backend.service.Product;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductService {
@@ -35,7 +36,5 @@ public interface ProductService {
 
     AveragePriceResponseDto getAveragePrices(String modelNum);
 
-//    List<ContractInfoDto> selectContractValue(String modelNum);
-
-//    AveragePriceResponseDto getAveragePrices(String modelNum);
+    List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours);
 }

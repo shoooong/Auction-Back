@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -81,10 +83,10 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
 
         // 최저 입찰가 찾기
-        Long minPrice = buyingDtoList.stream()
-                .mapToLong(BuyingDto::getBuyingBiddingPrice)
-                .min()
-                .orElse(0L);
+        BigDecimal minPrice = buyingDtoList.stream()
+                .map(BuyingDto::getBuyingBiddingPrice)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
 
         // 변환된 BuyingDto 리스트와 최저 입찰가를 ProductResponseDto 에 설정
         productDto.setBuyingDto(buyingDtoList);
@@ -93,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
-    // 상품의 기본정보 조회
+    // 상품의 상세정보 조회
     @Override
     @Transactional
     public ProductDetailDto productDetailInfo(String modelNum) {
@@ -196,12 +198,13 @@ public class ProductServiceImpl implements ProductService {
         LocalDateTime recentlyContractTime = recentlyContractValue.getSalesBiddingTime();
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
-        RecentlyPriceDto recentlyPriceDto = new RecentlyPriceDto();
 
-        recentlyPriceDto.setLatestDate(recentlyContractTime);
-        recentlyPriceDto.setLatestPrice(recentlyContractValue.getLatestPrice());
-        recentlyPriceDto.setSalesBiddingTime(recentlyContractTime);
-        recentlyPriceDto.setSalesBiddingPrice(recentlyContractValue.getSalesBiddingPrice());
+        RecentlyPriceDto recentlyPriceDto = RecentlyPriceDto.builder()
+                .latestDate(recentlyContractTime)
+                .latestPrice(recentlyContractValue.getLatestPrice())
+                .salesBiddingTime(recentlyContractTime)
+                .salesBiddingPrice(recentlyContractValue.getSalesBiddingPrice())
+                .build();
 
         if (lastCheckedTime.isBefore(recentlyContractTime)) {
             for (SalesBiddingDto product : newAllContractSelect) {
@@ -212,8 +215,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             Long recentlyProductId = recentlyContractValue.getProductId();
-            Long recentlyContractPrice = recentlyContractValue.getLatestPrice();
-            Long previousContractPrice = oldContractValue.get().getLatestPrice();
+            BigDecimal recentlyContractPrice = recentlyContractValue.getLatestPrice();
+            BigDecimal previousContractPrice = oldContractValue.get().getLatestPrice();
 
             log.info("업데이트 전 recentlyProductId : {}, recentlyContractPrice : {}", recentlyProductId, recentlyContractPrice);
 
@@ -228,14 +231,20 @@ public class ProductServiceImpl implements ProductService {
             productRepository.flush();
             entityManager.clear(); // 엔티티 매니저 캐시 비우기
 
-            Long result = recentlyContractPrice - previousContractPrice;
-            double changePercentage = (((recentlyContractPrice - previousContractPrice) / (double) previousContractPrice) * 100);
+            BigDecimal result = recentlyContractPrice.subtract(previousContractPrice);
+            BigDecimal changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
+                    .divide(previousContractPrice, MathContext.DECIMAL128)
+                    .multiply(BigDecimal.valueOf(100));
+
+            Long resultAsLong = result.longValueExact();
+
+            double changePercentage = changePercentageBD.doubleValue();
             DecimalFormat df = new DecimalFormat("#.#");
             String format = df.format(changePercentage);
             double finalChangePercentage = Double.parseDouble(format);
             productRepository.updateRecentlyContractPercentage(recentlyProductId, finalChangePercentage);
-            productRepository.updateDifferenceContract(recentlyProductId, result);
-            recentlyPriceDto.setDifferenceContract(result);
+            productRepository.updateDifferenceContract(recentlyProductId, resultAsLong);
+            recentlyPriceDto.setDifferenceContract(resultAsLong);
             recentlyPriceDto.setChangePercentage(finalChangePercentage);
             recentlyPriceDto.setPreviousPrice(previousContractPrice);
 
@@ -467,29 +476,65 @@ public class ProductServiceImpl implements ProductService {
             SalesBidding salesBidding = bidRequestDto.toSalesBidding(user, product);
             salesBiddingRepository.save(salesBidding);
         }
-
-        log.info("뭔가 오류인듯");
-
     }
 
     @Override
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
-        LocalDateTime now = LocalDateTime.of(2024, 7, 10, 0, 1);
-        List<SalesBidding> temp = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
-        SalesBidding salesBidding = temp.get(0);
+        LocalDateTime now = LocalDateTime.of(2024, 7, 16, 0, 1, 2);
+        List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, LocalDateTime.MIN, now);
+
+        if (allContractData.isEmpty()) {
+            throw new RuntimeException("No contract data available for model: " + modelNum);
+        }
+
+        LocalDateTime originalContractDate = allContractData.get(0).getContractDateTime();
+        log.info("OriginalContractDate : {}", originalContractDate.toString());
 
         return AveragePriceResponseDto.builder()
-                .threeDayPrices(getPrices(modelNum, now.minusDays(3), now, 3))
-                .oneMonthPrices(getPrices(modelNum, now.minusMonths(1), now, 24))
-                .sixMonthPrices(getPrices(modelNum, now.minusMonths(6), now, 168))
-                .oneYearPrices(getPrices(modelNum, now.minusYears(1), now, 7200))
-                .TotalExecutionPrice(getPrices(modelNum, salesBidding.getSalesBiddingTime(), now, 0))
+                .threeDayPrices(calculateAveragePrice(allContractData, now.minusDays(3), now, 3))
+                .oneMonthPrices(calculateAveragePrice(allContractData, now.minusMonths(1), now, 24))
+                .sixMonthPrices(calculateAveragePrice(allContractData, now.minusMonths(6), now, 168))
+                .oneYearPrices(calculateAveragePrice(allContractData, now.minusYears(1), now, 720))
+                .totalExecutionPrice(calculateAveragePrice(allContractData, originalContractDate, now, 720))
                 .build();
     }
 
-    private List<AveragePriceDto> getPrices(String modelNum, LocalDateTime startDate, LocalDateTime endDate, int intervalHours) {
+    @Override
+    public List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours) {
+        List<AveragePriceDto> result = new ArrayList<>();
+        BigDecimal recentlyContractPrice = BigDecimal.ZERO; // 최근 체결된 가격을 초기화
 
+        while (firstContractDateTime.isBefore(endDate)) {
+            LocalDateTime nextInterval = firstContractDateTime.plusHours(intervalHours);
 
-        return null;
+            List<AveragePriceDto> intervalData = getAllContractData(allContractData, firstContractDateTime, nextInterval);
+
+            if (intervalData.isEmpty()) {
+                result.add(new AveragePriceDto(firstContractDateTime, BigDecimal.ZERO)); // 체결 내역이 없으면 0
+            } else {
+                BigDecimal sum = BigDecimal.ZERO;
+                for (AveragePriceDto data : intervalData) {
+                    if (data.getAveragePrice() != null) {
+                        sum = sum.add(data.getAveragePrice());
+                    }
+                }
+                BigDecimal average = intervalData.isEmpty() ? BigDecimal.ZERO : sum.divide(BigDecimal.valueOf(intervalData.size()), MathContext.DECIMAL128);
+                result.add(new AveragePriceDto(firstContractDateTime, average));
+                recentlyContractPrice = average; // 최근 체결된 가격 업데이트
+            }
+
+            firstContractDateTime = nextInterval;
+        }
+        log.info("result : {}", result.toString());
+        return result;
     }
+
+    public List<AveragePriceDto> getAllContractData(List<AveragePriceDto> allContractData, LocalDateTime startDate, LocalDateTime endDate) {
+        return allContractData.stream()
+                .filter(data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime().isBefore(endDate))
+                .collect(Collectors.toList());
+    }
+
+
+
 }

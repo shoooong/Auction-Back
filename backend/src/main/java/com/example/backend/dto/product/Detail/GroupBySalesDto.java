@@ -1,12 +1,12 @@
 package com.example.backend.dto.product.Detail;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupBySalesDto {
@@ -14,5 +14,5 @@ public class GroupBySalesDto {
     private String productName;
     private String modelNum;
     private String productSize;
-    private Long productMaxPrice;
+    private BigDecimal productMaxPrice;
 }

@@ -1,18 +1,30 @@
 package com.example.backend.dto.product.Detail;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class AveragePriceDto {
-    private String dateTime;
-    private Double averagePrice;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime contractDateTime;
+    private BigDecimal averagePrice;
 
-    public AveragePriceDto(String dateTime, Double averagePrice) {
-        this.dateTime = dateTime;
+    public AveragePriceDto(LocalDateTime contractDateTime, BigDecimal averagePrice) {
+        this.contractDateTime = contractDateTime;
         this.averagePrice = averagePrice;
+    }
+
+    @Override
+    public String toString() {
+        return "AveragePriceDto{" +
+                "contractDateTime=" + contractDateTime +
+                ", averagePrice=" + averagePrice +
+                '}';
     }
 }

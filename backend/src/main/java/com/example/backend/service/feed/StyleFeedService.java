@@ -35,4 +35,6 @@ public interface StyleFeedService {
 
     // 관심피드 삭제
     void deleteFeedBookmark(final long styleSavedId, Long userId);
+
+    void increaseLikeCount(Long feedId);
 }

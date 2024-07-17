@@ -3,12 +3,12 @@ package com.example.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Entity
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class BookmarkProduct {
 
     @Id

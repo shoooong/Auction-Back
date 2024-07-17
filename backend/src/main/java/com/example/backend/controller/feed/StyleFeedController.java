@@ -108,4 +108,12 @@ public class StyleFeedController {
         Long userId = userDTO.getUserId();
         styleFeedService.deleteFeedBookmark(styleSavedId, userId);
     }
+
+    // 피드 좋아요 추가
+    @PostMapping("/user/likeFeed/{feedId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void likeStyleFeed(@PathVariable Long feedId) {
+        styleFeedService.increaseLikeCount(feedId);
+        log.info("피드 좋아요 추가: {}", feedId);
+    }
 }

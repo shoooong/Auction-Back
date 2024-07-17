@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Modifying
     @Transactional
     @Query("UPDATE Product p SET p.previousPrice = :previousContractPrice WHERE p.productId = :recentlyProductId")
-    void updatePreviousPrice(@Param("recentlyProductId") Long recentlyProductId, @Param("previousContractPrice") Long previousContractPrice);
+    void updatePreviousPrice(@Param("recentlyProductId") Long recentlyProductId, @Param("previousContractPrice") BigDecimal previousContractPrice);
 
     // 해당 Id의 변동률 계산
     @Modifying
@@ -60,14 +61,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Modifying
     @Transactional
     @Query("UPDATE Product p SET p.latestPrice = :latestPrice WHERE p.productId = :productId")
-    void updateLatestPrice(@Param("productId") Long productId, @Param("latestPrice") Long latestPrice);
+    void updateLatestPrice(@Param("productId") Long productId, @Param("latestPrice") BigDecimal latestPrice);
 
     @Modifying
     @Transactional
     @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
     void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
 
-    // 3일, 1개월, 3개월 6개월, 전체 평균값 산출
+    // 3일, 1개월, 6개월 1개월, 전체 기간 종합 평균값 산출
     @Query("SELECT FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00') as dateTime, AVG(p.latestPrice) as averagePrice " +
             "FROM Product p " +
             "WHERE p.modelNum = :modelNum AND p.latestDate >= :startDate AND p.latestDate < :endDate " +

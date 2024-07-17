@@ -7,7 +7,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,10 +23,13 @@ import java.util.Map;
 
 
 @Component
+@RequiredArgsConstructor
 @Log4j2
 public class JWTCheckFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final JWTUtil jwtUtil;
+
 
     private static final List<String> AUTHENTICATED_ENDPOINTS = List.of(
             "/mypage/**",
@@ -34,7 +39,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/requestProduct/user/**",
             "/order/**",
             "/coupon/*/issue",
-            "/alarm/subscribe"
+//            "/coupon/**",
+            "/alarm/subscribe",
+            "/coupon/user"
+
+
     );
 
     /**
@@ -60,6 +69,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 //            return true;
 //        }
 
+//        if (path.equals("/coupon/user"))
+//            return true;
+
         // 3) 이미지 조회 경로 제외
         // TODO: 클라우드 DB 이미지 업로드 성공 시 경로 설정
 
@@ -75,21 +87,18 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         String authHeaderStr = request.getHeader("Authorization");
         log.info("authHeaderStr: {}", authHeaderStr);
+
         try {
             String accessToken = authHeaderStr.substring(7);
-            Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+            Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
             log.info("###JWT claims: {}", claims);
 
             /**
              * 접근 권한별 처리를 위한 인증 컨텍스트 설정
              */
-            Long userId = ((Integer)claims.get("userId")).longValue();
-
-            log.info("###: {}", userId);
-
+            Long userId = ((Integer) claims.get("userId")).longValue();
             String email = (String) claims.get("email");
-            String password = (String) claims.get("password");
             int grade = (int) claims.get("grade");
             String nickname = (String) claims.get("nickname");
             String phoneNum = (String) claims.get("phoneNum");
@@ -105,16 +114,14 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
-
         } catch (Exception e) {
             log.error("JWT Check Error: " + e.getMessage());
-
-            Gson gson = new Gson();
-            String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+//            throw new CustomJWTException("@ERROR_ACCESS_TOKEN");
 
             response.setContentType("application/json");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             PrintWriter printWriter = response.getWriter();
-            printWriter.println(msg);
+            printWriter.write(new Gson().toJson(Map.of("error", "ERROR_ACCESS_TOKEN")));
             printWriter.close();
         }
     }

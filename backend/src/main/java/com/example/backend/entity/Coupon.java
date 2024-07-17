@@ -4,6 +4,7 @@ import com.example.backend.dto.coupon.CouponCreateDto;
 import com.example.backend.entity.enumData.DiscountType;
 import com.example.backend.entity.enumData.SalesStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
 
@@ -41,7 +42,7 @@ public class Coupon extends BaseEntity{
     private DiscountType discountType; //  PERCENT, FIXED
 
     @Column(nullable = false)
-    private Long amount; // 할인 금액
+    private BigDecimal amount; // 할인 금액
 
     @Column(nullable = false)
     private LocalDateTime startDate; // 쿠폰 발급 시작 날짜, 시간 "2024-07-31T18:00:00"

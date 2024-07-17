@@ -1,16 +1,16 @@
 package com.example.backend.dto.product.Detail;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalesHopeDto {
     private String productSize;
-    private Long salesBiddingPrice;
+    private BigDecimal salesBiddingPrice;
     private int salesQuantity;
 }

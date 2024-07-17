@@ -1,7 +1,6 @@
 package com.example.backend.controller.inquiry;
 
 import com.example.backend.dto.inquiry.InquiryDto;
-import com.example.backend.dto.inquiry.InquiryListDto;
 import com.example.backend.dto.inquiry.InquiryResponseDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.inquiry.InquiryService;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 
@@ -38,19 +38,49 @@ public class inquiryController {
     // 1:1 문의 조회
     @GetMapping("/inquiryList")
     public List<InquiryDto> getAllInquiryList(@AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new IllegalArgumentException("userDTO is null");
+        }
         Long userId = userDTO.getUserId();
         List<InquiryDto> inquiryList = inquiryService.getAllInquiryList(userId);
         log.info("조회 완료 {}", inquiryList);
         return inquiryList;
     }
 
+    // 1:1 문의 조회 - 관리자용
+    @GetMapping("/admin/inquiryList")
+    public List<InquiryDto> getAllInquiryListAdmin(@AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null || !userDTO.isRole()) {
+            throw new IllegalArgumentException("Access denied");
+        }
+        List<InquiryDto> inquiryList = inquiryService.getAllInquiryListAdmin();
+        log.info("관리자 조회 완료 {}", inquiryList);
+        return inquiryList;
+    }
+
+
     // 1:1 문의 상세조회
     @GetMapping("/{inquiryId}")
     public InquiryDto getInquiry(@PathVariable Long inquiryId,
                                  @AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new IllegalArgumentException("userDTO is null");
+        }
         Long userId = userDTO.getUserId();
         InquiryDto inquiryDto = inquiryService.getInquiryById(inquiryId, userId);
         log.info("1:1 문의 상세 조회: {}", inquiryDto);
+        return inquiryDto;
+    }
+
+    // 1:1 문의 상세조회 - 관리자용
+    @GetMapping("/admin/{inquiryId}")
+    public InquiryDto getInquiryForAdmin(@PathVariable Long inquiryId,
+                                         @AuthenticationPrincipal UserDTO userDTO) {
+        if (userDTO == null || !userDTO.isRole()) {
+            throw new IllegalArgumentException("Access denied");
+        }
+        InquiryDto inquiryDto = inquiryService.getInquiryByIdForAdmin(inquiryId);
+        log.info("관리자용 1:1 문의 상세 조회: {}", inquiryDto);
         return inquiryDto;
     }
 
@@ -62,23 +92,27 @@ public class inquiryController {
         inquiryService.deleteInquiry(inquiryId, userId);
     }
 
-    // 1:1 문의 답변 등록
-    @PostMapping("/inquiryResponseRegistration")
+    // 1대1 문의 답변 등록 - 관리자
+    @PostMapping("/inquiryResponseRegistration/{inquiryId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public InquiryResponseDto createInquiryResponse(@RequestBody InquiryResponseDto inquiryResponseDto,
-                                                    @AuthenticationPrincipal UserDTO userDTO) {
-        if (!userDTO.isRole()) {
-            throw new RuntimeException("Only administrators can create responses");
+    public InquiryResponseDto createInquiryResponse(@PathVariable Long inquiryId,
+                                                    @RequestBody InquiryResponseDto inquiryResponseDto,
+                                                    @AuthenticationPrincipal UserDTO userDTO) throws AccessDeniedException {
+
+        if (userDTO == null || !userDTO.isRole()) {
+            throw new AccessDeniedException("Only administrators can create responses");
         }
 
         inquiryResponseDto.setUserId(userDTO.getUserId());
-        InquiryResponseDto createInquiryResponse = inquiryService.createInquiryResponse(inquiryResponseDto);
-        log.info("답변 등록 완료: {}", createInquiryResponse);
-        return createInquiryResponse;
+        inquiryResponseDto.setInquiryId(inquiryId);
+        InquiryResponseDto createdInquiryResponse = inquiryService.createInquiryResponse(inquiryResponseDto);
+        log.info("답변 등록 완료: {}", createdInquiryResponse);
+        return createdInquiryResponse;
     }
 
-    // 1:1 문의 답변 삭제
-    @DeleteMapping("/delete/{responseId}")
+
+    // 1:1 문의 답변 삭제 - 관리자용
+    @DeleteMapping("/admin/delete/{responseId}")
     public void deleteInquiryResponse(@PathVariable Long responseId) {
         inquiryService.deleteInquiryResponse(responseId);
     }

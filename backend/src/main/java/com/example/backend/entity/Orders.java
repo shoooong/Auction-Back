@@ -1,7 +1,9 @@
 package com.example.backend.entity;
 
 import com.example.backend.entity.enumData.OrderStatus;
+import com.fasterxml.jackson.databind.ser.Serializers.Base;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-public class Orders {
+public class Orders extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +25,7 @@ public class Orders {
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
-    private LocalDateTime orderDate;
-
-    @Column(nullable = false)
-    private Long orderPrice;
+    private BigDecimal orderPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
@@ -40,5 +39,11 @@ public class Orders {
     @JoinColumn(name = "buyingBiddingId")
     private BuyingBidding buyingBidding;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "salesBiddingId")
+    private SalesBidding salesBidding;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "couponID")
+    private Coupon coupon;
 }
