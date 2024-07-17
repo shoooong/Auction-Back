@@ -2,14 +2,18 @@ package com.example.backend.service.Product;
 
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductService {
 
+    List<ProductResponseDto> getAllProducts(String mainDepartment);
+
     // 상품 카테고리에 따라 상품 정보 조회 (소분류)
-    List<ProductResponseDto> selectCategoryValue(String subDepartment);
+    Slice<ProductResponseDto> selectCategoryValue(String subDepartment, Pageable pageable);
 
     // 상세 상품 기본 정보 조회
     ProductDetailDto productDetailInfo(String modelNum);

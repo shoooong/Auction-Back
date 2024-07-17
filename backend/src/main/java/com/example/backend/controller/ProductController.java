@@ -1,11 +1,16 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.service.AdminService;
 import com.example.backend.service.Product.ProductService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,25 +18,44 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//userId를 못가져오면 null값이라는거니까 로그인을 안한상태
 @RestController
 @Log4j2
-@RequiredArgsConstructor
 @RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final AdminService adminService;
 
-    // 상품(카테고리 소분류) 불러오기
-    @GetMapping("/{subDepartment}")
-    public List<ProductResponseDto> products(@PathVariable String subDepartment) {
+    @Autowired
+    public ProductController(ProductService productService, AdminService adminService) {
+        this.productService = productService;
+        this.adminService = adminService;
+    }
 
-        log.info("subDepartment : " + subDepartment);
-        List<ProductResponseDto> products = productService.selectCategoryValue(subDepartment);
+    @GetMapping("/all/{mainDepartment}")
+    public ResponseEntity<?> allProduct(@PathVariable String mainDepartment) {
+        List<ProductResponseDto> productResponseDtoList = productService.getAllProducts(mainDepartment);
+        log.info("productResponseDtoList: " + productResponseDtoList);
+        return new ResponseEntity<>(productResponseDtoList,HttpStatus.OK);
+    }
+
+    @GetMapping("/main/{mainDepartment}")
+    public ResponseEntity<?> findProductsByDepartment(@PathVariable String mainDepartment) {
+
+        //판매중인 상품 대분류별 조회
+        //상품 이미지, 브랜드, 상품명, 모델명
+        //즉시구매가 = salesBiddingTable 의 상품중 PROCESS 인 상품중 최저가(모든 사이즈별)
+        List<ProductRespDto> mainValue = adminService.findProductsByDepartment(mainDepartment);
+        return new ResponseEntity<>(mainValue,HttpStatus.OK);
+    }
+
+    @GetMapping("/sub/{subDepartment}")
+    public Slice<ProductResponseDto> products(@PathVariable String subDepartment, @RequestParam(name = "page", defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Slice<ProductResponseDto> products = productService.selectCategoryValue(subDepartment, pageable);
         log.info("상품 정보 : {}", products);
         return products;
     }
-
     // 해당 상품(상세) 기본 정보 가져오기
     @GetMapping("/details/{modelNum}")
     public ProductDetailDto productDetailSelect(@PathVariable String modelNum) {
@@ -50,7 +74,7 @@ public class ProductController {
             @RequestParam(required = false) String type,
             @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
-            log.info("로그인이 되어있지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         Long userId = userDTO.getUserId();
         BuyingBidRequestDto bidRequestDto = BuyingBidRequestDto.builder()
@@ -71,7 +95,7 @@ public class ProductController {
             @RequestBody BidRequestDto bidRequestDto,
             @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
-            log.info("로그인이 되어있지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         Long userId = userDTO.getUserId();
         bidRequestDto.setUserId(userId);
@@ -80,18 +104,11 @@ public class ProductController {
         return ResponseEntity.ok("값이 정상적으로 저장되었습니다.");
     }
 
-//    @PutMapping("/details/{modelNum}/bid/{buyingBiddingId}")
-//    public ResponseEntity<?> updateBid(
-//            @PathVariable String modelNum,
-//            @PathVariable Long buyingBiddingId,
-//            @RequestBody
-//    )
-
     // 리뷰 작성
     @PostMapping("/details/{modelNum}/review")
     public ResponseEntity<?> productDetailReview(@PathVariable String modelNum, @RequestBody PhotoRequestDto photoRequestDto, @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
-            log.info("로그인을 해야한다~");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         Long userId = userDTO.getUserId();
         photoRequestDto.setUserId(userId);
@@ -133,9 +150,4 @@ public class ProductController {
         productService.deletePhotoReview(reviewId, userId);
         return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
     }
-
-//    @GetMapping("/products/average-prices/{modelNum}")
-//    public AveragePriceResponseDto getAveragePrices(@PathVariable String modelNum) {
-//        return productService.getAveragePrices(modelNum);
-//    }
 }

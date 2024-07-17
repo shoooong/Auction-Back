@@ -12,13 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductResponseDto {
-
     private Long productId;
     private String productImg;
     private String productBrand;
     private String productName;
-    private int productLike;
     private String modelNum;
-    private BigDecimal ProductMinPrice;
-    private List<BuyingDto> buyingDto;
+    private BigDecimal buyingBiddingPrice;
+    private LocalDateTime createDate;
 }
