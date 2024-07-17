@@ -36,7 +36,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = userDTO.getClaims();
 
-        String accessToken = jwtUtil.generateToken(claims, 1);          // 30분
+        String accessToken = jwtUtil.generateToken(claims, 300);          // 30분
         String refreshToken = jwtUtil.generateToken(claims, 60*24);
 
         redisTemplate.opsForValue().set(

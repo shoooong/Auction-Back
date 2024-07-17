@@ -39,7 +39,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/requestProduct/user/**",
             "/order/**",
             "/coupon/*/issue",
-            "/alarm/subscribe"
+//            "/coupon/**",
+            "/alarm/subscribe",
+            "/coupon/user"
+
+
     );
 
     /**
@@ -64,6 +68,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 //                path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
 //            return true;
 //        }
+
+//        if (path.equals("/coupon/user"))
+//            return true;
 
         // 3) 이미지 조회 경로 제외
         // TODO: 클라우드 DB 이미지 업로드 성공 시 경로 설정
