@@ -24,8 +24,6 @@ public class ProductDetailDto {
     private BigDecimal buyingBiddingPrice;
     private BigDecimal salesBiddingPrice;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private LocalDateTime latestDate;
     private BigDecimal latestPrice;
     private BigDecimal previousPrice;
     private Double changePercentage;
@@ -42,6 +40,6 @@ public class ProductDetailDto {
     private List<GroupByBuyingDto> groupByBuyingList;
     private List<GroupBySalesDto> groupBySalesList;
 
-    private List<AveragePriceResponseDto> averagePriceResponseList;
+    private AveragePriceResponseDto averagePriceResponseList;
 
 }

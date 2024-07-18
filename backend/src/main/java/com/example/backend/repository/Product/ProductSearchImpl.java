@@ -1,27 +1,25 @@
 package com.example.backend.repository.Product;
 
 import com.example.backend.dto.product.Detail.*;
+import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.entity.*;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Repository
 @AllArgsConstructor
@@ -36,37 +34,61 @@ public class ProductSearchImpl implements ProductSearch {
     private final QBuyingBidding buying = QBuyingBidding.buyingBidding;
     private final QSalesBidding sales = QSalesBidding.salesBidding;
 
-    // 소분류 상품 조회
     @Override
-    public List<Product> subProductInfo(String subDepartment) {
-
-        // 각 상품별 입찰 구매희망가가 가장 낮은 가격을 조회
-        JPQLQuery<Tuple> subQuery = JPAExpressions
-                .select(buying.product.modelNum, buying.buyingBiddingPrice.min())
-                .from(buying)
-                .where(buying.biddingStatus.eq(BiddingStatus.PROCESS)
-                        .and(buying.product.productStatus.eq(ProductStatus.REGISTERED)))
-                .groupBy(buying.product.modelNum);
-
-        BooleanBuilder whereSplit = new BooleanBuilder();
-        whereSplit.and(product.subDepartment.eq(subDepartment))
-                .and(product.productStatus.eq(ProductStatus.REGISTERED));
-
-        log.info("서브쿼리 실행 결과 : {}", whereSplit.toString());
-
-        // 서브쿼리 결과를 사용하여 최소 입찰가를 가진 상품을 조회
-        List<Product> products = queryFactory.selectFrom(product)
-                .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.PROCESS)))
-                .where(whereSplit.and(
-                        Expressions.list(product.modelNum, buying.buyingBiddingPrice).in(subQuery)
+    public List<ProductResponseDto> searchAllProduct(String mainDepartment) {
+        return queryFactory
+                .select(Projections.constructor(ProductResponseDto.class,
+                        product.productId,
+                        product.productImg,
+                        product.productBrand,
+                        product.productName,
+                        product.modelNum,
+                        buying.buyingBiddingPrice.min(),
+                        product.createDate
                 ))
-                .distinct()
+                .from(product)
+                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .where(product.productStatus.eq(ProductStatus.REGISTERED)
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
+                        .and(product.mainDepartment.eq(mainDepartment)))
                 .orderBy(product.createDate.desc())
+                .groupBy(product.modelNum)
                 .fetch();
 
-        log.info("최종 실행 결과 : {}", products);
+    }
 
-        return products;
+    // 소분류 상품 조회
+    @Override
+    public Slice<ProductResponseDto> subProductInfo(String subDepartment, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        List<ProductResponseDto> products = queryFactory
+                .select(Projections.constructor(ProductResponseDto.class,
+                        product.productId,
+                        product.productImg,
+                        product.productBrand,
+                        product.productName,
+                        product.modelNum,
+                        buying.buyingBiddingPrice.min()
+                ))
+                .from(product)
+                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .where(product.productStatus.eq(ProductStatus.REGISTERED)
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
+                        .and(product.subDepartment.eq(subDepartment)))
+                .groupBy(product.modelNum)
+                .offset(pageable.getOffset())
+                .limit(pageSize + 1)
+                .fetch();
+
+        // 다음 페이지 유무
+        boolean hasNext = false;
+        if (products.size() > pageSize) {
+            products.remove(pageSize);
+            hasNext = true;
+        }
+
+        // Slice 객체 변환
+        return new SliceImpl<>(products, pageable, hasNext);
     }
 
     // 해당 상품의 사이즈 상관없이 구매(최저), 판매(최고)가 조회
@@ -135,7 +157,7 @@ public class ProductSearchImpl implements ProductSearch {
     }
 
     @Override
-    public List<SalesHopeDto> SalesHopeInfo(String modelNum) {
+    public List<SalesHopeDto> salesHopeInfo(String modelNum) {
 
         return queryFactory.select(Projections.bean(SalesHopeDto.class,
                         sales.salesBiddingPrice,
@@ -151,7 +173,7 @@ public class ProductSearchImpl implements ProductSearch {
     }
 
     @Override
-    public List<BuyingHopeDto> BuyingHopeInfo(String modelNum) {
+    public List<BuyingHopeDto> buyingHopeInfo(String modelNum) {
         return queryFactory.select(Projections.bean(BuyingHopeDto.class,
                         buying.buyingBiddingPrice,
                         product.productSize,
@@ -166,7 +188,7 @@ public class ProductSearchImpl implements ProductSearch {
     }
 
     @Override
-    public List<GroupByBuyingDto> GroupByBuyingInfo(String modelNum) {
+    public List<GroupByBuyingDto> groupByBuyingSize(String modelNum) {
         List<GroupByBuyingDto> groupByBuyingDtoList = queryFactory.select(Projections.bean(GroupByBuyingDto.class,
                         product.productImg,
                         product.productName,
@@ -189,7 +211,7 @@ public class ProductSearchImpl implements ProductSearch {
     }
 
     @Override
-    public List<GroupBySalesDto> GroupBySalesInfo(String modelNum) {
+    public List<GroupBySalesDto> groupBySalesSize(String modelNum) {
         List<GroupBySalesDto> groupBySalesDtoList = queryFactory.select(Projections.bean(GroupBySalesDto.class,
                         product.productImg,
                         product.productName,
@@ -239,49 +261,34 @@ public class ProductSearchImpl implements ProductSearch {
                 .productSalePrice(highestPrice)
                 .build();
 
-        log.info("BuyingBidResponseDto: {}", priceValue);
+        log.info("BuyingBidResponseDto: {}", priceValue.toString());
 
         return priceValue;
     }
 
     @Override
-    public List<AveragePriceDto> AveragePriceInfo(String modelNum) {
-
-        List<AveragePriceDto> averagePriceDtoList = queryFactory.select(Projections.bean(AveragePriceDto.class,
-                sales.salesBiddingTime.as("contractDateTime"),
-                sales.salesBiddingPrice.as("averagePrice")))
-                .from(product)
-                .leftJoin(sales).on(sales.product.eq(product))
-                .leftJoin(buying).on(buying.product.eq(product))
-                .where(product.modelNum.eq(modelNum)
-                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
-                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
-                .orderBy(sales.salesBiddingTime.asc())
-                .fetch();
-
-        return averagePriceDtoList.stream()
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<AveragePriceDto> getAllContractData(String modelNum, LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Model Number: " + modelNum);
+        log.info("Start Date: " + startDate.toString());
+        log.info("End Date: " + endDate.toString());
+
         List<AveragePriceDto> averagePriceDto = queryFactory.select(Projections.bean(AveragePriceDto.class,
-                sales.salesBiddingTime.as("contractDateTime"),
-                sales.salesBiddingPrice.as("averagePrice")))
+                        sales.salesBiddingTime.as("contractDateTime"),
+                        sales.salesBiddingPrice.as("averagePrice")))
                 .from(product)
                 .leftJoin(sales).on(sales.product.eq(product))
                 .leftJoin(buying).on(buying.product.eq(product))
-                .where(product.latestDate.between(startDate, endDate)
+                .where(sales.salesBiddingTime.between(startDate, endDate)
                         .and(product.modelNum.eq(modelNum))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
-                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
-                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
+                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
+                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
                 .fetch();
 
-        return averagePriceDto.stream()
-                .distinct()
-                .collect(Collectors.toList());
+        log.info("Query Result: " + averagePriceDto.toString());
+
+        return averagePriceDto;
     }
+
+
 }
