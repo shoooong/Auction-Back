@@ -36,7 +36,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = userDTO.getClaims();
 
-        String accessToken = jwtUtil.generateToken(claims, 300);          // 30분
+        String accessToken = jwtUtil.generateToken(claims, 1);
         String refreshToken = jwtUtil.generateToken(claims, 60*24);
 
         redisTemplate.opsForValue().set(
@@ -58,16 +58,17 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         // HttpOnly 쿠키 설정
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
         accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true); // HTTPS 환경에서만 작동하도록 설정
+//        accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 30); // 30분 (초 단위)
+//        accessTokenCookie.setMaxAge(60 * 30);     // 30분
+        accessTokenCookie.setMaxAge(60);
 
         // HttpOnly 쿠키 설정 (RefreshToken)
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true); // HTTPS 환경에서만 작동하도록 설정
+//        refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일 (초 단위)
+        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
 
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
