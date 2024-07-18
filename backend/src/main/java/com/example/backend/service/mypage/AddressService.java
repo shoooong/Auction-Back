@@ -45,6 +45,7 @@ public class AddressService {
 
             Address address = Address.builder()
                     .user(Users.builder().userId(userId).build())
+                    .name(addressReqDto.getName())
                     .zonecode(addressReqDto.getZonecode())
                     .roadAddress(addressReqDto.getRoadAddress())
                     .jibunAddress(addressReqDto.getJibunAddress())
