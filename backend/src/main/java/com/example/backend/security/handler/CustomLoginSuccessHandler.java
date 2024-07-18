@@ -45,40 +45,23 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                 jwtUtil.getExpiration(refreshToken),
                 TimeUnit.SECONDS
         );
-        log.info("redis set key: {}, value: {}", userDTO.getUsername(), refreshToken);
 
+        log.info("redis set key: {}, value: {}", userDTO.getUsername(), refreshToken);
         log.info("AccessToken : {}", accessToken);
         log.info("RefreshToken : {}", refreshToken);
 
         claims.put("accessToken", accessToken);
         claims.put("refreshToken", refreshToken);
 
-
-
         // HttpOnly 쿠키 설정
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(false);
-        accessTokenCookie.setPath("/");
-//        accessTokenCookie.setMaxAge(60 * 30);     // 30분
-        accessTokenCookie.setMaxAge(60);
-
-        // HttpOnly 쿠키 설정 (RefreshToken)
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
+        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
+                accessToken, 60);
+        String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
+                refreshToken, 60 * 60 * 24);
 
         // 쿠키를 응답에 추가
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
-        response.addHeader("Set-Cookie",
-                String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
-                        accessToken, 60 * 30));
-        response.addHeader("Set-Cookie",
-                String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
-                        refreshToken, 60 * 60 * 24));
+        response.addHeader("Set-Cookie", accessTokenCookie);
+        response.addHeader("Set-Cookie", refreshTokenCookie);
 
         Gson gson = new Gson();
 //        claims.remove("accessToken");
