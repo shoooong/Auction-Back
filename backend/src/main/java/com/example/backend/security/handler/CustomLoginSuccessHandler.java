@@ -75,7 +75,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(refreshTokenCookie);
         response.addHeader("Set-Cookie",
                 String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
-                        accessToken, 60));
+                        accessToken, 60 * 30));
         response.addHeader("Set-Cookie",
                 String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
                         refreshToken, 60 * 60 * 24));
