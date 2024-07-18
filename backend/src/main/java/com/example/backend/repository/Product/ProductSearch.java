@@ -2,15 +2,19 @@ package com.example.backend.repository.Product;
 
 
 import com.example.backend.dto.product.Detail.*;
-import com.example.backend.entity.Product;
+import com.example.backend.dto.product.ProductResponseDto;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductSearch {
 
+    List<ProductResponseDto> searchAllProduct(String mainDepartment);
+
     // 소분류 상품 전체 보기
-    List<Product>  subProductInfo(String subDepartment);
+    Slice<ProductResponseDto> subProductInfo(String subDepartment, Pageable pageable);
 
     // 상품 최고, 최저 입찰 희망가격 조회
     ProductDetailDto searchProductPrice(String modelNum);
@@ -18,18 +22,15 @@ public interface ProductSearch {
     // 해당 상품의 기존 체결가가 있는지 확인
     List<SalesBiddingDto> recentlyTransaction(String modelNum);
 
-    List<SalesHopeDto> SalesHopeInfo(String modelNum);
+    List<SalesHopeDto> salesHopeInfo(String modelNum);
 
-    List<BuyingHopeDto> BuyingHopeInfo(String modelNum);
+    List<BuyingHopeDto> buyingHopeInfo(String modelNum);
 
-    List<GroupByBuyingDto> GroupByBuyingInfo(String modelNum);
+    List<GroupByBuyingDto> groupByBuyingSize(String modelNum);
 
-    List<GroupBySalesDto> GroupBySalesInfo(String modelNum);
+    List<GroupBySalesDto> groupBySalesSize(String modelNum);
 
     BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto);
-
-
-    List<AveragePriceDto> AveragePriceInfo(String modelNum);
 
     List<AveragePriceDto> getAllContractData(String modelNum, LocalDateTime startDate, LocalDateTime endDate);
 

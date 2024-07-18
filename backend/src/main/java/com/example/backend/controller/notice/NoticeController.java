@@ -5,7 +5,7 @@ import com.example.backend.dto.notice.CombinedNoticeDto;
 import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.Notice;
-import com.example.backend.service.NoticeService;
+import com.example.backend.service.notice.NoticeService;
 import com.example.backend.service.announcement.LuckyDrawAnnouncementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -55,6 +55,20 @@ public class NoticeController {
     public NoticeDto getNoticeById(@PathVariable Long noticeId){
         NoticeDto noticeDto = noticeService.getNoticeById(noticeId);
         log.info("공지사항 상세 조회: {}", noticeDto);
+        return noticeDto;
+    }
+
+    // 공지사항 조회-관리자
+    @GetMapping("/admin/noticeList")
+    public List<NoticeDto> getAllNoticeListForAdmin(){
+        List<NoticeDto> notices = noticeService.getAllNoticeListForAdmin();
+        return notices;
+    }
+
+    // 공지사항 상세조회-관리자
+    @GetMapping("/admin/notice/{noticeId}")
+    public NoticeDto getNoticeByIdForAdmin(@PathVariable Long noticeId){
+        NoticeDto noticeDto = noticeService.getNoticeByIdForAdmin(noticeId);
         return noticeDto;
     }
 

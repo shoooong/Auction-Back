@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.service.notice;
 
 import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.entity.Notice;
@@ -56,6 +56,38 @@ public class NoticeServiceImpl implements NoticeService {
                 notice.getUser().getUserId()
         );
     }
+
+    // 공지사항 문의 리스트조회-관리자
+    @Override
+    public List<NoticeDto> getAllNoticeListForAdmin() {
+        List<Notice> notices = noticeRepository.findAllByOrderByCreateDateDesc();
+        return notices.stream()
+                .map(notice -> new NoticeDto(
+                        notice.getNoticeId(),
+                        notice.getNoticeTitle(),
+                        notice.getNoticeContent(),
+                        notice.getCreateDate(),
+                        notice.getModifyDate(),
+                        notice.getUser().getUserId()
+                )).collect(Collectors.toList());
+    }
+
+    // 공지사항 문의 상세조회-관리자
+    @Override
+    public NoticeDto getNoticeByIdForAdmin(Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("Notice not found"));
+        return new NoticeDto(
+                notice.getNoticeId(),
+                notice.getNoticeTitle(),
+                notice.getNoticeContent(),
+                notice.getCreateDate(),
+                notice.getModifyDate(),
+                notice.getUser().getUserId()
+        );
+    }
+
+    // 공지사항 등록-관리자
     @Override
     public Notice createNotice(NoticeDto noticeDto) {
 
@@ -74,7 +106,7 @@ public class NoticeServiceImpl implements NoticeService {
         return noticeRepository.save(notice);
     }
 
-
+    // 공지사항 수정-관리자
     @Override
     public NoticeDto updateNotice(Long noticeId, NoticeDto noticeDto) {
         Notice notice = noticeRepository.findById(noticeId)
@@ -98,7 +130,7 @@ public class NoticeServiceImpl implements NoticeService {
         );
     }
 
-    // 공지사항 삭제
+    // 공지사항 삭제-관리자
     @Override
     public void deleteNotice(final long noticeId) {
         noticeRepository.deleteById(noticeId);

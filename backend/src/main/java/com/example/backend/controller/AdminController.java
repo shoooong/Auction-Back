@@ -93,19 +93,4 @@ public class AdminController {
 
         return new ResponseEntity<>(adminLuckDrawDto,HttpStatus.OK);
     }
-
-
-    @GetMapping("/product/{mainDepartment}")
-    public ResponseEntity<?> findProductsByDepartment(@PathVariable String mainDepartment) {
-
-        //판매중인 상품 대분류별 조회
-        //상품 이미지, 브랜드, 상품명, 모델명
-        //즉시구매가 = salesBiddingTable의 상품중 PROCESS 인 상품중 최저가(모든 사이즈별)
-        List<ProductRespDto> 범수야 = adminService.findProductsByDepartment(mainDepartment);
-
-        return new ResponseEntity<>(범수야,HttpStatus.OK);
-    }
-
-
-
 }

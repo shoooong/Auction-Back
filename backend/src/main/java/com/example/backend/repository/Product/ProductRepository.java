@@ -4,7 +4,6 @@ package com.example.backend.repository.Product;
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
-import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     // 이전 체결가 및 변동률이 없을 경우 0으로 초기화
     @Modifying
     @Transactional
-    @Query("UPDATE Product p SET p.previousPrice = 0L, p.previousPercentage = 0.0 WHERE p.productId = :productId")
+    @Query("UPDATE Product p SET p.previousPrice = 0, p.previousPercentage = 0.0 WHERE p.productId = :productId")
     void resetPreviousPrice(@Param("productId") Long productId);
 
     // 신규 체결가 있을때 기존 신규 체결가 -> 신규 이전 체결가
@@ -68,18 +66,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
     void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
 
-    // 3일, 1개월, 6개월 1개월, 전체 기간 종합 평균값 산출
-    @Query("SELECT FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00') as dateTime, AVG(p.latestPrice) as averagePrice " +
-            "FROM Product p " +
-            "WHERE p.modelNum = :modelNum AND p.latestDate >= :startDate AND p.latestDate < :endDate " +
-            "GROUP BY FUNCTION('DATE_FORMAT', p.latestDate, '%Y-%m-%d %H:00:00')")
-    List<Tuple> findHourlyAveragePricesByModelNumAndDateRange(
-            @Param("modelNum") String modelNum,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
-    );
-
-
     // TODO: QueryDSL로 변경
     // 회원의 관심상품 productIdList 로 상품 상세 정보 조회
     @Query("SELECT new com.example.backend.dto.mypage.main.ProductDetailsDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum) " +
@@ -95,6 +81,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Query("SELECT p.productId, p.modelNum " +
             "FROM Product p WHERE p.productId IN :productIdList")
     List<Object[]> findProductIdAndModelNum(List<Long> productIdList);
-
 
 }
