@@ -73,9 +73,12 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-        response.addHeader("Set-Cookie", "accessToken=" + accessToken + "; SameSite=Lax");
-        response.addHeader("Set-Cookie", "refreshToken=" + refreshToken + "; SameSite=Lax");
-
+        response.addHeader("Set-Cookie",
+                String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
+                        accessToken, 60));
+        response.addHeader("Set-Cookie",
+                String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
+                        refreshToken, 60 * 60 * 24));
 
         Gson gson = new Gson();
 //        claims.remove("accessToken");
