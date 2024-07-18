@@ -54,7 +54,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         claims.put("refreshToken", refreshToken);
 
         // 쿠키 설정
-        String domain = "www.sho0ong.com";
+        String domain = "sho0ong.com";
 
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
         accessTokenCookie.setHttpOnly(true);
