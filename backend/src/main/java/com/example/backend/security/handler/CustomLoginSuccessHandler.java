@@ -4,6 +4,7 @@ import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,16 +54,29 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         claims.put("refreshToken", refreshToken);
 
         // 쿠키 설정
-        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
-                accessToken, 60);
-        String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
-                refreshToken, 60 * 60 * 24);
-        String isLoginCookie = String.format("isLogin=true; Max-Age=%d; Path=/; Secure=false; SameSite=Lax", 60);
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(60);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 24);
+
+        Cookie isLoginCookie = new Cookie("isLogin", "true");
+        isLoginCookie.setHttpOnly(false);
+        isLoginCookie.setSecure(false);
+        isLoginCookie.setPath("/");
+        isLoginCookie.setMaxAge(60);
 
         // 쿠키를 응답에 추가
-        response.addHeader("Set-Cookie", accessTokenCookie);
-        response.addHeader("Set-Cookie", refreshTokenCookie);
-        response.addHeader("Set-Cookie", isLoginCookie);
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+        response.addCookie(isLoginCookie);
+
 
         Gson gson = new Gson();
 //        claims.remove("accessToken");
