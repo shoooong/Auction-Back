@@ -4,6 +4,7 @@ import com.example.backend.dto.feed.FeedBookmarkDto;
 import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.feed.StyleFeedService;
+import com.example.backend.service.objectstorage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,16 +26,35 @@ public class StyleFeedController {
     @Autowired
     private StyleFeedService styleFeedService;
 
+    @Autowired
+    private ObjectStorageService objectStorageService;
+
+    private String bucketName = "push";
+
     // 피드 등록
     @PostMapping("/user/feedRegistration")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createStyleFeed(@RequestBody StyleFeedDto styleFeedDto,
-                                @AuthenticationPrincipal UserDTO userDTO) {
+    public void createStyleFeed(@ModelAttribute StyleFeedDto styleFeedDto,
+                                @AuthenticationPrincipal UserDTO userDTO,
+                                @RequestParam("files") List<MultipartFile> files) {
         Long userId = userDTO.getUserId();
         styleFeedDto.setUserId(userId);
+        log.info("새로운 피드 생성: {}", styleFeedDto);
+
+        List<StyleFeedDto> styleFeedDtos = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = objectStorageService.uploadFile(bucketName, "shooong/", file);
+            if (fileName != null) {
+                StyleFeedDto styleFeedDto1 = new StyleFeedDto();
+                styleFeedDto1.setFeedImage(fileName);
+                styleFeedDtos.add(styleFeedDto1);
+            }
+        }
+        if (!styleFeedDtos.isEmpty()) {
+            styleFeedDto.setFeedImage(styleFeedDtos.get(0).getFeedImage());
+        }
 
         styleFeedService.createStyleFeed(styleFeedDto);
-        log.info("새로운 피드 생성: {}", styleFeedDto);
     }
 
     // 최신순으로 피드 조회
