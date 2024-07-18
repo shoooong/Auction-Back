@@ -16,6 +16,10 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressId;
 
+    // 수령인 이름
+    @Column(length = 255)
+    private String name;
+
     // 우편 번호
     @Column(length = 20, nullable = false)
     private String zonecode;
