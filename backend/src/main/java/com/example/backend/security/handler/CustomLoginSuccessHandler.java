@@ -53,34 +53,46 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         claims.put("accessToken", accessToken);
         claims.put("refreshToken", refreshToken);
 
+
+
         // 쿠키 설정
-//        String domain = "www.sho0ong.com";
+        String domain = "www.sho0ong.com";
+        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; Domain=%s; SameSite=Lax",
+                accessToken, 120, domain);
+        String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; Domain=%s; SameSite=Lax",
+                refreshToken, 60 * 60 * 24, domain);
+        String isLoginCookie = String.format("isLogin=%s; Max-Age=%d; Path=/; Secure=false; Domain=%s; SameSite=Lax",
+                accessToken, 120, domain);
 
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(false);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 2);
+        response.addHeader("Set-Cookie", accessTokenCookie);
+        response.addHeader("Set-Cookie", refreshTokenCookie);
+        response.addHeader("Set-Cookie", isLoginCookie);
+
+//        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+//        accessTokenCookie.setHttpOnly(true);
+//        accessTokenCookie.setSecure(false);
+//        accessTokenCookie.setPath("/");
+//        accessTokenCookie.setMaxAge(60 * 2);
 //        accessTokenCookie.setDomain(domain);
-
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24);
+//
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+//        refreshTokenCookie.setHttpOnly(true);
+//        refreshTokenCookie.setSecure(false);
+//        refreshTokenCookie.setPath("/");
+//        refreshTokenCookie.setMaxAge(60 * 60 * 24);
 //        refreshTokenCookie.setDomain(domain);
-
-        Cookie isLoginCookie = new Cookie("isLogin", "true");
-        isLoginCookie.setHttpOnly(false);
-        isLoginCookie.setSecure(false);
-        isLoginCookie.setPath("/");
-        isLoginCookie.setMaxAge(60 * 2);
+//
+//        Cookie isLoginCookie = new Cookie("isLogin", "true");
+//        isLoginCookie.setHttpOnly(false);
+//        isLoginCookie.setSecure(false);
+//        isLoginCookie.setPath("/");
+//        isLoginCookie.setMaxAge(60 * 2);
 //        isLoginCookie.setDomain(domain);
-
-        // 쿠키를 응답에 추가
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
-        response.addCookie(isLoginCookie);
+//
+////         쿠키를 응답에 추가
+//        response.addCookie(accessTokenCookie);
+//        response.addCookie(refreshTokenCookie);
+//        response.addCookie(isLoginCookie);
 
 
         Gson gson = new Gson();
