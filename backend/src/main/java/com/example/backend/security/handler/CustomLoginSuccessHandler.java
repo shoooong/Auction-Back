@@ -73,6 +73,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
+        response.addHeader("Set-Cookie", "accessToken=" + accessToken + "; SameSite=Lax");
+        response.addHeader("Set-Cookie", "refreshToken=" + refreshToken + "; SameSite=Lax");
 
 
         Gson gson = new Gson();
