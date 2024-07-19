@@ -181,14 +181,4 @@ public class AdminService {
         return new AdminRespDto.LuckyDrawsRespDto(luckyProcessStatus,luckyDrawList);
 
     }
-
-
-    //실제 판매중인 상품 대분류별 조회
-    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
-
-        List<ProductRespDto> 범수야 = productRepository.findProductsByDepartment(mainDepartment);
-        return 범수야;
-
-
-    }
 }

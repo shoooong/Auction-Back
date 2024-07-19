@@ -15,7 +15,4 @@ public interface AdminProduct {
 
     //싱품 상세 조회
     List<AdminProductRespDto> getDetailedProduct(@Param("modelNum") String modelNum, @Param("productSize") String productSize);
-
-    //범수
-    List<ProductRespDto> findProductsByDepartment(@Param("mainDepartment")String mainDepartment);
 }

@@ -92,7 +92,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
 
         StyleFeed styleFeed = new StyleFeed();
         styleFeed.setFeedTitle(styleFeedDTO.getFeedTitle());
-        styleFeed.setFeedImage(styleFeedDTO.getFeedImage());
+        styleFeed.setFeedImage(styleFeedDTO.getFeedImage()); // This now contains the cloud image path(s)
         styleFeed.setLikeCount(styleFeedDTO.getLikeCount());
         styleFeed.setUser(user);
 

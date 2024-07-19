@@ -1,5 +1,6 @@
 package com.example.backend.dto.product;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -9,14 +10,25 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ProductResponseDto {
     private Long productId;
     private String productImg;
     private String productBrand;
     private String productName;
     private String modelNum;
-    private BigDecimal buyingBiddingPrice;
-    private LocalDateTime createDate;
+    private BigDecimal biddingPrice;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime registerDate;
+
+    public ProductResponseDto(Long productId, String productImg, String productBrand, String productName, String modelNum, BigDecimal buyingBiddingPrice, LocalDateTime createDate) {
+        this.productId = productId;
+        this.productImg = productImg;
+        this.productBrand = productBrand;
+        this.productName = productName;
+        this.modelNum = modelNum;
+        this.biddingPrice = buyingBiddingPrice;
+        this.registerDate = createDate;
+    }
 }

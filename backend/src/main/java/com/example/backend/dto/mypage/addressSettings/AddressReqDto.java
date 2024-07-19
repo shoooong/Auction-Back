@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class AddressReqDto {
 
+    private String name;
     @NotBlank
     private String zonecode;
 
