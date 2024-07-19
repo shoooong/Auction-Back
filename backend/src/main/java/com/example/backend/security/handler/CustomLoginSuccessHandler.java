@@ -56,15 +56,15 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
 
         // 쿠키 설정
-        String domain = "www.sho0ong.com";
+//        String domain = "www.sho0ong.com";
 //        String domain = request.getServerName();
 
-        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Expires=%s; Path=/; HttpOnly; Secure=false; Domain=%s; SameSite=Lax",
-                accessToken, 120, "Wed, 21 Oct 2024 07:28:00 GMT", domain);
-        String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; Domain=%s; SameSite=Lax",
-                refreshToken, 60 * 60 * 24, domain);
-        String isLoginCookie = String.format("isLogin=%s; Max-Age=%d; Path=/; Secure=false; Domain=%s; SameSite=Lax",
-                accessToken, 120, domain);
+        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Expires=%s; Path=/; HttpOnly; Secure=false; SameSite=Lax",
+                accessToken, 120, "Wed, 21 Oct 2024 07:28:00 GMT");
+        String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
+                refreshToken, 60 * 60 * 24);
+        String isLoginCookie = String.format("isLogin=%s; Max-Age=%d; Path=/; Secure=false; SameSite=Lax",
+                accessToken, 120);
 
         response.addHeader("Set-Cookie", accessTokenCookie);
         response.addHeader("Set-Cookie", refreshTokenCookie);
