@@ -56,8 +56,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
 
         // 쿠키 설정
-//        String domain = "sho0ong.com";
-        String domain = request.getServerName();
+        String domain = "www.sho0ong.com";
+//        String domain = request.getServerName();
 
 //        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; Domain=%s; SameSite=Lax",
 //                accessToken, 120, domain);
