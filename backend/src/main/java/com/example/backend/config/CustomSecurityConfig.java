@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -117,7 +118,9 @@ public class CustomSecurityConfig {
 
         // TODO: 추후 도메인 변경
 //        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://www.sho0ong.com"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("http://www.sho0ong.com"));
+        configuration.addAllowedOrigin("http://www.sho0ong.com");
+        configuration.addAllowedOrigin("http://175.45.200.47");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
