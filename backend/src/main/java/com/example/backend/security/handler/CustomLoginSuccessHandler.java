@@ -17,7 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -59,13 +62,19 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 //        String domain = "www.sho0ong.com";
 //        String domain = request.getServerName();
 
-        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Expires=%s; Path=/; HttpOnly; Secure=false; SameSite=Lax",
+        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
                 accessToken, 120, "Wed, 21 Oct 2024 07:28:00 GMT");
         String refreshTokenCookie = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure=false; SameSite=Lax",
                 refreshToken, 60 * 60 * 24);
         String isLoginCookie = String.format("isLogin=%s; Max-Age=%d; Path=/; Secure=false; SameSite=Lax",
                 accessToken, 120);
 
+        SimpleDateFormat COOKIE_EXPIRES_HEADER_FORMAT = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz");
+        COOKIE_EXPIRES_HEADER_FORMAT.setTimeZone(new SimpleTimeZone(0, "GMT"));
+        Date d = new Date();
+        d.setTime(d.getTime() + 3600 * 1000); //1 hour
+        String cookieLifeTime = COOKIE_EXPIRES_HEADER_FORMAT.format(d);
+        response.setHeader("Set-Cookie", "Expires=" + cookieLifeTime + "; Path=/; HTTPOnly; max-age=2; SameSite=Lax");
         response.addHeader("Set-Cookie", accessTokenCookie);
         response.addHeader("Set-Cookie", refreshTokenCookie);
         response.addHeader("Set-Cookie", isLoginCookie);
