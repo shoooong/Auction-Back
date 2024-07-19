@@ -1,17 +1,27 @@
 package com.example.backend.repository.Product;
 
 
+import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.product.ProductResponseDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductSearch {
 
+    List<ProductRespDto> findProductsByDepartment(@Param("mainDepartment")String mainDepartment);
+
     List<ProductResponseDto> searchAllProduct(String mainDepartment);
+
+    List<ProductResponseDto> searchAllProductManyBid(String mainDepartment);
+
+    List<ProductResponseDto> searchAllProductNewBuying(String mainDepartment);
+
+    List<ProductResponseDto> searchAllProductNewSelling(String mainDepartment);
 
     // 소분류 상품 전체 보기
     Slice<ProductResponseDto> subProductInfo(String subDepartment, Pageable pageable);

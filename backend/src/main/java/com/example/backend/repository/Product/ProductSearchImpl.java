@@ -1,5 +1,6 @@
 package com.example.backend.repository.Product;
 
+import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.entity.*;
@@ -7,6 +8,8 @@ import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
@@ -34,6 +37,45 @@ public class ProductSearchImpl implements ProductSearch {
     private final QBuyingBidding buying = QBuyingBidding.buyingBidding;
     private final QSalesBidding sales = QSalesBidding.salesBidding;
 
+    //판매 상품 대분류 조회
+    @Override
+    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
+
+        BooleanExpression buyingCondition = buying.biddingStatus.eq(BiddingStatus.PROCESS);
+        BooleanExpression eqMainDepartment = product.mainDepartment.eq(mainDepartment);
+        BooleanExpression productCondition = product.productStatus.eq(ProductStatus.REGISTERED);
+
+        // 쿼리 실행 및 결과를 DTO로 매핑
+        return queryFactory.select(
+                        Projections.constructor(ProductRespDto.class,
+                                product.productBrand,  // 상품 브랜드
+                                product.productName,  // 상품 이름
+                                product.modelNum,  // 모델명
+                                product.productImg,  // 상품 이미지
+                                product.mainDepartment,  // 대분류
+                                // coalesce 함수 사용 부분
+                                Expressions.numberTemplate(BigDecimal.class, "coalesce({0}, {1})", // coalesce 함수 사용, BigDecimal 타입으로 반환
+                                                buying.buyingBiddingPrice.min(), // 첫 번째 인자: 최소 입찰 가격
+                                                product.originalPrice) // 두 번째 인자: 원래 가격
+                                        .as("buyingBiddingPrice") // 결과를 "최저가"로 이름 붙임
+                        )
+                )
+                .from(product)
+                // salesBidding 테이블과 LEFT JOIN
+                .leftJoin(buying)
+                .on(buying.product.modelNum.eq(product.modelNum)
+                        .and(buyingCondition))  // LEFT JOIN의 ON 절에 조건 추가
+                // 조건 결합
+                .where(eqMainDepartment.and(productCondition))
+                // 모델명을 기준으로 그룹화
+                .groupBy(
+                        product.modelNum
+                )
+                // 결과를 리스트로 반환
+                .fetch();
+    }
+
+    // 모든 상품에 대해 최신 등록순
     @Override
     public List<ProductResponseDto> searchAllProduct(String mainDepartment) {
         return queryFactory
@@ -43,8 +85,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min(),
-                        product.createDate
+                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        product.createDate.as("registerDate")
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -54,7 +96,77 @@ public class ProductSearchImpl implements ProductSearch {
                 .orderBy(product.createDate.desc())
                 .groupBy(product.modelNum)
                 .fetch();
+    }
 
+    // 모든 상품 구매입찰 등록된게 많은 순서
+    @Override
+    public List<ProductResponseDto> searchAllProductManyBid(String mainDepartment) {
+        return queryFactory
+                .select(Projections.constructor(ProductResponseDto.class,
+                        product.productId,
+                        product.productImg,
+                        product.productBrand,
+                        product.productName,
+                        product.modelNum,
+                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        product.createDate.as("registerDate")
+                ))
+                .from(product)
+                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .where(product.productStatus.eq(ProductStatus.REGISTERED)
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
+                        .and(product.mainDepartment.eq(mainDepartment)))
+                .orderBy(buying.count().desc())
+                .groupBy(product.modelNum)
+                .fetch();
+    }
+
+    // 가장 낮은 구매가격 + 가장 최신에 입찰이 들어온 순서
+    // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
+    @Override
+    public List<ProductResponseDto> searchAllProductNewBuying(String mainDepartment) {
+        return queryFactory
+                .select(Projections.constructor(ProductResponseDto.class,
+                        product.productId,
+                        product.productImg,
+                        product.productBrand,
+                        product.productName,
+                        product.modelNum,
+                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        product.createDate.as("registerDate")
+                ))
+                .from(product)
+                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .where(product.productStatus.eq(ProductStatus.REGISTERED)
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
+                        .and(product.mainDepartment.eq(mainDepartment)))
+                .orderBy(buying.buyingBiddingTime.desc())
+                .groupBy(product.modelNum)
+                .fetch();
+    }
+
+    // 판매 입찰이니까 가장 높은거 + 가장 최신에 입찰이 들어온 순서
+    // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
+    @Override
+    public List<ProductResponseDto> searchAllProductNewSelling(String mainDepartment) {
+        return queryFactory
+                .select(Projections.constructor(ProductResponseDto.class,
+                        product.productId,
+                        product.productImg,
+                        product.productBrand,
+                        product.productName,
+                        product.modelNum,
+                        sales.salesBiddingPrice.max().as("biddingPrice"),
+                        product.createDate.as("registerDate")
+                ))
+                .from(product)
+                .leftJoin(sales).on(product.productId.eq(sales.product.productId))
+                .where(product.productStatus.eq(ProductStatus.REGISTERED)
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS))
+                        .and(product.mainDepartment.eq(mainDepartment)))
+                .orderBy(sales.salesBiddingTime.desc())
+                .groupBy(product.modelNum)
+                .fetch();
     }
 
     // 소분류 상품 조회
@@ -68,7 +180,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min()
+                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        product.createDate.as("registerDate")
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))

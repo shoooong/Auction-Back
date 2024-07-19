@@ -4,7 +4,6 @@ import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.service.AdminService;
 import com.example.backend.service.Product.ProductService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,39 +23,61 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final AdminService adminService;
 
     @Autowired
-    public ProductController(ProductService productService, AdminService adminService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
-        this.adminService = adminService;
     }
 
-    @GetMapping("/all/{mainDepartment}")
-    public ResponseEntity<?> allProduct(@PathVariable String mainDepartment) {
-        List<ProductResponseDto> productResponseDtoList = productService.getAllProducts(mainDepartment);
-        log.info("productResponseDtoList: " + productResponseDtoList);
-        return new ResponseEntity<>(productResponseDtoList,HttpStatus.OK);
-    }
-
+    // 해당 대분류 상품
     @GetMapping("/main/{mainDepartment}")
     public ResponseEntity<?> findProductsByDepartment(@PathVariable String mainDepartment) {
 
         //판매중인 상품 대분류별 조회
         //상품 이미지, 브랜드, 상품명, 모델명
         //즉시구매가 = salesBiddingTable 의 상품중 PROCESS 인 상품중 최저가(모든 사이즈별)
-        List<ProductRespDto> mainValue = adminService.findProductsByDepartment(mainDepartment);
-        return new ResponseEntity<>(mainValue,HttpStatus.OK);
+        List<ProductRespDto> mainValue = productService.findProductsByDepartment(mainDepartment);
+        return new ResponseEntity<>(mainValue, HttpStatus.OK);
     }
 
+    // 해당 대분류 상품 중 최신 등록순
+    @GetMapping("/{mainDepartment}/all_product_createDate")
+    public ResponseEntity<?> allProduct(@PathVariable String mainDepartment) {
+        List<ProductResponseDto> productResponseDtoList = productService.getAllProducts(mainDepartment);
+        return new ResponseEntity<>(productResponseDtoList, HttpStatus.OK);
+    }
+
+    // 해당 대분류 상품 중 구매입찰이 많이 등록된 순
+    @GetMapping("/{mainDepartment}/all_product_manyBid")
+    public ResponseEntity<?> allProductManyBid(@PathVariable String mainDepartment) {
+        List<ProductResponseDto> productResponseDtoList = productService.getAllProductsManyBid(mainDepartment);
+        log.info("productResponseDtoList: " + productResponseDtoList);
+        return new ResponseEntity<>(productResponseDtoList, HttpStatus.OK);
+    }
+
+    // 해당 대분류 상품 중 최근 구매 체결이 생긴 순
+    @GetMapping("/{mainDepartment}/all_product_NewBuyingBid")
+    public ResponseEntity<?> allProductNewBuyingBid(@PathVariable String mainDepartment) {
+        List<ProductResponseDto> productResponseDtoList = productService.getAllProductsNewBuyBid(mainDepartment);
+        return new ResponseEntity<>(productResponseDtoList, HttpStatus.OK);
+    }
+
+    // 해당 대분류 상품 중 최근 판매 체결이 생긴 순
+    @GetMapping("/{mainDepartment}/all_product_newSalesBid")
+    public ResponseEntity<?> allProductNewSalesBid(@PathVariable String mainDepartment) {
+        List<ProductResponseDto> productResponseDtoList = productService.getAllProductsNewSaleBid(mainDepartment);
+        return new ResponseEntity<>(productResponseDtoList, HttpStatus.OK);
+    }
+
+    // 소분류 상품
     @GetMapping("/sub/{subDepartment}")
     public Slice<ProductResponseDto> products(@PathVariable String subDepartment, @RequestParam(name = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Slice<ProductResponseDto> products = productService.selectCategoryValue(subDepartment, pageable);
-        log.info("상품 정보 : {}", products);
         return products;
     }
-    // 해당 상품(상세) 기본 정보 가져오기
+
+    // 해당 상품(상세) 정보 가져오기
     @GetMapping("/details/{modelNum}")
     public ProductDetailDto productDetailSelect(@PathVariable String modelNum) {
 
@@ -67,6 +88,7 @@ public class ProductController {
         return basicInformationDto;
     }
 
+    // 상세 상품에 대한 정보 확인(로그인해야함)
     @GetMapping("/details/{modelNum}/bid")
     public ResponseEntity<?> buyingBidSelect(
             @PathVariable String modelNum,
@@ -89,6 +111,7 @@ public class ProductController {
 
     }
 
+    // 입찰 걸기 -> productId, userId, 입찰 마감날짜를 입력받아서 뽑아와야함
     @PostMapping("/details/{modelNum}/bid")
     public ResponseEntity<?> bidApplication(
             @PathVariable String modelNum,
@@ -104,7 +127,8 @@ public class ProductController {
         return ResponseEntity.ok("값이 정상적으로 저장되었습니다.");
     }
 
-    // 리뷰 작성
+
+    // 해당 상세 상품에 대한 리뷰 작성
     @PostMapping("/details/{modelNum}/review")
     public ResponseEntity<?> productDetailReview(@PathVariable String modelNum, @RequestBody PhotoRequestDto photoRequestDto, @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
@@ -118,7 +142,7 @@ public class ProductController {
         return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
     }
 
-
+    // 해당 userId가 일치할 경우 수정 가능 -> 아마 이건 지울듯
     @PutMapping("/details/{modelNum}/review/{reviewId}")
     public ResponseEntity<?> updatePhotoReview(
             @PathVariable String modelNum,
@@ -139,6 +163,7 @@ public class ProductController {
         return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
     }
 
+    // 해당 userId가 일치할 경우 본인이 작성한 리뷰 삭제
     @DeleteMapping("/details/{modelNum}/review/{reviewId}")
     public ResponseEntity<?> deletePhotoReview(@PathVariable String modelNum, @PathVariable Long reviewId, @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {

@@ -1,5 +1,6 @@
 package com.example.backend.service.Product;
 
+import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.entity.*;
@@ -52,18 +53,38 @@ public class ProductServiceImpl implements ProductService {
         this.salesBiddingRepository = salesBiddingRepository;
     }
 
-
-
     @PersistenceContext
     private EntityManager entityManager;
 
     private LocalDateTime lastCheckedTime;
     private boolean isUpdated = false;
 
+    //실제 판매중인 상품 대분류별 조회
+    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
+
+        return productRepository.findProductsByDepartment(mainDepartment);
+    }
+
+    // 존재하는 대분류 중 최신순으로 조회
     @Override
     public List<ProductResponseDto> getAllProducts(String mainDepartment) {
 
         return productRepository.searchAllProduct(mainDepartment);
+    }
+
+    @Override
+    public List<ProductResponseDto> getAllProductsManyBid(String mainDepartment) {
+        return productRepository.searchAllProductManyBid(mainDepartment);
+    }
+
+    @Override
+    public List<ProductResponseDto> getAllProductsNewBuyBid(String mainDepartment) {
+        return productRepository.searchAllProductNewBuying(mainDepartment);
+    }
+
+    @Override
+    public List<ProductResponseDto> getAllProductsNewSaleBid(String mainDepartment) {
+        return productRepository.searchAllProductNewSelling(mainDepartment);
     }
 
     // 상품 소분류 조회

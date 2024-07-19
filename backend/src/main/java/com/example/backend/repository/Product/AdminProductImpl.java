@@ -14,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -254,49 +255,6 @@ public class AdminProductImpl implements AdminProduct {
                     .salesBiddingDtoList(filteredSalesBiddings)
                     .build();
         }).collect(Collectors.toList());
-    }
-
-    //범수
-    //판매 상품 대분류 조회
-    @Override
-    public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
-        QProduct product = new QProduct("product");
-        QBuyingBidding buyingBidding = new QBuyingBidding("buyingBidding");
-
-        BooleanExpression buyingCondition = buyingBidding.biddingStatus.eq(BiddingStatus.PROCESS);
-        BooleanExpression eqMainDepartment = product.mainDepartment.eq(mainDepartment);
-        BooleanExpression productCondition = product.productStatus.eq(ProductStatus.REGISTERED);
-//        BooleanExpression eqSubDepartment = product.subDepartment.eq(subDepartment);
-
-        // 쿼리 실행 및 결과를 DTO로 매핑
-        return queryFactory.select(
-                        Projections.constructor(ProductRespDto.class,
-                                product.productBrand,  // 상품 브랜드
-                                product.productName,  // 상품 이름
-                                product.modelNum,  // 모델명
-                                product.productImg,  // 상품 이미지
-                                product.mainDepartment,  // 대분류
-                                // coalesce 함수 사용 부분
-                                Expressions.numberTemplate(Long.class, "coalesce({0}, {1})", // coalesce 함수 사용, Long 타입으로 반환
-                                                buyingBidding.buyingBiddingPrice.min(), // 첫 번째 인자: 최소 입찰 가격
-                                                product.originalPrice) // 두 번째 인자: 원래 가격
-                                        .as("최저가") // 결과를 "최저가"로 이름 붙임
-//                                buyingBidding.buyingBiddingPrice.min().as("최저가")  // 최저가
-                        )
-                )
-                .from(product)
-                // salesBidding 테이블과 LEFT JOIN
-                .leftJoin(buyingBidding)
-                .on(buyingBidding.product.modelNum.eq(product.modelNum)
-                        .and(buyingCondition))  // LEFT JOIN의 ON 절에 조건 추가
-                // 조건 결합
-                .where(eqMainDepartment.and(productCondition))
-                // 모델명을 기준으로 그룹화
-                .groupBy(
-                        product.modelNum
-                )
-                // 결과를 리스트로 반환
-                .fetch();
     }
 }
 

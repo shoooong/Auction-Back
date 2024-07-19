@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 //대분류별 상품 조회
 @Getter
@@ -15,10 +16,9 @@ public class ProductRespDto {
     private String modelNum;
     private String productImg;
     private String mainDepartment;
-
     private BigDecimal buyingBiddingPrice;
 
-    public ProductRespDto( String brand, String productName, String modelNum, String productImg, String mainDepartment, BigDecimal buyingBiddingPrice) {
+    public ProductRespDto(String brand, String productName, String modelNum, String productImg, String mainDepartment, BigDecimal buyingBiddingPrice) {
         this.brand = brand;
         this.productName = productName;
         this.modelNum = modelNum;
