@@ -40,6 +40,7 @@ public class MypageController {
     private final AccountService accountService;
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
+    private final BuyingBiddingService buyingBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
     private final UserRepository userRepository;
@@ -181,6 +182,15 @@ public class MypageController {
         Long userId = userDTO.getUserId();
 
         return ordersService.getBuyHistoryComplete(userId);
+    }
+    // 입찰 취소
+    @PutMapping("/buyHistory/process")
+    public ResponseEntity<String> cancelBuyingBidding(@RequestParam Long buyingBiddingId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        buyingBiddingService.cancelBuyingBidding(userId, buyingBiddingId);
+
+        return ResponseEntity.ok("BuyingBidding canceled successfully!");
     }
 
 
