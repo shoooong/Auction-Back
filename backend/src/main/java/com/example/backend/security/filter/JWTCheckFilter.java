@@ -47,11 +47,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/inquiry/inquiryResponseRegistration/*",
             "/inquiry/user/registration",
             "/notice/user/**",
-            "/inquiry/**"
-
-
-
-
+            "/inquiry/**",
+            "/products/details/**"
     );
 
     /**

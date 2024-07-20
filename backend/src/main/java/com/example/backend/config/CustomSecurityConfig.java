@@ -42,7 +42,8 @@ public class CustomSecurityConfig {
             "/requestProduct/user/**",
             "/order/**",
             "/coupon/{couponId}/issue",
-            "/alarm/subscribe"
+            "/alarm/subscribe",
+            "/products/details/**"
     };
 
     @Bean
