@@ -50,7 +50,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     @Query("SELECT new com.example.backend.dto.mypage.buyHistory.BuyDetailsDto(p.productImg, p.productName, p.productSize, o.orderPrice, o.orderStatus) " +
             "FROM Orders o JOIN o.product p JOIN o.user u " +
             "WHERE u.userId = :userId " +
-            "ORDER BY o.createDate DESC")
+            "ORDER BY o.modifyDate DESC")
     List<BuyDetailsDto> findRecentOrderDetails(Long userId, Pageable pageable);
 
 
