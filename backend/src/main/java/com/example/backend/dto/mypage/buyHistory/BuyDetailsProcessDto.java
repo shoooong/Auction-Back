@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 @Builder
 public class BuyDetailsProcessDto {
 
+    private Long buyingBiddingId;
+
     private String productImg;
     private String productName;
     private String productSize;
@@ -17,7 +19,8 @@ public class BuyDetailsProcessDto {
     private BigDecimal buyingBiddingPrice;
     private BiddingStatus biddingStatus;
 
-    public BuyDetailsProcessDto(String productImg, String productName, String productSize, BigDecimal buyingBiddingPrice, BiddingStatus biddingStatus) {
+    public BuyDetailsProcessDto(Long buyingBiddingId, String productImg, String productName, String productSize, BigDecimal buyingBiddingPrice, BiddingStatus biddingStatus) {
+        this.buyingBiddingId = buyingBiddingId;
         this.productImg = productImg;
         this.productName = productName;
         this.productSize = productSize;

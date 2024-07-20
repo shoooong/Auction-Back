@@ -14,14 +14,16 @@ public class SaleDetailsDto {
     private String productName;
     private String productSize;
 
+    private Long salesBiddingId;
     private BigDecimal saleBiddingPrice;
     private SalesStatus salesStatus;
 
 
-    public SaleDetailsDto(String productImg, String productName, String productSize, BigDecimal saleBiddingPrice, SalesStatus salesStatus) {
+    public SaleDetailsDto(String productImg, String productName, String productSize, Long salesBiddingId, BigDecimal saleBiddingPrice, SalesStatus salesStatus) {
         this.productImg = productImg;
         this.productName = productName;
         this.productSize = productSize;
+        this.salesBiddingId = salesBiddingId;
         this.saleBiddingPrice = saleBiddingPrice;
         this.salesStatus = salesStatus;
     }

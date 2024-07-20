@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, Long> {
@@ -18,6 +19,8 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     // 종료 건수
     @Query("SELECT COUNT(o) FROM Orders o WHERE o.user.userId = :userId AND o.orderStatus ='COMPLETE'")
     Long countCompleteByUserId(Long userId);
+
+    Optional<Orders> findByBuyingBiddingBuyingBiddingId(Long buyingBiddingId);
 
     // TODO: QueryDSL로 변경할 것
     // 주문 내역 상세 정보 - 전체
@@ -31,7 +34,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     //         orderStatus = CANCEL 이면, "취소"
 
     // 주문 내역 상세 정보 - 입찰 중
-    @Query("SELECT new com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto(p.productImg, p.productName, p.productSize, bb.buyingBiddingPrice, bb.biddingStatus) " +
+    @Query("SELECT new com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto(bb.buyingBiddingId, p.productImg, p.productName, p.productSize, bb.buyingBiddingPrice, bb.biddingStatus) " +
             "FROM BuyingBidding bb JOIN bb.product p JOIN bb.user u " +
             "WHERE u.userId = :userId " +
             "AND bb.biddingStatus = 'PROCESS' " +

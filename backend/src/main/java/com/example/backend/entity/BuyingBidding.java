@@ -36,6 +36,7 @@ public class BuyingBidding extends BaseEntity {
     private LocalDateTime buyingBiddingTime;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
     private BiddingStatus biddingStatus;
 
     // 구매 입찰 상태 변경

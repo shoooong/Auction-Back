@@ -40,6 +40,7 @@ public class MypageController {
     private final AccountService accountService;
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
+    private final BuyingBiddingService buyingBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
     private final UserRepository userRepository;
@@ -182,6 +183,15 @@ public class MypageController {
 
         return ordersService.getBuyHistoryComplete(userId);
     }
+    // 입찰 취소
+    @PutMapping("/buyHistory/process")
+    public ResponseEntity<String> cancelBuyingBidding(@RequestParam Long buyingBiddingId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        buyingBiddingService.cancelBuyingBidding(userId, buyingBiddingId);
+
+        return ResponseEntity.ok("BuyingBidding canceled successfully!");
+    }
 
 
     /**
@@ -189,6 +199,7 @@ public class MypageController {
      * 전체, 검수 중, 진행 중, 종료 건수
      * 판매 입찰 시간 최신순 정렬
      */
+    // 상태별 필터
     @GetMapping("/saleHistory")
     public ResponseEntity<SaleHistoryDto> getSaleHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -196,6 +207,15 @@ public class MypageController {
         SaleHistoryDto saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
 
         return ResponseEntity.ok(saleHistoryDTO);
+    }
+    // 입찰 취소
+    @PutMapping("/saleHistory")
+    public ResponseEntity<String> cancelSalesBidding(@RequestParam Long salesBiddingId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        salesBiddingService.cancelSalesBidding(userId, salesBiddingId);
+
+        return ResponseEntity.ok("SalesBidding canceled successfully!");
     }
 
 
