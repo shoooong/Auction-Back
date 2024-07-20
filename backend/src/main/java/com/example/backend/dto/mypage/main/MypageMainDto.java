@@ -1,6 +1,6 @@
 package com.example.backend.dto.mypage.main;
 
-import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class MypageMainDto {
 
     private ProfileDto profileDto;
     private Long couponCount;
-    private BuyHistoryDto buyHistoryDto;
+    private BuyHistoryAllDto buyHistoryAllDto;
     private SaleHistoryDto saleHistoryDto;
 
     private List<BookmarkProductsDto> bookmarkProductsDto;

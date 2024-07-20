@@ -24,7 +24,6 @@ public class Orders extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    @Column(nullable = false)
     private BigDecimal orderPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)

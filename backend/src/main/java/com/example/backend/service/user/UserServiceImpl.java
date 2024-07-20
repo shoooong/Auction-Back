@@ -1,6 +1,6 @@
 package com.example.backend.service.user;
 
-import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.main.ProfileDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
@@ -212,13 +212,13 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         Long couponCount = userCouponService.getValidCouponCount(userId);
-        BuyHistoryDto buyHistoryDto = ordersService.getRecentBuyHistory(userId);
+        BuyHistoryAllDto buyHistoryAllDto = ordersService.getRecentBuyHistory(userId);
         SaleHistoryDto saleHistoryDto = salesBiddingService.getRecentSaleHistory(userId);
 
         return MypageMainDto.builder()
                 .profileDto(profileDto)
                 .couponCount(couponCount)
-                .buyHistoryDto(buyHistoryDto)
+                .buyHistoryAllDto(buyHistoryAllDto)
                 .saleHistoryDto(saleHistoryDto)
                 .bookmarkProductsDto(bookmarkProductService.getLatestBookmarkProducts(userId))
                 .build();
