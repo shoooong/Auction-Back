@@ -3,10 +3,13 @@ package com.example.backend.service;
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto;
+import com.example.backend.entity.SalesBidding;
+import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -44,5 +47,14 @@ public class SalesBiddingService {
                 .salesStatusCounts(SalesStatusCountDto)
                 .saleDetails(saleDetailsDTO)
                 .build();
+    }
+
+    @Transactional
+    public void cancelSalesBidding(Long userId, Long salesBiddingId) {
+        SalesBidding salesBidding = salesBiddingRepository.findBySalesBiddingIdAndUserUserId(salesBiddingId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 판매 입찰 내역입니다."));
+
+        salesBidding.changeSalesStatus(SalesStatus.CANCEL);
+        salesBiddingRepository.save(salesBidding);
     }
 }
