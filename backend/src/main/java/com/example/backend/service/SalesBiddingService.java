@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
+import com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,35 +24,24 @@ public class SalesBiddingService {
      */
     public SaleHistoryDto getSaleHistory(Long userId) {
         Long allCount = salesBiddingRepository.countAllByUserId(userId);
-        Long inspectionCount = salesBiddingRepository.countInspectionByUserId(userId);
-        Long processCount = salesBiddingRepository.countProcessByUserId(userId);
-        Long completeCount = salesBiddingRepository.countCompleteByUserId(userId);
-
+        List<SalesStatusCountDto> SalesStatusCountDto = salesBiddingRepository.countSalesStatus(userId);
         List<SaleDetailsDto> saleDetailsDTO = salesBiddingRepository.findSaleDetailsByUserId(userId);
 
         return SaleHistoryDto.builder()
                 .allCount(allCount)
-                .inspectionCount(inspectionCount)
-                .processCount(processCount)
-                .completeCount(completeCount)
+                .salesStatusCounts(SalesStatusCountDto)
                 .saleDetails(saleDetailsDTO)
                 .build();
     }
 
-
     public SaleHistoryDto getRecentSaleHistory(Long userId) {
         Long allCount = salesBiddingRepository.countAllByUserId(userId);
-        Long inspectionCount = salesBiddingRepository.countInspectionByUserId(userId);
-        Long processCount = salesBiddingRepository.countProcessByUserId(userId);
-        Long completeCount = salesBiddingRepository.countCompleteByUserId(userId);
-
+        List<SalesStatusCountDto> SalesStatusCountDto = salesBiddingRepository.countSalesStatus(userId);
         List<SaleDetailsDto> saleDetailsDTO = salesBiddingRepository.findRecentSaleDetailsByUserId(userId, PageRequest.of(0, 3));
 
         return SaleHistoryDto.builder()
                 .allCount(allCount)
-                .inspectionCount(inspectionCount)
-                .processCount(processCount)
-                .completeCount(completeCount)
+                .salesStatusCounts(SalesStatusCountDto)
                 .saleDetails(saleDetailsDTO)
                 .build();
     }
