@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.plaf.multi.MultiListUI;
 import java.time.LocalDateTime;
 
  // 기본 생성자 추가
@@ -18,21 +21,9 @@ public class AdminReqDto {
         private String luckyName;
         private String content;
         private String luckyImage;
-
-//        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-//        private LocalDateTime luckyStartDate;
-//
-//        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-//        private LocalDateTime luckyEndDate;
-//
-//        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-//        private LocalDateTime luckyDate;
-
         private String luckySize;
-
         private Integer luckyPeople;
-
-
+        private MultipartFile luckyphoto;
 
         public AdminLuckDrawDto(LuckyDraw luckyDraw) {
             this.luckyName = luckyDraw.getLuckyName();
@@ -40,6 +31,7 @@ public class AdminReqDto {
             this.luckyImage = luckyDraw.getLuckyImage();
             this.luckySize = luckyDraw.getLuckySize();
             this.luckyPeople = luckyDraw.getLuckyPeople();
+
         }
     }
 }
