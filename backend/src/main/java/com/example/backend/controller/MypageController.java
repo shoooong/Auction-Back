@@ -43,7 +43,6 @@ public class MypageController {
     private final BuyingBiddingService buyingBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
-    private final UserRepository userRepository;
 
     /**
      * 마이페이지 메인
@@ -66,8 +65,7 @@ public class MypageController {
     public ResponseEntity<UserDTO> getUser(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        Users user = userService.validateUserId(userId);
 
         return ResponseEntity.ok(userService.entityToDTO(user));
     }
