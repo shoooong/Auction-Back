@@ -2,6 +2,7 @@ package com.example.backend.repository.Orders;
 
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
+import com.example.backend.entity.Address;
 import com.example.backend.entity.Orders;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,6 +56,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
             "WHERE u.userId = :userId " +
             "ORDER BY o.modifyDate DESC")
     List<BuyDetailsDto> findRecentOrderDetails(Long userId, Pageable pageable);
+    /**
+     * 주문 회원 기본 배송 정보
+     */
+    @Query("SELECT a FROM Address a WHERE a.user.userId = :userId AND a.defaultAddress = true")
+    Optional<Address> findDefaultAddress(Long userId);
 
 
 }

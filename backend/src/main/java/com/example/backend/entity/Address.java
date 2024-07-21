@@ -20,6 +20,10 @@ public class Address {
     @Column(length = 255)
     private String name;
 
+    // 수령인 전화번호
+    @Column(length = 255)
+    private String addrPhone;
+
     // 우편 번호
     @Column(length = 20, nullable = false)
     private String zonecode;
