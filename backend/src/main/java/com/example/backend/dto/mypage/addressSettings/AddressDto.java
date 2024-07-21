@@ -16,7 +16,6 @@ public class AddressDto {
     private String jibunAddress;
     private String detailAddress;
     private String extraAddress;
-    private String addressName;
     private boolean defaultAddress;
 
 
@@ -30,7 +29,6 @@ public class AddressDto {
                 .jibunAddress(address.getJibunAddress())
                 .detailAddress(address.getDetailAddress())
                 .extraAddress(address.getExtraAddress())
-                .addressName(address.getAddressName())
                 .defaultAddress(address.getDefaultAddress())
                 .build();
     }

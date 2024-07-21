@@ -52,7 +52,6 @@ public class AddressService {
                     .jibunAddress(addressReqDto.getJibunAddress())
                     .detailAddress(addressReqDto.getDetailAddress())
                     .extraAddress(addressReqDto.getExtraAddress())
-                    .addressName(addressReqDto.getAddressName())
                     .defaultAddress(addressReqDto.isDefaultAddress())
                     .build();
 
