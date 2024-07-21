@@ -9,6 +9,9 @@ import lombok.Getter;
 public class AddressReqDto {
 
     private String name;
+
+    private String addrPhone;
+
     @NotBlank
     private String zonecode;
 
