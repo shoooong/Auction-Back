@@ -2,6 +2,7 @@ package com.example.backend.controller.shop;
 
 import com.example.backend.dto.product.AllProductDto;
 import com.example.backend.service.ShopService;
+import io.lettuce.core.dynamic.annotation.Param;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -23,12 +24,25 @@ public class ShopController {
     @GetMapping("/all")
     public Slice<AllProductDto> getTotalProduct(@RequestParam("pageNumber") int pageNumber) {
 
-        Pageable pageable = PageRequest.of(pageNumber, 10);
+        Pageable pageable = PageRequest.of(pageNumber, 20);
         return shopService.getTotalProduct(pageable);
     }
 
-    @GetMapping
-    public Slice<AllProductDto> getFilterProducts(@RequestParam("pageNumber") int pageNumber, @RequestParam("subDepartment") String subDepartment) {
+    @GetMapping("/main")
+    public Slice<AllProductDto> getMainDepartment(@RequestParam("pageNumber") int pageNumber, @RequestParam(value = "mainDepartment", required = false) String mainDepartment) {
+        String[] mainDepartments = null;
+        if (mainDepartment.contains(",")) {
+            mainDepartments = mainDepartment.split(",");
+        } else {
+            mainDepartments = new String[]{mainDepartment};
+        }
+
+        Pageable pageable = PageRequest.of(pageNumber, 20);
+        return shopService.getMainDepartmentFilter(pageable, Arrays.asList(mainDepartments));
+    }
+
+    @GetMapping("/sub")
+    public Slice<AllProductDto> getSubDepartment(@RequestParam("pageNumber") int pageNumber, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
 
         String[] subDepartments = null;
         if (subDepartment.contains(",")) {
@@ -37,10 +51,8 @@ public class ShopController {
             subDepartments = new String[]{subDepartment};
         }
 
-        System.out.println("subDepartment: " + subDepartment);
-
-        Pageable pageable = PageRequest.of(pageNumber, 10);
-        return shopService.getFilter(pageable, Arrays.asList(subDepartments));
+        Pageable pageable = PageRequest.of(pageNumber, 20);
+        return shopService.getSubDepartmentFilter(pageable, Arrays.asList(subDepartments));
     }
 
 }

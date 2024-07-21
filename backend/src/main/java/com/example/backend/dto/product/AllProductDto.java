@@ -15,6 +15,7 @@ public class AllProductDto {
     private Long productId;
     private String productBrand;
     private String productName;
+    private String mainDepartment;
     private String subDepartment;
     private String productImg;
 

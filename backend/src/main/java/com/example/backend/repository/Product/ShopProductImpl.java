@@ -29,11 +29,19 @@ public class ShopProductImpl implements ShopProduct {
     QBuyingBidding buyingBidding = QBuyingBidding.buyingBidding;
 
     // 필터링
+    private BooleanExpression eqMain(List<String> mainDepartment){
+        if (StringUtils.isBlank(mainDepartment.toString())){
+            return null;
+        }
+        return product.mainDepartment.in(mainDepartment);
+    }
     private BooleanExpression eqSub(List<String> subDepartment){
-        log.info("subDepartment : {}", subDepartment);
-        log.info("subDepartment toString : {}", subDepartment.toString());
+        if (StringUtils.isBlank(subDepartment.toString())){
+            return null;
+        }
         return product.subDepartment.in(subDepartment);
     }
+
 
     // 모든 상품 조회
     @Override
@@ -47,6 +55,7 @@ public class ShopProductImpl implements ShopProduct {
                         product.productId,
                         product.productBrand,
                         product.productName,
+                        product.mainDepartment,
                         product.subDepartment,
                         product.productImg,
                         buyingBidding.buyingBiddingPrice.min()
@@ -72,7 +81,7 @@ public class ShopProductImpl implements ShopProduct {
     }
 
     @Override
-    public Slice<AllProductDto> filterProduct(Pageable pageable, List<String> subDepartment) {
+    public Slice<AllProductDto> getProductsByMainDepartment(Pageable pageable, List<String> mainDepartment) {
         int pageSize = pageable.getPageSize();
 
         List<AllProductDto> products = queryFactory
@@ -81,6 +90,42 @@ public class ShopProductImpl implements ShopProduct {
                         product.productId,
                         product.productBrand,
                         product.productName,
+                        product.mainDepartment,
+                        product.subDepartment,
+                        product.productImg,
+                        buyingBidding.buyingBiddingPrice.min()
+                ))
+                .from(product)
+                .leftJoin(buyingBidding).on(product.productId.eq(buyingBidding.product.productId))
+                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED"))
+                        .and(buyingBidding.biddingStatus.eq(BiddingStatus.valueOf("PROCESS"))), eqMain(mainDepartment))
+                .groupBy(product.modelNum)
+                .offset(pageable.getOffset())
+                .limit(pageSize + 1)
+                .fetch();
+
+        // 다음 페이지 유무
+        boolean hasNext = false;
+        if(products.size() > pageSize){
+            products.remove(pageSize);
+            hasNext = true;
+        }
+
+        // Slice 객체 변환
+        return new SliceImpl<>(products, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<AllProductDto> getProductsBySubDepartment(Pageable pageable, List<String> subDepartment) {
+        int pageSize = pageable.getPageSize();
+
+        List<AllProductDto> products = queryFactory
+                .select(Projections.constructor(AllProductDto.class,
+                        product.modelNum,
+                        product.productId,
+                        product.productBrand,
+                        product.productName,
+                        product.mainDepartment,
                         product.subDepartment,
                         product.productImg,
                         buyingBidding.buyingBiddingPrice.min()

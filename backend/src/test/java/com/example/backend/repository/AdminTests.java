@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
+
 @SpringBootTest
 @Log4j2
 public class AdminTests {
@@ -33,7 +35,7 @@ public class AdminTests {
                         .productBrand("브랜드" + i)
                         .productName(mainDepartment + " 상품" + i)
                         .modelNum("modelnum" + i)
-                        .originalPrice(1000L + i * 100)
+                        .originalPrice(BigDecimal.valueOf(1000.00 + i * 100))
                         .mainDepartment(mainDepartment)
                         .subDepartment(subDepartment)
                         .productQuantity(i * 10)
@@ -52,7 +54,7 @@ public class AdminTests {
                         .productBrand("브랜드" + i)
                         .productName(mainDepartment + " 상품" + i)
                         .modelNum("modelnum" + i)
-                        .originalPrice(1000L + i * 100)
+                        .originalPrice(BigDecimal.valueOf(1000 + i * 100))
                         .mainDepartment(mainDepartment)
                         .productQuantity(i * 10)
                         .productSize("사이즈" + i)

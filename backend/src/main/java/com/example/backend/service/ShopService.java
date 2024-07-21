@@ -22,7 +22,11 @@ public class ShopService {
         return productRepository.allProduct(pageable);
     }
 
-    public Slice<AllProductDto> getFilter(Pageable pageable, List<String> subDepartment){
-        return productRepository.filterProduct(pageable, subDepartment);
+    public Slice<AllProductDto> getMainDepartmentFilter(Pageable pageable, List<String> mainDepartment){
+        return productRepository.getProductsByMainDepartment(pageable, mainDepartment);
+    }
+
+    public Slice<AllProductDto> getSubDepartmentFilter(Pageable pageable, List<String> subDepartment){
+        return productRepository.getProductsBySubDepartment(pageable, subDepartment);
     }
 }
