@@ -58,6 +58,8 @@ public class Address {
 
 
     public void updateAddress(AddressReqDto addressReqDto) {
+        this.name = addressReqDto.getName();
+        this.addrPhone = addressReqDto.getAddrPhone();
         this.zonecode = addressReqDto.getZonecode();
         this.roadAddress = addressReqDto.getRoadAddress();
         this.jibunAddress = addressReqDto.getJibunAddress();
