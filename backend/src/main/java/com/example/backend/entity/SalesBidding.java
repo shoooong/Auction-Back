@@ -24,6 +24,7 @@ public class SalesBidding extends BaseEntity{
     private int salesQuantity;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
     private SalesStatus salesStatus;
 
     private LocalDateTime salesBiddingTime;

@@ -4,11 +4,13 @@ import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
 import com.example.backend.dto.mypage.addressSettings.AddressDto;
 import com.example.backend.dto.mypage.addressSettings.AddressReqDto;
+import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
+import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
 import com.example.backend.dto.mypage.main.BookmarkProductsDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
-import com.example.backend.dto.mypage.buyHistory.BuyHistoryDto;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.user.*;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
@@ -38,9 +40,9 @@ public class MypageController {
     private final AccountService accountService;
     private final OrdersService ordersService;
     private final SalesBiddingService salesBiddingService;
+    private final BuyingBiddingService buyingBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
-    private final UserRepository userRepository;
 
     /**
      * 마이페이지 메인
@@ -63,8 +65,7 @@ public class MypageController {
     public ResponseEntity<UserDTO> getUser(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        Users user = userService.validateUserId(userId);
 
         return ResponseEntity.ok(userService.entityToDTO(user));
     }
@@ -154,31 +155,65 @@ public class MypageController {
 
     /**
      * 쇼핑 정보 - 구매 내역
-     * 전체, 진행 중, 종료 건수
-     * 구매 내역 전체 조회 (주문 날짜 최신순 정렬)
+     * 전체, 입찰 중, 종료 건수
+     * 주문 날짜 최신순 정렬
      */
+    // 전체
     @GetMapping("/buyHistory")
-    public ResponseEntity<BuyHistoryDto> getBuyHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<BuyHistoryAllDto> getAllBuyHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        BuyHistoryDto buyHistoryDTO = ordersService.getBuyHistory(userId);
+        BuyHistoryAllDto buyHistoryAllDto = ordersService.getAllBuyHistory(userId);
 
-        return ResponseEntity.ok(buyHistoryDTO);
+        return ResponseEntity.ok(buyHistoryAllDto);
+    }
+    // 입찰 중
+    @GetMapping("/buyHistory/process")
+    public List<BuyDetailsProcessDto> getBuyHistoryProcess(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        return ordersService.getBuyHistoryProcess(userId);
+    }
+    // 종료
+    @GetMapping("/buyHistory/complete")
+    public List<BuyDetailsDto> getBuyHistoryComplete(@AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        return ordersService.getBuyHistoryComplete(userId);
+    }
+    // 입찰 취소
+    @PutMapping("/buyHistory/process")
+    public ResponseEntity<String> cancelBuyingBidding(@RequestParam Long buyingBiddingId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        buyingBiddingService.cancelBuyingBidding(userId, buyingBiddingId);
+
+        return ResponseEntity.ok("BuyingBidding canceled successfully!");
     }
 
 
     /**
      * 쇼핑 정보 - 판매 내역
      * 전체, 검수 중, 진행 중, 종료 건수
-     * 판매 내역 전체 조회 (판매 입찰 시간 최신순 정렬)
+     * 판매 입찰 시간 최신순 정렬
      */
+    // 상태별 필터
     @GetMapping("/saleHistory")
-    ResponseEntity<SaleHistoryDto> getSaleHistory(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<SaleHistoryDto> getSaleHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
         SaleHistoryDto saleHistoryDTO = salesBiddingService.getSaleHistory(userId);
 
         return ResponseEntity.ok(saleHistoryDTO);
+    }
+    // 입찰 취소
+    @PutMapping("/saleHistory")
+    public ResponseEntity<String> cancelSalesBidding(@RequestParam Long salesBiddingId, @AuthenticationPrincipal UserDTO userDTO) {
+        Long userId = userDTO.getUserId();
+
+        salesBiddingService.cancelSalesBidding(userId, salesBiddingId);
+
+        return ResponseEntity.ok("SalesBidding canceled successfully!");
     }
 
 

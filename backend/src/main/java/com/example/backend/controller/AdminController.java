@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -84,13 +85,27 @@ public class AdminController {
 
     //럭키드로우 상품 등록
     @PostMapping("/luckydraw/insert")
-    public ResponseEntity<?> registerLuckyDraw(@RequestBody AdminReqDto.AdminLuckDrawDto adminLuckDrawDto){
+    public ResponseEntity<?> registerLuckyDraw(@ModelAttribute AdminReqDto.AdminLuckDrawDto adminLuckDrawDto){
 
         //관리자가 상품 폼만 등록, 실제 럭키드로우 상품을 schedule을 통하여 등록됨
         log.info("럭키드로우등록"+adminLuckDrawDto.getLuckyName());
+        log.info("포토"+adminLuckDrawDto.getLuckyphoto());
+        log.info("콘텐츠"+adminLuckDrawDto.getContent());
+        log.info("피플"+adminLuckDrawDto.getLuckyPeople());
+        log.info("이미지"+adminLuckDrawDto.getLuckyImage());
+        log.info("--------------------------------------------");
 
-        adminService.insertLucky(adminLuckDrawDto);
 
-        return new ResponseEntity<>(adminLuckDrawDto,HttpStatus.OK);
+        AdminReqDto.AdminLuckDrawDto result = adminService.insertLucky(adminLuckDrawDto);
+
+        //관리자가 상품 폼만 등록, 실제 럭키드로우 상품을 schedule을 통하여 등록됨
+        log.info("럭키드로우등록"+adminLuckDrawDto.getLuckyName());
+        log.info("포토"+adminLuckDrawDto.getLuckyphoto());
+        log.info("콘텐츠"+adminLuckDrawDto.getContent());
+        log.info("피플"+adminLuckDrawDto.getLuckyPeople());
+        log.info("이미지"+adminLuckDrawDto.getLuckyImage());
+
+
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 }

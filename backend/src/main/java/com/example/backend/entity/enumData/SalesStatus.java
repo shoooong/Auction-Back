@@ -7,7 +7,7 @@ public enum SalesStatus {
     //진행
     PROCESS,
     //취소
-    DELETE,
+    CANCEL,
     //실패
     FAIL,
     //종료

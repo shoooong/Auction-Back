@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BuyingBiddingRepository extends JpaRepository<BuyingBidding, Long> {
     List<BuyingBidding> findByProduct(Product product);
@@ -15,13 +16,11 @@ public interface BuyingBiddingRepository extends JpaRepository<BuyingBidding, Lo
     @Query("SELECT COUNT(b) FROM BuyingBidding b WHERE b.user.userId = :userId AND b.biddingStatus ='PROCESS'")
     Long countProcessByUserId(Long userId);
 
-    // 종료 건수
-    @Query("SELECT COUNT(b) FROM BuyingBidding b WHERE b.user.userId = :userId AND b.biddingStatus ='COMPLETE'")
-    Long countCompleteByUserId(Long userId);
-
     // 구매 입찰 - 즉시 구매가
     @Query("SELECT MIN(b.buyingBiddingPrice) FROM BuyingBidding b WHERE b.product.productId IN :productIdList AND b.biddingStatus = 'PROCESS'")
     Long findLowPrice(List<Long> productIdList);
+
+    Optional<BuyingBidding> findByBuyingBiddingIdAndUserUserId(Long buyingBiddingId, Long userId);
 
     List<BuyingBidding> findByProductAndBiddingStatus(Product product, BiddingStatus biddingStatus);
 }

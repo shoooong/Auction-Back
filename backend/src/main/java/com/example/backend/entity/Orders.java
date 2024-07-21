@@ -24,7 +24,6 @@ public class Orders extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    @Column(nullable = false)
     private BigDecimal orderPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,4 +45,8 @@ public class Orders extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "couponID")
     private Coupon coupon;
+
+    public void changeOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }
