@@ -119,8 +119,9 @@ public class CustomSecurityConfig {
         // TODO: 추후 도메인 변경
 //        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
 //        configuration.setAllowedOriginPatterns(Arrays.asList("http://www.sho0ong.com"));
-        configuration.addAllowedOrigin("http://www.sho0ong.com");
+        configuration.addAllowedOrigin("https://www.sho0ong.com");
         configuration.addAllowedOrigin("http://175.45.200.47");
+        configuration.addAllowedOrigin("http://175.45.200.196");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
