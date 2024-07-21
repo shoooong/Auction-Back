@@ -44,10 +44,6 @@ public class Address {
     @Column(length = 20, nullable = false)
     private String extraAddress;
 
-    // 배송지명
-    @Column(length = 20, nullable = false)
-    private String addressName;
-
     // 기본 배송지 설정 여부
     @Column(nullable = false)
     private Boolean defaultAddress;
@@ -65,7 +61,6 @@ public class Address {
         this.jibunAddress = addressReqDto.getJibunAddress();
         this.detailAddress = addressReqDto.getDetailAddress();
         this.extraAddress = addressReqDto.getExtraAddress();
-        this.addressName = addressReqDto.getAddressName();
         this.defaultAddress = addressReqDto.isDefaultAddress();
     }
 }

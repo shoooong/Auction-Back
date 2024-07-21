@@ -1,6 +1,7 @@
 package com.example.backend.dto.mypage.addressSettings;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ public class AddressReqDto {
 
     private String name;
 
+    @Pattern(regexp = "\\d{11}", message = "핸드폰 번호는 공백없이 11자리 숫자만 가능합니다.")
     private String addrPhone;
 
     @NotBlank
@@ -22,9 +24,6 @@ public class AddressReqDto {
     private String detailAddress;
 
     private String extraAddress;
-
-    @NotBlank
-    private String addressName;
 
     private boolean defaultAddress;
 
