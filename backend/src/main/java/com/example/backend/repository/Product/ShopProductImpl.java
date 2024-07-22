@@ -81,41 +81,6 @@ public class ShopProductImpl implements ShopProduct {
     }
 
     @Override
-    public Slice<AllProductDto> getProductsByMainDepartment(Pageable pageable, List<String> mainDepartment) {
-        int pageSize = pageable.getPageSize();
-
-        List<AllProductDto> products = queryFactory
-                .select(Projections.constructor(AllProductDto.class,
-                        product.modelNum,
-                        product.productId,
-                        product.productBrand,
-                        product.productName,
-                        product.mainDepartment,
-                        product.subDepartment,
-                        product.productImg,
-                        buyingBidding.buyingBiddingPrice.min()
-                ))
-                .from(product)
-                .leftJoin(buyingBidding).on(product.productId.eq(buyingBidding.product.productId))
-                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED"))
-                        .and(buyingBidding.biddingStatus.eq(BiddingStatus.valueOf("PROCESS"))), eqMain(mainDepartment))
-                .groupBy(product.modelNum)
-                .offset(pageable.getOffset())
-                .limit(pageSize + 1)
-                .fetch();
-
-        // 다음 페이지 유무
-        boolean hasNext = false;
-        if(products.size() > pageSize){
-            products.remove(pageSize);
-            hasNext = true;
-        }
-
-        // Slice 객체 변환
-        return new SliceImpl<>(products, pageable, hasNext);
-    }
-
-    @Override
     public Slice<AllProductDto> getProductsBySubDepartment(Pageable pageable, List<String> subDepartment) {
         int pageSize = pageable.getPageSize();
 

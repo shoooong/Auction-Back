@@ -28,19 +28,6 @@ public class ShopController {
         return shopService.getTotalProduct(pageable);
     }
 
-    @GetMapping("/main")
-    public Slice<AllProductDto> getMainDepartment(@RequestParam("pageNumber") int pageNumber, @RequestParam(value = "mainDepartment", required = false) String mainDepartment) {
-        String[] mainDepartments = null;
-        if (mainDepartment.contains(",")) {
-            mainDepartments = mainDepartment.split(",");
-        } else {
-            mainDepartments = new String[]{mainDepartment};
-        }
-
-        Pageable pageable = PageRequest.of(pageNumber, 20);
-        return shopService.getMainDepartmentFilter(pageable, Arrays.asList(mainDepartments));
-    }
-
     @GetMapping("/sub")
     public Slice<AllProductDto> getSubDepartment(@RequestParam("pageNumber") int pageNumber, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
 
