@@ -28,7 +28,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String productName;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String modelNum;
 
     @Column(nullable = false)
