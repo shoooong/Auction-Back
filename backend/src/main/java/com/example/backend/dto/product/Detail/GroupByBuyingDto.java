@@ -15,4 +15,5 @@ public class GroupByBuyingDto {
     private String modelNum;
     private String productSize;
     private BigDecimal buyingBiddingPrice;
+    private Long productId;
 }

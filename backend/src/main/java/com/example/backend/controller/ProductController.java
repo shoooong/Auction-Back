@@ -78,7 +78,7 @@ public class ProductController {
     }
 
     // 해당 상품(상세) 정보 가져오기
-    @GetMapping("/details/{modelNum}")
+    @GetMapping("/detailInfo/{modelNum}")
     public ProductDetailDto productDetailSelect(@PathVariable String modelNum) {
 
         // (상품의 기본 정보) && (해당 상품의 구매(최저) / 판매(최고)가 조회) && (해당 상품에 대한 최근 체결 정보) && 상품 체결 / 구매 / 판매 내역 리스트
@@ -142,7 +142,7 @@ public class ProductController {
         return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
     }
 
-    // 해당 userId가 일치할 경우 수정 가능 -> 아마 이건 지울듯
+    // 해당 userId가 일치할 경우 수정 가능 -> > 사실상 사용 X
     @PutMapping("/details/{modelNum}/review/{reviewId}")
     public ResponseEntity<?> updatePhotoReview(
             @PathVariable String modelNum,
@@ -163,7 +163,7 @@ public class ProductController {
         return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
     }
 
-    // 해당 userId가 일치할 경우 본인이 작성한 리뷰 삭제
+    // 해당 userId가 일치할 경우 본인이 작성한 리뷰 삭제 -> 사실상 사용 X
     @DeleteMapping("/details/{modelNum}/review/{reviewId}")
     public ResponseEntity<?> deletePhotoReview(@PathVariable String modelNum, @PathVariable Long reviewId, @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {

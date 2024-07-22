@@ -15,4 +15,5 @@ public class GroupBySalesDto {
     private String modelNum;
     private String productSize;
     private BigDecimal productMaxPrice;
+    private Long productId;
 }

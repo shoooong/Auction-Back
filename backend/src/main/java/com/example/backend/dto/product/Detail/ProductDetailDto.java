@@ -19,7 +19,10 @@ public class ProductDetailDto {
     private String modelNum;
     private String productName;
     private BigDecimal originalPrice;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    private LocalDateTime createDate;
     private int productLike;
+    private String subDepartment;
 
     private BigDecimal buyingBiddingPrice;
     private BigDecimal salesBiddingPrice;
@@ -27,7 +30,7 @@ public class ProductDetailDto {
     private BigDecimal latestPrice;
     private BigDecimal previousPrice;
     private Double changePercentage;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime recentlyContractDate;
     private Long differenceContract;
 

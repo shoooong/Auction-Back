@@ -189,6 +189,7 @@ public class ProductSearchImpl implements ProductSearch {
                         .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
                         .and(product.subDepartment.eq(subDepartment)))
                 .groupBy(product.modelNum)
+                .orderBy(product.createDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageSize + 1)
                 .fetch();
@@ -260,7 +261,8 @@ public class ProductSearchImpl implements ProductSearch {
                 .where(product.modelNum.eq(modelNum)
                         .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
                         .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(product.productId.eq(product.productId)))
                 .orderBy(sales.salesBiddingTime.desc())
                 .fetch();
 
@@ -307,7 +309,9 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         product.productSize,
-                        buying.buyingBiddingPrice.min().as("buyingBiddingPrice")))
+                        buying.buyingBiddingPrice.min().as("buyingBiddingPrice"),
+                        product.productId.as("productId"))
+                        )
                 .from(product)
                 .leftJoin(buying).on(buying.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
@@ -330,7 +334,9 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         product.productSize,
-                        sales.salesBiddingPrice.max().as("productMaxPrice")))
+                        sales.salesBiddingPrice.max().as("productMaxPrice"),
+                        product.productId.as("productId"))
+                        )
                 .from(product)
                 .leftJoin(sales).on(sales.product.eq(product))
                 .where(product.modelNum.eq(modelNum)

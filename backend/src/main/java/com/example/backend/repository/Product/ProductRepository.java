@@ -22,11 +22,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     Optional<Product> findByProductIdAndProductStatus(Long productId, ProductStatus productStatus);
 
     // 상품 모델번호에 따른 1개의 정보만 가져오기 - 모델번호가 똑같다는 것은 같은 상품이라는 것
-    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = com.example.backend.entity.enumData.ProductStatus.REGISTERED")
+    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED'")
     List<Product> findAllByModelNumAndStatus(@Param("modelNum") String modelNum);
 
     // 사이즈가 일치할 경우 같은 상품 찾기
-    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = com.example.backend.entity.enumData.ProductStatus.REGISTERED and p.productSize = :productSize")
+    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED' and p.productSize = :productSize")
     Optional<Product> findBidProductInfo(@Param("modelNum") String modelNum, @Param("productSize") String productSize);
 
     Optional<Product> findFirstByModelNum(String modelNum);

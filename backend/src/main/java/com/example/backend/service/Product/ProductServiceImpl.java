@@ -130,8 +130,10 @@ public class ProductServiceImpl implements ProductService {
                     .productBrand(product.getProductBrand())
                     .modelNum(product.getModelNum())
                     .productName(product.getProductName())
+                    .createDate(product.getCreateDate())
                     .originalPrice(product.getOriginalPrice())
                     .productLike(product.getProductLike())
+                    .subDepartment(product.getSubDepartment())
 
                     .buyingBiddingPrice(priceValue.getBuyingBiddingPrice())
                     .salesBiddingPrice(priceValue.getSalesBiddingPrice())

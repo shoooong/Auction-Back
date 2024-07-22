@@ -40,6 +40,7 @@ public class CustomSecurityConfig {
             "/feed/user/**",
             "/inquiry/{inquiryId}/delete",
             "/requestProduct/user/**",
+            "/products/details/**",
             "/order/**",
             "/coupon/{couponId}/issue",
             "/alarm/subscribe",
