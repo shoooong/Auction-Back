@@ -1,6 +1,6 @@
 package com.example.backend.controller.requesstproduct;
 
-import com.example.backend.dto.product.RequestProudctDto;
+import com.example.backend.dto.product.RequestProductDto;
 import com.example.backend.service.requestproduct.RequestProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ public class RequestProductController {
 
     @PostMapping("/request")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRequestProduct(@RequestBody RequestProudctDto requestProductDto) {
+    public void createRequestProduct(@RequestBody RequestProductDto requestProductDto) {
         requestProductService.createRequestProduct(requestProductDto);
     }
 }

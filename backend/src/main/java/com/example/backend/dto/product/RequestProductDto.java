@@ -4,7 +4,6 @@ import com.example.backend.entity.enumData.ProductStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class RequestProudctDto {
+public class RequestProductDto {
 
     private Long productId;
     private String productImg;
@@ -23,5 +22,4 @@ public class RequestProudctDto {
     private String subDepartment;
     private String productSize;
     private ProductStatus productStatus;
-    private String modelNum;
 }

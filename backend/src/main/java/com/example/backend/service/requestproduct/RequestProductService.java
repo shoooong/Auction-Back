@@ -1,7 +1,7 @@
 package com.example.backend.service.requestproduct;
 
-import com.example.backend.dto.product.RequestProudctDto;
+import com.example.backend.dto.product.RequestProductDto;
 
 public interface RequestProductService {
-    void createRequestProduct(RequestProudctDto requestProductDto);
+    void createRequestProduct(RequestProductDto requestProductDto);
 }

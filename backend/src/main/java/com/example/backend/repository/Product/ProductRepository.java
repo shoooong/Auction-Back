@@ -82,4 +82,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
             "FROM Product p WHERE p.productId IN :productIdList")
     List<Object[]> findProductIdAndModelNum(List<Long> productIdList);
 
+    boolean existsByModelNumAndProductSize(String modelNum, String productSize);
+    Optional<Product> findByModelNumAndProductSize(String modelNum, String productSize);
+
 }

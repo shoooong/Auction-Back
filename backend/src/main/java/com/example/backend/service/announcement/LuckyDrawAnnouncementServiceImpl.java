@@ -1,12 +1,8 @@
 package com.example.backend.service.announcement;
 
 import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
-import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementListDto;
-import com.example.backend.entity.Draw;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.LuckyDrawAnnouncement;
-import com.example.backend.entity.Users;
-import com.example.backend.entity.enumData.LuckyStatus;
 import com.example.backend.repository.LuckyDraw.DrawRepository;
 import com.example.backend.repository.LuckyDraw.LuckyDrawAnnouncementRepository;
 import com.example.backend.repository.LuckyDraw.LuckyDrawRepository;
@@ -35,11 +31,11 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
 
     // 이벤트 공지사항 조회
     @Override
-    public List<LuckyDrawAnnouncementListDto> getAllLuckyDrawAnnouncementList() {
+    public List<LuckyDrawAnnouncementDto> getAllLuckyDrawAnnouncementList() {
         List<LuckyDrawAnnouncement> luckyDrawAnnouncements = luckyDrawAnnouncementRepository.findAll();
 
         return luckyDrawAnnouncements.stream()
-                .map(luckyDrawAnnouncement -> new LuckyDrawAnnouncementListDto(
+                .map(luckyDrawAnnouncement -> new LuckyDrawAnnouncementDto(
                         luckyDrawAnnouncement.getLuckyAnnouncementId(),
                         luckyDrawAnnouncement.getLuckyDraw().getLuckyId(),
                         luckyDrawAnnouncement.getLuckyTitle(),
@@ -56,48 +52,54 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
 
         LuckyDraw luckyDraw = luckyDrawAnnouncement.getLuckyDraw();
 
-        Draw draw = drawRepository.findByLuckyDrawAndLuckyStatus(luckyDraw, LuckyStatus.LUCKY);
+        return LuckyDrawAnnouncementDto.builder()
+                .luckyAnnouncementId(luckyDrawAnnouncement.getLuckyAnnouncementId())
+                .luckyId(luckyDraw.getLuckyId())
+                .luckyTitle(luckyDrawAnnouncement.getLuckyTitle())
+                .luckyContent(luckyDrawAnnouncement.getLuckyContent())
+                .build();
+    }
 
-        Long userId = (draw != null) ? draw.getUser().getUserId() : null;
+    // 관리자용 메서드 구현
+    @Override
+    public List<LuckyDrawAnnouncementDto> getAllAdminLuckyDrawAnnouncementList() {
+        // 관리자 전용 로직을 추가할 수 있습니다.
+        List<LuckyDrawAnnouncement> luckyDrawAnnouncements = luckyDrawAnnouncementRepository.findAll();
+        return luckyDrawAnnouncements.stream()
+                .map(luckyDrawAnnouncement -> new LuckyDrawAnnouncementDto(
+                        luckyDrawAnnouncement.getLuckyAnnouncementId(),
+                        luckyDrawAnnouncement.getLuckyDraw().getLuckyId(),
+                        luckyDrawAnnouncement.getLuckyTitle(),
+                        luckyDrawAnnouncement.getLuckyContent()
+                ))
+                .collect(Collectors.toList());
+    }
 
-        String email = null;
-        String nickname = null;
+    @Override
+    public LuckyDrawAnnouncementDto findAdminLuckyDrawAnnouncementById(Long luckyAnnouncementId) {
+        // 관리자 전용 로직을 추가할 수 있습니다.
+        LuckyDrawAnnouncement luckyDrawAnnouncement = luckyDrawAnnouncementRepository.findById(luckyAnnouncementId)
+                .orElseThrow(() -> new RuntimeException("Lucky Draw Announcement Not Found"));
 
-        if (userId != null) {
-            Users user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User Not Found"));
-            email = user.getEmail();
-            nickname = user.getNickname();
-        }
+        LuckyDraw luckyDraw = luckyDrawAnnouncement.getLuckyDraw();
 
         return LuckyDrawAnnouncementDto.builder()
                 .luckyAnnouncementId(luckyDrawAnnouncement.getLuckyAnnouncementId())
                 .luckyId(luckyDraw.getLuckyId())
                 .luckyTitle(luckyDrawAnnouncement.getLuckyTitle())
                 .luckyContent(luckyDrawAnnouncement.getLuckyContent())
-                .luckyName(luckyDraw.getLuckyName())
-                .content(luckyDraw.getContent())
-                .luckySize(luckyDraw.getLuckySize())
-                .luckyImage(luckyDraw.getLuckyImage())
-                .luckyStartDate(luckyDraw.getLuckyStartDate())
-                .luckyEndDate(luckyDraw.getLuckyEndDate())
-                .luckyDate(luckyDraw.getLuckyDate())
-                .luckyPeople(luckyDraw.getLuckyPeople())
-                .userId(userId)
-                .email(email)
-                .nickname(nickname)
                 .build();
     }
 
     // 이벤트 공지사항 등록
     @Override
-    public LuckyDrawAnnouncement createLuckyDrawAnnouncement(LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto) {
-        LuckyDraw luckyDraw = luckyDrawRepository.findById(luckyDrawAnnouncementListDto.getLuckyId())
+    public LuckyDrawAnnouncement createLuckyDrawAnnouncement(LuckyDrawAnnouncementDto luckyDrawAnnouncementDto) {
+        LuckyDraw luckyDraw = luckyDrawRepository.findById(luckyDrawAnnouncementDto.getLuckyId())
                 .orElseThrow(() -> new RuntimeException("Lucky Draw Not Found"));
 
         LuckyDrawAnnouncement luckyDrawAnnouncement = new LuckyDrawAnnouncement();
-        luckyDrawAnnouncement.setLuckyTitle(luckyDrawAnnouncementListDto.getLuckyTitle());
-        luckyDrawAnnouncement.setLuckyContent(luckyDrawAnnouncementListDto.getLuckyContent());
+        luckyDrawAnnouncement.setLuckyTitle(luckyDrawAnnouncementDto.getLuckyTitle());
+        luckyDrawAnnouncement.setLuckyContent(luckyDrawAnnouncementDto.getLuckyContent());
         luckyDrawAnnouncement.setLuckyDraw(luckyDraw);
 
         LuckyDrawAnnouncement saved = luckyDrawAnnouncementRepository.save(luckyDrawAnnouncement);
@@ -107,15 +109,15 @@ public class LuckyDrawAnnouncementServiceImpl implements LuckyDrawAnnouncementSe
     }
 
     @Override
-    public LuckyDrawAnnouncementListDto updateLuckyDrawAnnouncement(Long luckyAnnouncementId, LuckyDrawAnnouncementListDto luckyDrawAnnouncementListDto) {
+    public LuckyDrawAnnouncementDto updateLuckyDrawAnnouncement(Long luckyAnnouncementId, LuckyDrawAnnouncementDto luckyDrawAnnouncementDto) {
         LuckyDrawAnnouncement luckyDrawAnnouncement = luckyDrawAnnouncementRepository.findById(luckyAnnouncementId)
                 .orElseThrow(() -> new RuntimeException("Lucky Draw Announcement Not Found"));
 
-        luckyDrawAnnouncement.setLuckyTitle(luckyDrawAnnouncementListDto.getLuckyTitle());
-        luckyDrawAnnouncement.setLuckyContent(luckyDrawAnnouncementListDto.getLuckyContent());
+        luckyDrawAnnouncement.setLuckyTitle(luckyDrawAnnouncementDto.getLuckyTitle());
+        luckyDrawAnnouncement.setLuckyContent(luckyDrawAnnouncementDto.getLuckyContent());
 
         LuckyDrawAnnouncement updated = luckyDrawAnnouncementRepository.save(luckyDrawAnnouncement);
-        return new LuckyDrawAnnouncementListDto(
+        return new LuckyDrawAnnouncementDto(
                 updated.getLuckyAnnouncementId(),
                 updated.getLuckyDraw().getLuckyId(),
                 updated.getLuckyTitle(),
