@@ -31,7 +31,6 @@ public class AdminReqDto {
             this.luckyImage = luckyDraw.getLuckyImage();
             this.luckySize = luckyDraw.getLuckySize();
             this.luckyPeople = luckyDraw.getLuckyPeople();
-
         }
     }
 }

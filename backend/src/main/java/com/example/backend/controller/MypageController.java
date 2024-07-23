@@ -2,6 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
+import com.example.backend.dto.mypage.accountSettings.SalesSummaryDto;
+import com.example.backend.dto.mypage.accountSettings.SalesSummaryRespDto;
 import com.example.backend.dto.mypage.addressSettings.AddressDto;
 import com.example.backend.dto.mypage.addressSettings.AddressReqDto;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
@@ -23,6 +25,8 @@ import com.example.backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +47,7 @@ public class MypageController {
     private final BuyingBiddingService buyingBiddingService;
     private final DrawService drawService;
     private final BookmarkProductService bookmarkProductService;
+    private final AdminService adminService;
 
     /**
      * 마이페이지 메인
@@ -244,11 +249,22 @@ public class MypageController {
         return bookmarkProductService.getAllBookmarkProducts(userId);
     }
 
-
     /**
      * 쇼핑 정보 - 관심
      * 2) 관심 스타일
      */
 //    @GetMapping("/bookmark/style")
+
+    //정산 내역
+    @GetMapping("/account/sales/user")
+    public ResponseEntity<SalesSummaryRespDto> getSalesSummary(@AuthenticationPrincipal UserDTO user, Pageable pagable){
+
+        Long userId = user.getUserId();
+        log.info("userId: {}",userId);
+
+        SalesSummaryRespDto result =adminService.getSalesSummary(userId,pagable);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
 }

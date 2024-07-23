@@ -11,11 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class AdminProductRespDto {
-    //    private String modelNum;
-//    private String productSize;
-//    private List<AdminProductDetailDto> adminProductDetailDtos;
-//    private List<BuyinBiddingDto> buyingBiddingDtoList;
-//    private List<SalesBiddingDto> salesBiddingDtoList;a
+
     private AdminProductDetailDto adminProductDetailDto;
     private List<BuyinBiddingDto> buyingBiddingDtoList;
     private List<SalesBiddingDto> salesBiddingDtoList;

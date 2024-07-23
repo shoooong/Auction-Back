@@ -2,14 +2,21 @@ package com.example.backend.controller;
 
 
 import com.example.backend.dto.admin.*;
+import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
+import com.example.backend.dto.notice.NoticeDto;
+import com.example.backend.dto.product.RequestProductDto;
+import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.LuckyProcessStatus;
+import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.service.AdminService;
+import com.example.backend.service.notice.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +29,7 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final NoticeService noticeService;
     //요청상품 전체조회
     @GetMapping("/requests")
     public ResponseEntity<?> findReqProduct() {
@@ -36,16 +44,35 @@ public class AdminController {
         return new ResponseEntity<>(reqProductRespDto, HttpStatus.OK);
     }
 
-    // 요청상품 판매상품으로 등록
+//    // 요청상품 판매상품으로 등록
+//    @PutMapping("/requests/{productId}")
+//    public ResponseEntity<?> acceptReqProduct(@PathVariable Long productId) {
+//        try {
+//            AdminRespDto.RegProductRespDto regProductRespDto = adminService.acceptRequest(productId);
+//            return new ResponseEntity<>(regProductRespDto, HttpStatus.OK);
+//        } catch (RuntimeException e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//    }
+    //요청상품 판매 상품으로 등록 ver2
     @PutMapping("/requests/{productId}")
-    public ResponseEntity<?> acceptReqProduct(@PathVariable Long productId) {
-        try {
-            AdminRespDto.RegProductRespDto regProductRespDto = adminService.acceptRequest(productId);
-            return new ResponseEntity<>(regProductRespDto, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> saveReqProduct(@PathVariable Long productId,@RequestBody ProductReqDto productReqDto) {
+        //productId로 요청 상품의 정보를 가져옴,
+
+
+        adminService.acceptRequest(productId,productReqDto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
+
+    //요청상품 삭제
+    @DeleteMapping("/requests/{productId}")
+    public ResponseEntity<?> deleteReqProduct(@PathVariable Long productId) {
+        adminService.deleteRequest(productId);
+        return new ResponseEntity<>("중복 요청상품 삭제 완료",HttpStatus.OK);
+    }
+
     //관리자 상품 카테고리별 조회(대분류, 소분류)
     @GetMapping("/products/{mainDepartment}")
     public ResponseEntity<?> getProductsByDepartment(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
@@ -83,29 +110,34 @@ public class AdminController {
         return new ResponseEntity<>(luckyDrawList,HttpStatus.OK);
     }
 
+    //관리자 럭키드로우 단건 조회
+    @GetMapping("/luckydraw/{luckyId}")
+    public ResponseEntity<?> findLuckydraw(@PathVariable Long luckyId) {
+
+        LuckyDrawsDto luckyOne = adminService.getLucky(luckyId);
+
+        return new ResponseEntity<>(luckyOne,HttpStatus.OK);
+    }
+
+
     //럭키드로우 상품 등록
     @PostMapping("/luckydraw/insert")
     public ResponseEntity<?> registerLuckyDraw(@ModelAttribute AdminReqDto.AdminLuckDrawDto adminLuckDrawDto){
 
         //관리자가 상품 폼만 등록, 실제 럭키드로우 상품을 schedule을 통하여 등록됨
-        log.info("럭키드로우등록"+adminLuckDrawDto.getLuckyName());
-        log.info("포토"+adminLuckDrawDto.getLuckyphoto());
-        log.info("콘텐츠"+adminLuckDrawDto.getContent());
-        log.info("피플"+adminLuckDrawDto.getLuckyPeople());
-        log.info("이미지"+adminLuckDrawDto.getLuckyImage());
-        log.info("--------------------------------------------");
-
 
         AdminReqDto.AdminLuckDrawDto result = adminService.insertLucky(adminLuckDrawDto);
 
-        //관리자가 상품 폼만 등록, 실제 럭키드로우 상품을 schedule을 통하여 등록됨
-        log.info("럭키드로우등록"+adminLuckDrawDto.getLuckyName());
-        log.info("포토"+adminLuckDrawDto.getLuckyphoto());
-        log.info("콘텐츠"+adminLuckDrawDto.getContent());
-        log.info("피플"+adminLuckDrawDto.getLuckyPeople());
-        log.info("이미지"+adminLuckDrawDto.getLuckyImage());
-
-
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
+
+
+
+
+
+
+
+
+
+
 }
