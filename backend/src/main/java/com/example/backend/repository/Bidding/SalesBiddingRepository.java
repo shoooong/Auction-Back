@@ -3,6 +3,7 @@ package com.example.backend.repository.Bidding;
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
 import com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto;
 import com.example.backend.entity.SalesBidding;
+import com.example.backend.entity.enumData.SalesStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +45,7 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
 
     @Query("SELECT s FROM SalesBidding s LEFT JOIN Product p on s.product.productId = p.productId WHERE p.modelNum = :modelNum ORDER BY s.salesBiddingTime asc")
     List<SalesBidding> findFirstByOriginalContractDate(@Param("modelNum") String modelNum);
+
+    //판매 입찰 상태 COMPLETE 인 판매 내역 = 판매 정산 내역 조회
+    List<SalesBidding> findBySalesStatusAndUser_UserId(SalesStatus salesStatus, Long userId);
 }
