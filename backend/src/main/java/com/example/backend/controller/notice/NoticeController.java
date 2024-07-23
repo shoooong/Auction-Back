@@ -109,4 +109,18 @@ public class NoticeController {
         log.info("통합 공지사항 조회 완료: {}", combinedNotice);
         return combinedNotice;
     }
+
+    // 공지사항 전체 조회-관리자
+    @GetMapping("/admin/user/combinedNoticeList")
+    public CombinedNoticeDto getCombinedNoticeListAdmin() {
+        List<NoticeDto> notices = noticeService.getAllNoticeList();
+        List<LuckyDrawAnnouncementDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
+
+        CombinedNoticeDto combinedNotice = new CombinedNoticeDto();
+        combinedNotice.setNotices(notices);
+        combinedNotice.setLuckyDrawAnnouncements(luckyDrawAnnouncements);
+
+        log.info("통합 공지사항 조회 완료: {}", combinedNotice);
+        return combinedNotice;
+    }
 }

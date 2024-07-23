@@ -45,13 +45,13 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 이벤트 공지사항 상세조회
-    @GetMapping("/luckyDrawAnnouncement/{announcementId}")
-    public LuckyDrawAnnouncementDto luckyDrawAnnouncement(@PathVariable Long announcementId){
-        LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findLuckyDrawAnnouncementById(announcementId);
+    @GetMapping("/luckyDrawAnnouncement/{luckyAnnouncementId}")
+    public LuckyDrawAnnouncementDto luckyDrawAnnouncement(@PathVariable Long luckyAnnouncementId){
+        LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findLuckyDrawAnnouncementById(luckyAnnouncementId);
         log.info("이벤트 공지사항 상세조회 완료: {}", luckyDrawAnnouncementDto);
         return luckyDrawAnnouncementDto;
     }
-    // 관리자용 이벤트 공지사항 조회
+    // 이벤트 공지사항 조회-관리자
     @GetMapping("/admin/luckyDrawAnnouncementList")
     public List<LuckyDrawAnnouncementDto> adminLuckyDrawAnnouncementList(){
         List<LuckyDrawAnnouncementDto> announcement = luckyDrawAnnouncementService.getAllAdminLuckyDrawAnnouncementList();
