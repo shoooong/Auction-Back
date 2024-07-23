@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -57,7 +58,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // 쿠키 설정
 //        String domain = "www.sho0ong.com";
-        String domain = request.getServerName();
+//        String domain = request.getServerName();
 
 //        String accessTokenCookie = String.format("accessToken=%s; Max-Age=%d; Expires=%s; Path=/; HttpOnly; Secure=true; Domain=%s; SameSite=Lax",
 //                accessToken, 120, "Wed, 21 Oct 2024 07:28:00 GMT", domain);
@@ -77,21 +78,18 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(60 * 10);
-        accessTokenCookie.setDomain(domain);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(60 * 60 * 24);
-        refreshTokenCookie.setDomain(domain);
 
         Cookie isLoginCookie = new Cookie("isLogin", "true");
         isLoginCookie.setHttpOnly(false);
         isLoginCookie.setSecure(false);
         isLoginCookie.setPath("/");
         isLoginCookie.setMaxAge(60 * 10);
-        isLoginCookie.setDomain(domain);
 
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
@@ -99,9 +97,10 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(isLoginCookie);
 
 
+        claims.remove("accessToken");
+        claims.remove("refreshToken");
+
         Gson gson = new Gson();
-//        claims.remove("accessToken");
-//        claims.remove("refreshToken");
         String jsonStr = gson.toJson(claims);
 
         response.setContentType("application/json; charset=UTF-8");
