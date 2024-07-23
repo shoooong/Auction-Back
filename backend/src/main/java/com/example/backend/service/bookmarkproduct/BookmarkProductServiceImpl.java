@@ -6,7 +6,6 @@ import com.example.backend.entity.Users;
 import com.example.backend.repository.Product.ProductRepository;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.mypage.BookmarkProductRepository;
-import com.example.backend.service.bookmarkproduct.BookmarkProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -51,4 +51,8 @@ public interface ProductService {
     AveragePriceResponseDto getAveragePrices(String modelNum);
 
     List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours);
+
+    void incrementProductLikes(String modelNum);
+
+    List<ProductRankingDto> getAllProductsByLikes(String mainDepartment);
 }

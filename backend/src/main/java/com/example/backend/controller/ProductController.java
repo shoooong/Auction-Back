@@ -175,4 +175,23 @@ public class ProductController {
         productService.deletePhotoReview(reviewId, userId);
         return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
     }
+
+    // 상품 좋아요
+    @PostMapping("/like/{modelNum}")
+    public ResponseEntity<String> incrementProductLikes(@PathVariable String modelNum) {
+        try {
+            productService.incrementProductLikes(modelNum);
+            return ResponseEntity.status(HttpStatus.OK).body("Likes incremented successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error incrementing likes.");
+        }
+    }
+
+    // 상품 랭킹
+    @GetMapping("/{mainDepartment}/all_product_likes")
+    public ResponseEntity<?> allProductByLikes(@PathVariable String mainDepartment) {
+        List<ProductRankingDto> productRankingDtos = productService.getAllProductsByLikes(mainDepartment);
+        return new ResponseEntity<>(productRankingDtos, HttpStatus.OK);
+    }
+
 }
