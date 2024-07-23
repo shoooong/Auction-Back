@@ -35,7 +35,7 @@ public class ProductDetailDto {
     private Long differenceContract;
 
     private List<ProductsContractListDto> contractInfoList; // 체결 내역
-    private List<SalesHopeDto> salesHopeList;   // 구매 희망 가격
+    private List<SalesHopeDto> salesHoxpeList;   // 구매 희망 가격
     private List<BuyingHopeDto> buyingHopeList; // 판매 희망 가격
 
     private List<PhotoReviewDto> photoReviewList;   // 해당 상품의 스타일 리뷰

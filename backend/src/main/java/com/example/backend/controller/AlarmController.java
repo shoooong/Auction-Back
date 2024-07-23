@@ -4,6 +4,8 @@ import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.alarm.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +24,7 @@ public class AlarmController {
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(@AuthenticationPrincipal UserDTO userDTO) {
         log.info("subscribe event start");
+
         return ResponseEntity.ok(alarmService.subscribe(userDTO.getUserId()));
     }
 

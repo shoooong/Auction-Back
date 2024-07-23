@@ -1,4 +1,4 @@
-package com.example.backend.dto.product;
+package com.example.backend.dto.requestproduct;
 
 import com.example.backend.entity.enumData.ProductStatus;
 import lombok.*;
@@ -22,4 +22,5 @@ public class RequestProductDto {
     private String subDepartment;
     private String productSize;
     private ProductStatus productStatus;
+    private String modelNum;
 }

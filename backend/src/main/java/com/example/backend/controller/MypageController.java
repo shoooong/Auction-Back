@@ -15,7 +15,6 @@ import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.user.*;
 import com.example.backend.entity.Users;
-import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.*;
 import com.example.backend.service.luckyDraw.DrawService;
 import com.example.backend.service.mypage.AccountService;
@@ -30,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -76,11 +76,10 @@ public class MypageController {
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<String> modifyUser(@RequestBody UserModifyDTO userModifyDTO) {
-        log.info("UserModifyDTO: {}", userModifyDTO);
+    public ResponseEntity<String> modifyUser(@RequestPart(required = false) MultipartFile file,
+                                             @RequestPart UserModifyDTO userModifyDTO) {
 
-        userService.modifyUser(userModifyDTO);
-        // TODO: 사용자 검증 방법 통일
+        userService.modifyUser(userModifyDTO, file);
 
         return ResponseEntity.ok("User information updated successfully!");
     }
@@ -155,6 +154,18 @@ public class MypageController {
         AccountDTO accountDTO = accountService.updateAccount(userId, accountReqDTO);
 
         return ResponseEntity.ok(accountDTO);
+    }
+
+    // 판매 정산 내역
+    @GetMapping("/account/sales/user")
+    public ResponseEntity<SalesSummaryRespDto> getSalesSummary(@AuthenticationPrincipal UserDTO user, Pageable pagable){
+
+        Long userId = user.getUserId();
+        log.info("userId: {}",userId);
+
+        SalesSummaryRespDto result =adminService.getSalesSummary(userId,pagable);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
@@ -255,16 +266,5 @@ public class MypageController {
      */
 //    @GetMapping("/bookmark/style")
 
-    //정산 내역
-    @GetMapping("/account/sales/user")
-    public ResponseEntity<SalesSummaryRespDto> getSalesSummary(@AuthenticationPrincipal UserDTO user, Pageable pagable){
-
-        Long userId = user.getUserId();
-        log.info("userId: {}",userId);
-
-        SalesSummaryRespDto result =adminService.getSalesSummary(userId,pagable);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
 
 }
