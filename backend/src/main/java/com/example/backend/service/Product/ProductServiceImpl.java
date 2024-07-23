@@ -146,6 +146,7 @@ public class ProductServiceImpl implements ProductService {
 
                     .contractInfoList(contractInfoList)
                     .buyingHopeList(buyingHopeDtoList)
+                    .salesHopeList(salesHopeDtoList)
 
                     .photoReviewList(photoReviewDtoList)
 
@@ -360,6 +361,7 @@ public class ProductServiceImpl implements ProductService {
                 .user(user)
                 .reviewLike(0)
                 .reviewImg(photoRequestDto.getReviewImg())
+                .reviewId(photoRequestDto.getReviewId())
                 .reviewContent(photoRequestDto.getReviewContent())
                 .build();
 

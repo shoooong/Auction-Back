@@ -13,4 +13,5 @@ public class PhotoRequestDto {
     private String modelNum;
     private String reviewImg;
     private String reviewContent;
+    private int reviewLike;
 }
