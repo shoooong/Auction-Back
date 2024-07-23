@@ -3,6 +3,7 @@ package com.example.backend.service.Product;
 import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
+import com.example.backend.dto.requestproduct.RequestProductListDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
@@ -51,4 +52,8 @@ public interface ProductService {
     AveragePriceResponseDto getAveragePrices(String modelNum);
 
     List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours);
+
+    void incrementProductLikes(String modelNum);
+
+    List<ProductRankingDto> getAllProductsByLikes(String mainDepartment);
 }

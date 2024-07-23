@@ -1,6 +1,6 @@
 package com.example.backend.dto.notice;
 
-import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementListDto;
+import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
 import lombok.*;
 
 import java.util.List;
@@ -14,5 +14,5 @@ import java.util.List;
 public class CombinedNoticeDto {
 
     private List<NoticeDto> notices;
-    private List<LuckyDrawAnnouncementListDto> luckyDrawAnnouncements;
+    private List<LuckyDrawAnnouncementDto> luckyDrawAnnouncements;
 }

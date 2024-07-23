@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.dto.admin.ProductReqDto;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@Setter
 public class Product extends BaseEntity {
 
     @Id
@@ -28,7 +30,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String productName;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String modelNum;
 
     @Column(nullable = false)
@@ -71,6 +73,13 @@ public class Product extends BaseEntity {
 
     public void changeProductStatus(ProductStatus productStatus) {
         this.productStatus = productStatus;
+    }
+    public void registerProduct(ProductReqDto regProduct) {
+        this.productImg = regProduct.getProductImg();
+        this.productBrand = regProduct.getProductBrand();
+        this.productName = regProduct.getProductName();
+        this.modelNum = regProduct.getModelNum();
+        this.productStatus = ProductStatus.REGISTERED;
     }
 
     //  상품 수량 증가 메서드

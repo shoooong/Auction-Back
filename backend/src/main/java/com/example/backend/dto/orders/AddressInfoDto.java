@@ -1,0 +1,20 @@
+package com.example.backend.dto.orders;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Builder
+@Getter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class AddressInfoDto {
+    private String name;
+    private String addrPhone;
+    private String roadAddress;
+    private String detailAddress;
+    private String zonecode;
+}

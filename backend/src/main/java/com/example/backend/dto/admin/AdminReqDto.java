@@ -1,15 +1,11 @@
 package com.example.backend.dto.admin;
 
 import com.example.backend.entity.LuckyDraw;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.multi.MultiListUI;
-import java.time.LocalDateTime;
 
  // 기본 생성자 추가
 public class AdminReqDto {
@@ -31,7 +27,6 @@ public class AdminReqDto {
             this.luckyImage = luckyDraw.getLuckyImage();
             this.luckySize = luckyDraw.getLuckySize();
             this.luckyPeople = luckyDraw.getLuckyPeople();
-
         }
     }
 }

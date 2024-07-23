@@ -1,0 +1,37 @@
+package com.example.backend.controller.requesstproduct;
+
+import com.example.backend.dto.requestproduct.RequestProductDto;
+import com.example.backend.dto.requestproduct.RequestProductListDto;
+import com.example.backend.service.requestproduct.RequestProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/product")
+public class RequestProductController {
+
+    @Autowired
+    private RequestProductService requestProductService;
+
+    // 미등록 상품 등록 요청글 등록
+    @PostMapping("/request")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createRequestProduct(@RequestBody RequestProductDto requestProductDto) {
+        requestProductService.createRequestProduct(requestProductDto);
+    }
+
+    // 미등록 상품 등록 요청글 조회
+    @GetMapping("/requestList")
+    public List<RequestProductListDto> getRequestProducts() {
+        return requestProductService.getRequestProducts();
+    }
+
+    // 미등록 상품 등록 요청글 상세조회
+    @GetMapping("/request/{productId}")
+    public RequestProductDto getRequestProductById(@PathVariable Long productId) {
+        return requestProductService.getRequestProductById(productId);
+    }
+}

@@ -5,7 +5,8 @@ import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.main.ProfileDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.dto.user.UserModifyDTO;
+import com.example.backend.dto.user.UserModifyReqDto;
+import com.example.backend.dto.user.UserModifyResDto;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
@@ -13,6 +14,7 @@ import com.example.backend.service.OrdersService;
 import com.example.backend.service.SalesBiddingService;
 import com.example.backend.service.UserCouponService;
 import com.example.backend.service.mypage.BookmarkProductService;
+import com.example.backend.service.objectstorage.ObjectStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -45,7 +48,9 @@ public class UserService {
    private final UserCouponService userCouponService;
    private final BookmarkProductService bookmarkProductService;
 
-   public UserDTO entityToDTO(Users user) {
+   private final ObjectStorageService objectStorageService;
+
+    public UserDTO entityToDTO(Users user) {
        return new UserDTO(
               user.getUserId(),
               user.getEmail(),
@@ -58,9 +63,18 @@ public class UserService {
               user.isRole());
    }
 
-   public void registerUser(UserRegisterDTO userRegisterDTO, boolean isAdmin) {
+   public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
-         throw new IllegalArgumentException("Email already in use");
+         throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+      }
+
+      String imageUrl = "";
+
+      if (file != null && !file.isEmpty()) {
+         String bucketName = "push";
+         String directoryPath = "shooong/mypage/";
+
+         imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, file);
       }
 
       Users user = Users.builder()
@@ -68,6 +82,7 @@ public class UserService {
               .password(passwordEncoder.encode(userRegisterDTO.getPassword()))
               .nickname(userRegisterDTO.getNickname())
               .phoneNum(userRegisterDTO.getPhoneNum())
+              .profileImg(imageUrl)
               .role(isAdmin)
               .build();
 
@@ -178,29 +193,40 @@ public class UserService {
    /**
     * 회원 정보 수정
     */
+   public UserModifyResDto getUser(Long userId) {
+      Users user = validateUserId(userId);
+
+      return UserModifyResDto.builder()
+              .email(user.getEmail())
+              .nickname(user.getNickname())
+              .phoneNum(user.getPhoneNum())
+              .profileImg(user.getProfileImg())
+              .build();
+   }
+
    @Transactional
-   public void modifyUser(UserModifyDTO userModifyDTO) {
-      Users user = userRepository.findByEmail(userModifyDTO.getEmail())
+   public void modifyUser(UserModifyReqDto userModifyReqDto, MultipartFile file) {
+      Users user = userRepository.findByEmail(userModifyReqDto.getEmail())
               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-      String password = userRepository.findPasswordByUserId(user.getEmail());
+      String imageUrl = userModifyReqDto.getProfileImg();
+
+      if (file != null && !file.isEmpty()) {
+         String bucketName = "push";
+         String directoryPath = "shooong/mypage/";
+
+         imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, file);
+      }
 
       // TODO: 비밀번호는 수정 안했을 떄, 다른 방법 생각해보기
-      if (userModifyDTO.getPassword() != null) {
-         user.updateUser(userModifyDTO, passwordEncoder);
+      if (userModifyReqDto.getPassword() != null && !userModifyReqDto.getPassword().isBlank()) {
+         userModifyReqDto.setPassword(passwordEncoder.encode(userModifyReqDto.getPassword()));
       }
-      user.updateUser(password, userModifyDTO);
+
+      user.updateUser(userModifyReqDto, imageUrl);
 
       userRepository.save(user);
    }
-
-   /**
-    * 존재하는 회원인지 확인
-    */
-    public Users validateUserId(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-    }
 
    /**
     * 마이페이지 메인 - 모든 정보 조회
@@ -226,5 +252,13 @@ public class UserService {
               .saleHistoryDto(saleHistoryDto)
               .bookmarkProductsDto(bookmarkProductService.getLatestBookmarkProducts(userId))
               .build();
+   }
+
+   /**
+    * 존재하는 회원인지 확인
+    */
+   public Users validateUserId(Long userId) {
+      return userRepository.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
    }
 }

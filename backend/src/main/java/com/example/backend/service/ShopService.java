@@ -17,12 +17,12 @@ public class ShopService {
 
     private final ProductRepository productRepository;
 
-    public Slice<AllProductDto> getTotalProduct(Pageable pageable){
+    public Slice<AllProductDto> getTotalProduct(Pageable pageable) {
 
         return productRepository.allProduct(pageable);
     }
 
-    public Slice<AllProductDto> getFilter(Pageable pageable, List<String> subDepartment){
-        return productRepository.filterProduct(pageable, subDepartment);
+    public Slice<AllProductDto> getSubDepartmentFilter(Pageable pageable, List<String> subDepartment){
+        return productRepository.getProductsBySubDepartment(pageable, subDepartment);
     }
 }

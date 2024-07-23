@@ -1,6 +1,6 @@
 package com.example.backend.controller.notice;
 
-import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementListDto;
+import com.example.backend.dto.luckyDraw.LuckyDrawAnnouncementDto;
 import com.example.backend.dto.notice.CombinedNoticeDto;
 import com.example.backend.dto.notice.NoticeDto;
 import com.example.backend.dto.user.UserDTO;
@@ -100,7 +100,7 @@ public class NoticeController {
     @GetMapping("/user/combinedNoticeList")
     public CombinedNoticeDto getCombinedNoticeList() {
         List<NoticeDto> notices = noticeService.getAllNoticeList();
-        List<LuckyDrawAnnouncementListDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
+        List<LuckyDrawAnnouncementDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
 
         CombinedNoticeDto combinedNotice = new CombinedNoticeDto();
         combinedNotice.setNotices(notices);

@@ -12,6 +12,7 @@ import com.example.backend.repository.CouponIssue.CouponIssueRepository;
 import com.example.backend.repository.CouponIssue.RedisRepository;
 import com.example.backend.repository.coupon.CouponRepository;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,8 @@ public class CouponService {
 
     // 이벤트 쿠폰 조회
     public List<CouponDto> searchCouponsByTitle(String keyword) {
-        List<Coupon> coupons = couponRepository.findByCouponTitleContaining(keyword);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        List<Coupon> coupons = couponRepository.findActiveCouponsByTitleAndDate(keyword, currentDateTime);
         return coupons.stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());

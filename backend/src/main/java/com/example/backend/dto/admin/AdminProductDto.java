@@ -1,6 +1,5 @@
 package com.example.backend.dto.admin;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 @Getter

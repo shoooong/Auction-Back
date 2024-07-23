@@ -130,8 +130,10 @@ public class ProductServiceImpl implements ProductService {
                     .productBrand(product.getProductBrand())
                     .modelNum(product.getModelNum())
                     .productName(product.getProductName())
+                    .createDate(product.getCreateDate())
                     .originalPrice(product.getOriginalPrice())
                     .productLike(product.getProductLike())
+                    .subDepartment(product.getSubDepartment())
 
                     .buyingBiddingPrice(priceValue.getBuyingBiddingPrice())
                     .salesBiddingPrice(priceValue.getSalesBiddingPrice())
@@ -143,7 +145,6 @@ public class ProductServiceImpl implements ProductService {
                     .differenceContract(recentlyContractPrice.getDifferenceContract())
 
                     .contractInfoList(contractInfoList)
-                    .salesHopeList(salesHopeDtoList)
                     .buyingHopeList(buyingHopeDtoList)
 
                     .photoReviewList(photoReviewDtoList)
@@ -539,5 +540,24 @@ public class ProductServiceImpl implements ProductService {
         return allContractData.stream()
                 .filter(data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime().isBefore(endDate))
                 .collect(Collectors.toList());
+    }
+
+    // 상품 좋아요
+    @Override
+    @Transactional
+    public void incrementProductLikes(String modelNum) {
+
+        List<Product> products = productRepository.findAllByModelNum(modelNum);
+
+        for (Product product : products) {
+            product.setProductLike(product.getProductLike() + 1);
+            productRepository.save(product);
+        }
+    }
+
+    // 피드 랭킹
+    @Override
+    public List<ProductRankingDto> getAllProductsByLikes(String mainDepartment) {
+        return productRepository.searchAllProductByLikes(mainDepartment);
     }
 }

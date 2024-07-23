@@ -2,6 +2,7 @@ package com.example.backend.repository.Product;
 
 
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
+import com.example.backend.dto.product.ProductRankingDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.transaction.Transactional;
@@ -22,11 +23,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     Optional<Product> findByProductIdAndProductStatus(Long productId, ProductStatus productStatus);
 
     // 상품 모델번호에 따른 1개의 정보만 가져오기 - 모델번호가 똑같다는 것은 같은 상품이라는 것
-    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = com.example.backend.entity.enumData.ProductStatus.REGISTERED")
+    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED'")
     List<Product> findAllByModelNumAndStatus(@Param("modelNum") String modelNum);
 
     // 사이즈가 일치할 경우 같은 상품 찾기
-    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = com.example.backend.entity.enumData.ProductStatus.REGISTERED and p.productSize = :productSize")
+    @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED' and p.productSize = :productSize")
     Optional<Product> findBidProductInfo(@Param("modelNum") String modelNum, @Param("productSize") String productSize);
 
     Optional<Product> findFirstByModelNum(String modelNum);
@@ -81,5 +82,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     @Query("SELECT p.productId, p.modelNum " +
             "FROM Product p WHERE p.productId IN :productIdList")
     List<Object[]> findProductIdAndModelNum(List<Long> productIdList);
+
+    boolean existsByModelNumAndProductSize(String modelNum, String productSize);
+    Optional<Product> findByModelNumAndProductSize(String modelNum, String productSize);
+    List<Product> findAllByModelNum(String modelNum);
+
+    // 좋아요순으로 대분류 상품 조회
+    @Query("SELECT DISTINCT new com.example.backend.dto.product.ProductRankingDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum, bb.buyingBiddingPrice, p.createDate, p.productLike) " +
+            "FROM Product p LEFT JOIN BuyingBidding bb ON p.productId = bb.product.productId " +
+            "WHERE p.mainDepartment = :mainDepartment " +
+            "GROUP BY p.modelNum " +
+            "ORDER BY p.productLike DESC")
+    List<ProductRankingDto> searchAllProductByLikes(@Param("mainDepartment") String mainDepartment);
 
 }

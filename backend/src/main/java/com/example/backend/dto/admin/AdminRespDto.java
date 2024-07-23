@@ -5,6 +5,7 @@ import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.enumData.LuckyProcessStatus;
 import com.example.backend.entity.enumData.ProductStatus;
+import com.example.backend.entity.enumData.SalesStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -96,9 +97,11 @@ public class AdminRespDto {
         private Long salesBiddingId;
         private Long productId;
         private int productQuantity;
+        private SalesStatus salesStatus;
 
         public ChangeRespDto(SalesBidding salesBidding, Product product) {
             this.salesBiddingId = salesBidding.getSalesBiddingId();
+            this.salesStatus = salesBidding.getSalesStatus();
             this.productId = product.getProductId();
             this.productQuantity = product.getProductQuantity();
         }
@@ -129,8 +132,8 @@ public class AdminRespDto {
                 this.luckyProcessStatus = luckyDraw.getLuckyProcessStatus();
             }
         }
-
     }
+
 
     //상품 전체 대분류 소분류별 조회 응답 Dto
     @Getter

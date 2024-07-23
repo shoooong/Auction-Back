@@ -15,6 +15,8 @@ public interface BookmarkProductRepository extends JpaRepository<BookmarkProduct
     @Query("SELECT bp.product.productId FROM BookmarkProduct bp WHERE bp.user.userId = :userId ORDER BY bp.bookmarkProductId DESC")
     List<Long> findBookmarkProductIdList(Long userId, Pageable pageable);
 
+    boolean existsByUser_UserIdAndProduct_ProductId(Long userId, Long productId);
+
     // 회원 관심상품과 같은 모델번호를 가진 전체 상품Id 조회
 //    @Query("SELECT p.productId FROM Users u " +
 //            "JOIN BookmarkProduct bp ON bp.user.userId = :userId " +
