@@ -3,24 +3,15 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.admin.*;
 import com.example.backend.dto.luckyDraw.LuckyDrawsDto;
-import com.example.backend.dto.notice.NoticeDto;
-import com.example.backend.dto.product.RequestProductDto;
-import com.example.backend.dto.user.UserDTO;
-import com.example.backend.entity.LuckyDraw;
-import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.LuckyProcessStatus;
-import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.service.AdminService;
 import com.example.backend.service.notice.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -55,12 +46,18 @@ public class AdminController {
 //        }
 //    }
     //요청상품 판매 상품으로 등록 ver2
-    @PutMapping("/requests/{productId}")
-    public ResponseEntity<?> saveReqProduct(@PathVariable Long productId,@RequestBody ProductReqDto productReqDto) {
-        //productId로 요청 상품의 정보를 가져옴,
 
+    @PutMapping("/requests/{productId}")
+    public ResponseEntity<?> saveReqProduct(@PathVariable Long productId,@ModelAttribute ProductReqDto productReqDto){
+
+        if (productReqDto.getProductPhoto().isEmpty()){
+            productReqDto.setProductImg(productReqDto.getProductImg());
+            log.info("============================"+productReqDto.getProductName());
+        }
 
         adminService.acceptRequest(productId,productReqDto);
+        log.info("============================"+productReqDto.getProductName());
+
 
         return new ResponseEntity<>(HttpStatus.OK);
 

@@ -42,7 +42,7 @@ public class BidRequestDto {
         return SalesBidding.builder()
                 .user(user)
                 .product(product)
-                .salesBiddingPrice(this.price)
+//                .salesBiddingPrice(this.price)
                 .salesQuantity(1)
                 .salesBiddingTime(this.duration)
                 .salesStatus(SalesStatus.PROCESS)

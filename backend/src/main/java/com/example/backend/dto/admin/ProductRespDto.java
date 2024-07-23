@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 //대분류별 상품 조회
 @Getter

@@ -3,7 +3,6 @@ package com.example.backend.repository.Product;
 
 import com.example.backend.dto.mypage.main.ProductDetailsDto;
 import com.example.backend.dto.product.ProductRankingDto;
-import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.transaction.Transactional;

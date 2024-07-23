@@ -2,8 +2,6 @@ package com.example.backend.repository.Product;
 
 import com.example.backend.dto.admin.AdminProductDto;
 import com.example.backend.dto.admin.AdminProductRespDto;
-import com.example.backend.dto.admin.ProductRespDto;
-import com.example.backend.entity.Product;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;

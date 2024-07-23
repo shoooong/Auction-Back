@@ -6,15 +6,12 @@ import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 

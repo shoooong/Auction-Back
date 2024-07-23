@@ -19,10 +19,7 @@ import com.example.backend.repository.Orders.OrdersRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.objectstorage.ObjectStorageService;
-import com.querydsl.core.Tuple;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,10 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -88,6 +83,9 @@ public class AdminService {
 //    }
     @Transactional
     public void acceptRequest(Long productId, ProductReqDto productReqDto){
+        String bucketName = "push";
+        String directoryPath = "shooong/dummy/products";
+
         Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
         Product request = productPs.orElseThrow();
 
@@ -99,6 +97,7 @@ public class AdminService {
             throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
         }else {
 
+
 //            ProductReqDto reqDto = productReqDto.builder()
 //                    .productImg(productReqDto.getProductImg())
 //                    .productName(productReqDto.getProductName())
@@ -109,7 +108,11 @@ public class AdminService {
 //                    .productStatus(ProductStatus.REGISTERED)
 //                    .build();
 
-             request.registerProduct(productReqDto);
+            // S3에 이미지 업로드
+            String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productReqDto.getProductPhoto());
+            productReqDto.setProductImg(imageUrl);
+
+            request.registerProduct(productReqDto);
 
         }
 
