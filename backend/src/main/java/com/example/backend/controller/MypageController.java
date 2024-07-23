@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.mypage.accountSettings.AccountDTO;
 import com.example.backend.dto.mypage.accountSettings.AccountReqDTO;
-import com.example.backend.dto.mypage.accountSettings.SalesSummaryDto;
 import com.example.backend.dto.mypage.accountSettings.SalesSummaryRespDto;
 import com.example.backend.dto.mypage.addressSettings.AddressDto;
 import com.example.backend.dto.mypage.addressSettings.AddressReqDto;
@@ -14,7 +13,6 @@ import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.drawHistory.DrawHistoryDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.user.*;
-import com.example.backend.entity.Users;
 import com.example.backend.service.*;
 import com.example.backend.service.luckyDraw.DrawService;
 import com.example.backend.service.mypage.AccountService;
@@ -67,19 +65,19 @@ public class MypageController {
      * 회원 정보 수정
      */
     @GetMapping("/modify")
-    public ResponseEntity<UserDTO> getUser(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<UserModifyResDto> getUser(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        Users user = userService.validateUserId(userId);
+        UserModifyResDto userModifyResDto = userService.getUser(userId);
 
-        return ResponseEntity.ok(userService.entityToDTO(user));
+        return ResponseEntity.ok(userModifyResDto);
     }
 
     @PutMapping("/modify")
     public ResponseEntity<String> modifyUser(@RequestPart(required = false) MultipartFile file,
-                                             @RequestPart UserModifyDTO userModifyDTO) {
+                                             @RequestPart UserModifyReqDto userModifyReqDto) {
 
-        userService.modifyUser(userModifyDTO, file);
+        userService.modifyUser(userModifyReqDto, file);
 
         return ResponseEntity.ok("User information updated successfully!");
     }
