@@ -193,17 +193,26 @@ public class UserService {
     * 회원 정보 수정
     */
    @Transactional
-   public void modifyUser(UserModifyDTO userModifyDTO) {
+   public void modifyUser(UserModifyDTO userModifyDTO, MultipartFile file) {
       Users user = userRepository.findByEmail(userModifyDTO.getEmail())
               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
       String password = userRepository.findPasswordByUserId(user.getEmail());
+      String imageUrl = userModifyDTO.getProfileImg();
+
+      if (file != null && !file.isEmpty()) {
+         String bucketName = "push";
+         String directoryPath = "shooong/mypage/";
+
+         imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, file);
+      }
 
       // TODO: 비밀번호는 수정 안했을 떄, 다른 방법 생각해보기
       if (userModifyDTO.getPassword() != null) {
-         user.updateUser(userModifyDTO, passwordEncoder);
+         password = passwordEncoder.encode(userModifyDTO.getPassword());
       }
-      user.updateUser(password, userModifyDTO);
+
+      user.updateUser(password, userModifyDTO, imageUrl);
 
       userRepository.save(user);
    }
