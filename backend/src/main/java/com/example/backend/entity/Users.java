@@ -1,6 +1,6 @@
 package com.example.backend.entity;
 
-import com.example.backend.dto.user.UserModifyDTO;
+import com.example.backend.dto.user.UserModifyReqDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,11 +43,13 @@ public class Users extends BaseEntity {
     private boolean social;
 
 
-    public void updateUser(String password, UserModifyDTO userModifyDTO, String imageUrl) {
-        this.email = userModifyDTO.getEmail();
-        this.password = password;
-        this.nickname = userModifyDTO.getNickname();
-        this.phoneNum = userModifyDTO.getPhoneNum();
+    public void updateUser(UserModifyReqDto userModifyReqDto, String imageUrl) {
+        this.email = userModifyReqDto.getEmail();
+        if (userModifyReqDto.getPassword() != null && !userModifyReqDto.getPassword().isBlank()) {
+            this.password = userModifyReqDto.getPassword();
+        }
+        this.nickname = userModifyReqDto.getNickname();
+        this.phoneNum = userModifyReqDto.getPhoneNum();
         this.profileImg = imageUrl;
     }
 }

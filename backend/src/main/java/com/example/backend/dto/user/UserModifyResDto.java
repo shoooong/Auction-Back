@@ -1,16 +1,15 @@
 package com.example.backend.dto.user;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
+@Builder
 @ToString
-public class UserModifyDTO {
+public class UserModifyResDto {
 
     private String email;
-    private String password;
     private String nickname;
     private String phoneNum;
     private String profileImg;

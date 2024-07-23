@@ -5,7 +5,8 @@ import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.main.ProfileDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.user.UserDTO;
-import com.example.backend.dto.user.UserModifyDTO;
+import com.example.backend.dto.user.UserModifyReqDto;
+import com.example.backend.dto.user.UserModifyResDto;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
@@ -192,13 +193,23 @@ public class UserService {
    /**
     * 회원 정보 수정
     */
+   public UserModifyResDto getUser(Long userId) {
+      Users user = validateUserId(userId);
+
+      return UserModifyResDto.builder()
+              .email(user.getEmail())
+              .nickname(user.getNickname())
+              .phoneNum(user.getPhoneNum())
+              .profileImg(user.getProfileImg())
+              .build();
+   }
+
    @Transactional
-   public void modifyUser(UserModifyDTO userModifyDTO, MultipartFile file) {
-      Users user = userRepository.findByEmail(userModifyDTO.getEmail())
+   public void modifyUser(UserModifyReqDto userModifyReqDto, MultipartFile file) {
+      Users user = userRepository.findByEmail(userModifyReqDto.getEmail())
               .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-      String password = userRepository.findPasswordByUserId(user.getEmail());
-      String imageUrl = userModifyDTO.getProfileImg();
+      String imageUrl = userModifyReqDto.getProfileImg();
 
       if (file != null && !file.isEmpty()) {
          String bucketName = "push";
@@ -208,11 +219,11 @@ public class UserService {
       }
 
       // TODO: 비밀번호는 수정 안했을 떄, 다른 방법 생각해보기
-      if (userModifyDTO.getPassword() != null) {
-         password = passwordEncoder.encode(userModifyDTO.getPassword());
+      if (userModifyReqDto.getPassword() != null && !userModifyReqDto.getPassword().isBlank()) {
+         userModifyReqDto.setPassword(passwordEncoder.encode(userModifyReqDto.getPassword()));
       }
 
-      user.updateUser(password, userModifyDTO, imageUrl);
+      user.updateUser(userModifyReqDto, imageUrl);
 
       userRepository.save(user);
    }
