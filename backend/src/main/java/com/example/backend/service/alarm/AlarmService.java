@@ -34,33 +34,28 @@ public class AlarmService {
     public SseEmitter subscribe(Long userId){
         userEmitters.put(userId, emitter);
 
-        if (userEmitters.containsKey(userId)){
-            SseEmitter existingEmitter = userEmitters.get(userId);
-            if (existingEmitter != null) {
-                existingEmitter.complete();
-                userEmitters.remove(userId);
-            }
-        }
-
+        // 기존 알람 데이터 전송
+        sendAlarmNotification(userId);
+        sendHeartBeat();
 
         // 상황별 emitter 삭제 처리
         emitter.onCompletion(() -> userEmitters.remove(userId));
         emitter.onTimeout(() -> userEmitters.remove(userId));
         emitter.onError(e -> userEmitters.remove(userId));
 
-        // 기존 알람 데이터 전송
-        sendAlarmNotification(userId);
         return emitter;
     }
 
     @Scheduled(fixedRate = 45 * 1000)
     public void sendHeartBeat(){
+
+        SseEmitter dummyEmitter = new SseEmitter(DEFAULT_TIMEOUT);
         try {
-            emitter.send(SseEmitter.event()
+            dummyEmitter.send(SseEmitter.event()
                     .comment("alarm beat"));
             log.info("슬기 alarm beat");
         } catch (IOException e) {
-            emitter.completeWithError(e);
+            e.printStackTrace();
         }
     }
 
@@ -75,6 +70,7 @@ public class AlarmService {
                     .id(String.valueOf(userId))
                     .name("alarm-list")
                     .data(list));
+
         } catch (IOException e) {
             userEmitters.remove(userId,emitter);
         }
@@ -97,7 +93,7 @@ public class AlarmService {
                         .data(responseAlarmDto));
             }
         } catch (IOException e) {
-            emitter.completeWithError(e);
+            userEmitters.remove(userId);
         }
     }
 }

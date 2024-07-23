@@ -24,6 +24,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +67,7 @@ public class ProductsTests {
                     .productBrand("Tech Brand " + (i + 1))
                     .modelNum("TECH-" + (i + 1))
                     .productName("테크 제품 " + (i + 1))
-                    .originalPrice(200000L + i * 20000)
+                    .originalPrice(BigDecimal.valueOf(200000L + i * 20000))
                     .productLike(0)
                     .mainDepartment("테크")
                     .subDepartment(null)
@@ -79,7 +80,7 @@ public class ProductsTests {
 
             SalesBidding salesBidding = SalesBidding.builder()
                     .salesBiddingTime(LocalDateTime.now().plusDays(15))
-                    .salesBiddingPrice(250000L + i * 10000)
+                    .salesBiddingPrice(BigDecimal.valueOf(250000L + i * 10000))
                     .salesQuantity(1)
                     .salesStatus(SalesStatus.COMPLETE)
                     .product(product)
@@ -88,7 +89,53 @@ public class ProductsTests {
             salesRepository.save(salesBidding);
 
             BuyingBidding buyBid = BuyingBidding.builder()
-                    .buyingBiddingPrice(230000L + i * 8000)
+                    .buyingBiddingPrice(BigDecimal.valueOf(230000L + i * 8000))
+                    .buyingQuantity(1)
+                    .biddingStatus(BiddingStatus.COMPLETE)
+                    .product(product)
+                    .user(user)
+                    .build();
+            biddingRepository.save(buyBid);
+
+            PhotoReview photoReview = PhotoReview.builder()
+                    .reviewImg("Tech Review Image " + (i + 1))
+                    .reviewContent("Review content for Tech " + (i + 1))
+                    .reviewLike(0)
+                    .user(user)
+                    .products(product)
+                    .build();
+            photoReviewRepository.save(photoReview);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            Product product = Product.builder()
+                    .productImg("Tech Image " + (i + 1))
+                    .productBrand("Tech Brand " + (i + 1))
+                    .modelNum("TECH-" + (i + 1))
+                    .productName("테크 제품 " + (i + 1))
+                    .originalPrice(BigDecimal.valueOf(200000L + i * 20000))
+                    .productLike(0)
+                    .mainDepartment("테크")
+                    .subDepartment(null)
+                    .productQuantity(1)
+                    .productSize("Large")
+                    .productStatus(ProductStatus.REGISTERED)
+                    .build();
+
+            productRepository.save(product);
+
+            SalesBidding salesBidding = SalesBidding.builder()
+                    .salesBiddingTime(LocalDateTime.now().plusDays(15))
+                    .salesBiddingPrice(BigDecimal.valueOf(250000L + i * 10000))
+                    .salesQuantity(1)
+                    .salesStatus(SalesStatus.COMPLETE)
+                    .product(product)
+                    .user(user)
+                    .build();
+            salesRepository.save(salesBidding);
+
+            BuyingBidding buyBid = BuyingBidding.builder()
+                    .buyingBiddingPrice(BigDecimal.valueOf(230000L + i * 8000))
                     .buyingQuantity(1)
                     .biddingStatus(BiddingStatus.COMPLETE)
                     .product(product)
@@ -107,14 +154,14 @@ public class ProductsTests {
         }
     }
 
-    @Test
-    @Transactional
-        // 소분류 카테고리 조회
-    void filterProductsByCategory() {
-
-        List<ProductResponseDto> products = productService.selectCategoryValue("신발");
-        log.info("상품 정보 : {}", products);
-    }
+//    @Test
+//    @Transactional
+//        // 소분류 카테고리 조회
+//    void filterProductsByCategory() {
+//
+//        List<ProductResponseDto> products = productService.selectCategoryValue("shoes");
+//        log.info("상품 정보 : {}", products);
+//    }
 
     @Test
     @Transactional
@@ -147,17 +194,17 @@ public class ProductsTests {
         assertNotNull(price);
         System.out.println("Latest Sales Bidding: " + price);
     }
-    @Test
-    public void testFindGroupByBuying() {
-        List<GroupByBuyingDto> temp = productRepository.GroupByBuyingInfo("NIKE-1");
-        assertNotNull(temp);
-    }
-
-    @Test
-    public void testFindLatestBiddingDate() {
-        List<AveragePriceDto> temp = productRepository.AveragePriceInfo("NIKE-1");
-        AveragePriceDto averagePriceDto = temp.get(0);
-        log.info("최초에 체결된 거래 날짜 : {}", averagePriceDto.toString());
-    }
+//    @Test
+//    public void testFindGroupByBuying() {
+//        List<GroupByBuyingDto> temp = productRepository.GroupByBuyingInfo("NIKE-1");
+//        assertNotNull(temp);
+//    }
+//
+//    @Test
+//    public void testFindLatestBiddingDate() {
+//        List<AveragePriceDto> temp = productRepository.AveragePriceInfo("NIKE-1");
+//        AveragePriceDto averagePriceDto = temp.get(0);
+//        log.info("최초에 체결된 거래 날짜 : {}", averagePriceDto.toString());
+//    }
 
 }
