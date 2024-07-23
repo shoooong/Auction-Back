@@ -4,13 +4,13 @@ import com.example.backend.exception.CustomJWTException;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.security.JWTUtil;
-import jakarta.servlet.http.Cookie;
 import com.example.backend.service.user.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -64,19 +64,19 @@ public class UserController {
     // TODO: 중복 가입 예외처리 (닉네임, 비밀번호)
     // 일반회원 회원가입
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<?> registerUser(@RequestPart(required = false) MultipartFile file,
+                                          @RequestPart UserRegisterDTO userRegisterDTO) {
 
-        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhoneNum());
-        userService.registerUser(userRegisterDTO, false);
+        userService.registerUser(userRegisterDTO, file, false);
         return ResponseEntity.ok("User registered successfully");
     }
 
     // 관리자 회원가입
     @PostMapping("/register/admin")
-    public ResponseEntity<?> registerAdmin(@RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<?> registerAdmin(@RequestPart(required = false) MultipartFile file,
+                                           @RequestPart UserRegisterDTO userRegisterDTO) {
 
-        log.info("Register request: email={}, nickname={}, phone={}", userRegisterDTO.getEmail(), userRegisterDTO.getNickname(), userRegisterDTO.getPhoneNum());
-        userService.registerUser(userRegisterDTO, true);
+        userService.registerUser(userRegisterDTO, file,  true);
         return ResponseEntity.ok("Admin registered successfully");
     }
 
