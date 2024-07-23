@@ -3,7 +3,6 @@ package com.example.backend.entity;
 import com.example.backend.dto.user.UserModifyDTO;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -44,19 +43,11 @@ public class Users extends BaseEntity {
     private boolean social;
 
 
-    public void updateUser(UserModifyDTO userModifyDTO, PasswordEncoder passwordEncoder) {
-        this.email = userModifyDTO.getEmail();
-        this.password = passwordEncoder.encode(userModifyDTO.getPassword());
-        this.nickname = userModifyDTO.getNickname();
-        this.phoneNum = userModifyDTO.getPhoneNum();
-        this.profileImg = userModifyDTO.getProfileImg();
-    }
-
-    public void updateUser(String password, UserModifyDTO userModifyDTO) {
+    public void updateUser(String password, UserModifyDTO userModifyDTO, String imageUrl) {
         this.email = userModifyDTO.getEmail();
         this.password = password;
         this.nickname = userModifyDTO.getNickname();
         this.phoneNum = userModifyDTO.getPhoneNum();
-        this.profileImg = userModifyDTO.getProfileImg();
+        this.profileImg = imageUrl;
     }
 }
