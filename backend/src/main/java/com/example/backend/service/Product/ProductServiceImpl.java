@@ -145,7 +145,6 @@ public class ProductServiceImpl implements ProductService {
                     .differenceContract(recentlyContractPrice.getDifferenceContract())
 
                     .contractInfoList(contractInfoList)
-                    .salesHopeList(salesHopeDtoList)
                     .buyingHopeList(buyingHopeDtoList)
 
                     .photoReviewList(photoReviewDtoList)
