@@ -74,9 +74,6 @@ public class CouponIssueService {
 
         LocalDateTime currentDateTime = LocalDateTime.now();
 
-        System.out.println("startDateTime = " + startDateTime);
-        System.out.println("endDateTime = " + endDateTime);
-        System.out.println("currentDateTime = " + currentDateTime);
 
         if (currentDateTime.isBefore(startDateTime) || currentDateTime.isAfter(endDateTime)) {
             System.out.println("쿠폰 발급 시간이 아닙니다.");

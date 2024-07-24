@@ -33,28 +33,29 @@ public class CouponController {
     private final CouponService couponService;
     private final CouponIssueService couponIssueService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> couponCreate(@RequestBody CouponCreateDto couponCreateDto){
-        couponService.createCoupon(couponCreateDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
-    }
-
-    @PostMapping("/{couponId}/issue")
-    public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
-        couponIssueService.issueCoupon(couponId, userDTO.getUserId());
-
-        return ResponseEntity.ok(200);
-    }
-
     @GetMapping("/time-attack")
     public ResponseEntity<List<CouponDto>> timeAttack(){
         List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
 
         return new ResponseEntity<>(couponDto, HttpStatus.OK);
     }
+    @PostMapping("/api/create")
+    public ResponseEntity<?> couponCreate(@RequestBody CouponCreateDto couponCreateDto){
+        couponService.createCoupon(couponCreateDto);
 
-    @GetMapping("/user")
+        return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
+    }
+
+    @PostMapping("/api/{couponId}/issue")
+    public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
+        couponIssueService.issueCoupon(couponId, userDTO.getUserId());
+
+        return ResponseEntity.ok(200);
+    }
+
+
+
+    @GetMapping("/api/user")
     public ResponseEntity<List<UserCouponDto>> userCoupons(@AuthenticationPrincipal UserDTO userDTO){
         List<UserCouponDto> userCoupons= couponIssueService.userCoupons(userDTO.getUserId());
 

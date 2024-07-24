@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import static com.example.backend.entity.enumData.OrderStatus.WAITING;
+import static com.example.backend.entity.enumData.BiddingStatus.COMPLETE;
 
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
@@ -101,11 +101,14 @@ public class OrdersService {
             .product(buyingBidding.getProduct())
             .buyingBidding(buyingBidding)
             .coupon(coupon)
-            .orderStatus((buyingBidding.getBiddingStatus() == BiddingStatus.COMPLETE)
+            .orderStatus((buyingBidding.getBiddingStatus() == COMPLETE)
                 ? OrderStatus.COMPLETE
                 : OrderStatus.WAITING)
             .orderPrice(totalAmount)
             .build();
+
+        buyingBidding.changeBiddingStatus(COMPLETE);
+
 
         return ordersRepository.save(order);
     }
@@ -155,6 +158,9 @@ public class OrdersService {
                     : OrderStatus.WAITING)
             .orderPrice(totalAmount)
             .build();
+
+        salesBidding.changeSalesStatus(SalesStatus.COMPLETE);
+
 
         return ordersRepository.save(order);
     }

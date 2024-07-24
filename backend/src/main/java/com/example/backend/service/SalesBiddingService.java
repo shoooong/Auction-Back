@@ -1,11 +1,20 @@
 package com.example.backend.service;
 
+import static com.example.backend.entity.enumData.SalesStatus.INSPECTION;
+
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto;
+import com.example.backend.dto.orders.BiddingRequestDto;
+import com.example.backend.dto.user.UserDTO;
+import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
+import com.example.backend.entity.Users;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
+import com.example.backend.repository.Product.ProductRepository;
+import com.example.backend.repository.User.UserRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,6 +27,31 @@ import java.util.List;
 public class SalesBiddingService {
 
     private final SalesBiddingRepository salesBiddingRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    /**
+     * 판매 입찰 등록
+     */
+    public void registerSalesBidding(UserDTO userDTO, BiddingRequestDto salesInfo) {
+        Product product = productRepository.findById(salesInfo.getProductId())
+            .orElseThrow(() -> new RuntimeException("Product not valid"));
+
+        Users user = userRepository.findById(userDTO.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not valid"));
+
+        SalesBidding salesBidding = SalesBidding.builder()
+            .salesBiddingPrice(salesInfo.getPrice())
+            .product(product)
+            .user(user)
+            .salesBiddingTime(LocalDateTime
+                .now().plusDays(salesInfo.getExp()))
+            .salesStatus(INSPECTION)
+            .build();
+
+        salesBiddingRepository.save(salesBidding);
+    }
+
 
     /**
      * 판매 내역

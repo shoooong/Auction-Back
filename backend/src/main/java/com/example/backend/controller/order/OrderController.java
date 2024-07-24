@@ -3,6 +3,7 @@ package com.example.backend.controller.order;
 import com.example.backend.dto.orders.AddressInfoDto;
 import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
+import com.example.backend.dto.orders.PaymentDto;
 import com.example.backend.dto.orders.SaleOrderDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.BuyingBiddingService;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/order")
+@RequestMapping("/api/order")
 @Log4j2
 public class OrderController {
 
@@ -38,8 +39,13 @@ public class OrderController {
         return new ResponseEntity<>(buyOrderDto, HttpStatus.OK);
     }
 
+    @GetMapping("/addr") // 배송지 반환
+    public ResponseEntity<?> addrInfo(@AuthenticationPrincipal UserDTO userDTO){
+        AddressInfoDto addressInfoDto = ordersService.getDefaultAddress(userDTO.getUserId());
+        return new ResponseEntity<>(addressInfoDto, HttpStatus.OK);
+    }
 
-    @PostMapping("/sales")
+    @PostMapping("/sales") //
     public ResponseEntity<?> salesOrder(@AuthenticationPrincipal UserDTO userDTO, @RequestBody
     SaleOrderDto saleOrderDto) {
         ordersService.createSaleOrder(userDTO, saleOrderDto);
@@ -47,16 +53,17 @@ public class OrderController {
         return new ResponseEntity<>(saleOrderDto, HttpStatus.OK);
     }
 
-    @GetMapping("/addr")
-    public ResponseEntity<?> addrInfo(@AuthenticationPrincipal UserDTO userDTO){
-        AddressInfoDto addressInfoDto = ordersService.getDefaultAddress(userDTO.getUserId());
-        return new ResponseEntity<>(addressInfoDto, HttpStatus.OK);
-    }
 
-    @GetMapping("/buy") // 주문내역
+    @GetMapping("/buy") // 결제 완료 후 주문 완료 페이지
     public ResponseEntity<?> buyInfo(@RequestParam Long buyingBiddingId){
         BuyingBiddingDto buyingBiddingDto = buyingBiddingService.getBuyingBiddingDto(buyingBiddingId);
         return new ResponseEntity<>(buyingBiddingDto, HttpStatus.OK);
+    }
+
+    @GetMapping("toss/success")
+    public ResponseEntity<?> tossSuccess(@AuthenticationPrincipal UserDTO userDTO, @RequestBody
+        PaymentDto paymentDto){
+        return null;
     }
 
 
