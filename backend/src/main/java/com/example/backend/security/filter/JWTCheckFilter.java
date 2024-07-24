@@ -1,5 +1,7 @@
 package com.example.backend.security.filter;
 
+import com.example.backend.exception.CustomJWTException;
+import com.example.backend.repository.User.TokenRepository;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
@@ -29,6 +31,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final JWTUtil jwtUtil;
+    private final TokenRepository tokenRepository;
 
 
     private static final List<String> AUTHENTICATED_ENDPOINTS = List.of(
@@ -94,11 +97,15 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("------------------JWTCheckFilter...-----------------");
 
-        String authHeaderStr = request.getHeader("Authorization");
-        log.info("authHeaderStr: {}", authHeaderStr);
+        String authHeader = request.getHeader("Authorization");
 
         try {
-            String accessToken = authHeaderStr.substring(7);
+            String accessToken = authHeader.substring(7);
+
+            if (tokenRepository.isBlacklist(accessToken)) {
+                throw new CustomJWTException("TOKEN_BLACKLISTED");
+            }
+
             Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
             log.info("###JWT claims: {}", claims);

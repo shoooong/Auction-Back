@@ -1,7 +1,7 @@
 package com.example.backend.service.user;
 
 import com.example.backend.exception.CustomJWTException;
-import com.example.backend.repository.User.RefreshTokenRepository;
+import com.example.backend.repository.User.TokenRepository;
 import com.example.backend.security.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Log4j2
 public class RefreshTokenService {
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenRepository tokenRepository;
     private final JWTUtil jwtUtil;
 
     public Map<String,Object> refreshToken(String authHeader, String refreshToken){
@@ -28,7 +28,7 @@ public class RefreshTokenService {
         }
 
         String email = jwtUtil.extractUsername(refreshToken);
-        String storedRefreshToken = refreshTokenRepository.getRefreshToken(email);
+        String storedRefreshToken = tokenRepository.getToken(email);
 
         validateStoredRefreshToken(email, storedRefreshToken);
 
@@ -49,7 +49,7 @@ public class RefreshTokenService {
     }
 
     private void validateStoredRefreshToken(String email, String refreshToken) {
-        String storedRefreshToken = refreshTokenRepository.getRefreshToken(email);
+        String storedRefreshToken = tokenRepository.getToken(email);
 
         if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
             throw new CustomJWTException("INVALID_REFRESH_TOKEN");
@@ -62,7 +62,7 @@ public class RefreshTokenService {
                 ? jwtUtil.generateToken(claims, 60 * 24)
                 : refreshToken;
 
-        refreshTokenRepository.updateRefreshToken(email, newRefreshToken, jwtUtil.extractExpiration(newRefreshToken));
+        tokenRepository.updateRefreshToken(email, newRefreshToken, jwtUtil.extractExpiration(newRefreshToken));
 
         return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
     }
