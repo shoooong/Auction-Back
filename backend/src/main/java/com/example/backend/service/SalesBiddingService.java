@@ -6,7 +6,10 @@ import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
 import com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto;
 import com.example.backend.dto.orders.BiddingRequestDto;
+import com.example.backend.dto.orders.SalesBiddingDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.Users;
@@ -50,6 +53,31 @@ public class SalesBiddingService {
             .build();
 
         salesBiddingRepository.save(salesBidding);
+    }
+
+    /**
+     * 구매입찰 Id로 해당 입찰 데이터 가져오기
+     */
+    public SalesBiddingDto getSalesBiddingDto(Long salesBiddingId) {
+        SalesBidding salesBidding = salesBiddingRepository.findById(salesBiddingId)
+            .orElseThrow(() -> new RuntimeException("SalesBidding not valid"));
+
+        return SalesBiddingDto.builder()
+            .salesBiddingId(salesBidding.getSalesBiddingId())
+            .product(
+                OrderProductDto.builder()
+                    .productId(salesBidding.getProduct().getProductId())
+                    .productName(salesBidding.getProduct().getProductName())
+                    .productImg(salesBidding.getProduct().getProductImg())
+                    .productBrand(salesBidding.getProduct().getProductBrand())
+                    .modelNum(salesBidding.getProduct().getModelNum())
+                    .productSize(salesBidding.getProduct().getProductSize())
+                    .build())
+            .salesQuantity(salesBidding.getSalesQuantity())
+            .salesBiddingPrice(salesBidding.getSalesBiddingPrice())
+            .salesBiddingTime(salesBidding.getSalesBiddingTime())
+            .salesStatus(salesBidding.getSalesStatus())
+            .build();
     }
 
 

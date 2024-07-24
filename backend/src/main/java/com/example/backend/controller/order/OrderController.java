@@ -5,9 +5,12 @@ import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
 import com.example.backend.dto.orders.PaymentDto;
 import com.example.backend.dto.orders.SaleOrderDto;
+import com.example.backend.dto.orders.SalesBiddingDto;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.entity.SalesBidding;
 import com.example.backend.service.BuyingBiddingService;
 import com.example.backend.service.OrdersService;
+import com.example.backend.service.SalesBiddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,7 @@ public class OrderController {
 
     private final OrdersService ordersService;
     private final BuyingBiddingService buyingBiddingService;
+    private final SalesBiddingService salesBiddingService;
 
     @PostMapping("/buy")
     public ResponseEntity<?> buyOrder(@AuthenticationPrincipal UserDTO userDTO,
@@ -58,6 +62,11 @@ public class OrderController {
     public ResponseEntity<?> buyInfo(@RequestParam Long buyingBiddingId){
         BuyingBiddingDto buyingBiddingDto = buyingBiddingService.getBuyingBiddingDto(buyingBiddingId);
         return new ResponseEntity<>(buyingBiddingDto, HttpStatus.OK);
+    }
+    @GetMapping("/sales") // 결제 완료 후 주문 완료 페이지
+    public ResponseEntity<?> salesInfo(@RequestParam Long salesBiddingId){
+        SalesBiddingDto salesBiddingDto = salesBiddingService.getSalesBiddingDto(salesBiddingId);
+        return new ResponseEntity<>(salesBiddingDto, HttpStatus.OK);
     }
 
     @GetMapping("toss/success")
