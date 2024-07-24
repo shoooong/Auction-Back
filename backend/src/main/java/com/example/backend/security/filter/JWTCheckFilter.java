@@ -1,5 +1,6 @@
 package com.example.backend.security.filter;
 
+import com.example.backend.exception.CustomJWTException;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
@@ -106,7 +107,16 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String authHeaderStr = request.getHeader("Authorization");
         log.info("authHeaderStr: {}", authHeaderStr);
 
+        if (pathMatcher.match("/user/refresh", request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
+            if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")) {
+                throw new CustomJWTException("INVALID_AUTHORIZATION_HEADER");
+            }
+
             String accessToken = authHeaderStr.substring(7);
             Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 

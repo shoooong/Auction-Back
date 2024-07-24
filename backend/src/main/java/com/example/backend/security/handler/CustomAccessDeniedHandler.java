@@ -22,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         response.setStatus(HttpStatus.FORBIDDEN.value());
         PrintWriter printWriter = response.getWriter();
-        printWriter.println(new Gson().toJson(Map.of("error", accessDeniedException.getMessage())));
+        printWriter.println(new Gson().toJson(Map.of("error", "ERROR_ACCESSDENIED")));
         printWriter.close();
     }
 }

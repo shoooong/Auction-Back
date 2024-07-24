@@ -4,7 +4,6 @@ import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +35,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = userDTO.getClaims();
 
-        String accessToken = jwtUtil.generateToken(claims, 30000);
-        String refreshToken = jwtUtil.generateToken(claims, 60000*24);
+        String accessToken = jwtUtil.generateToken(claims, 30);
+        String refreshToken = jwtUtil.generateToken(claims, 60*24);
 
         redisTemplate.opsForValue().set(
                 userDTO.getUsername(),
@@ -53,26 +52,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         claims.put("accessToken", accessToken);
         claims.put("refreshToken", refreshToken);
 
-
-
-//        // HttpOnly 쿠키 설정
-//        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-//        accessTokenCookie.setHttpOnly(true);
-//        accessTokenCookie.setSecure(false);
-//        accessTokenCookie.setPath("/");
-////        accessTokenCookie.setMaxAge(60 * 30);     // 30분
-//        accessTokenCookie.setMaxAge(60);
-//
-//        // HttpOnly 쿠키 설정 (RefreshToken)
-//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-//        refreshTokenCookie.setHttpOnly(true);
-//        refreshTokenCookie.setSecure(false);
-//        refreshTokenCookie.setPath("/");
-//        refreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
-//
-//        // 쿠키를 응답에 추가
-//        response.addCookie(accessTokenCookie);
-//        response.addCookie(refreshTokenCookie);
 
 
         Gson gson = new Gson();
