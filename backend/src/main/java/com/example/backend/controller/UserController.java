@@ -5,10 +5,10 @@ import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.service.user.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,7 +61,6 @@ public class UserController {
     }
 
 
-    // TODO: 중복 가입 예외처리 (닉네임, 비밀번호)
     // 일반회원 회원가입
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestPart(required = false) MultipartFile file,
@@ -81,11 +80,11 @@ public class UserController {
     }
 
 
-    // refreshToken 재발행
+    // 토큰 재발행
     // TODO: 시간별 재발행 여부 test
     @PostMapping("/refresh")
-    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader,
-                                       @CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
+    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> token) {
+        String refreshToken = token.get("refreshToken");
 
         // 1. accessToken이 없거나 잘못된 JWT인 경우, 예외 메시지 발생
         if (refreshToken == null) {
@@ -93,7 +92,7 @@ public class UserController {
         }
 
         if (authHeader == null || authHeader.length() < 7) {
-            throw new CustomJWTException("INVALID_REFRESH_TOKEN") ;
+            throw new CustomJWTException("INVALID_AUTHORIZATION") ;
         }
 
         String accessToken = authHeader.substring(7);
@@ -116,27 +115,7 @@ public class UserController {
         String newRefreshToken = jwtUtil.checkTime((Integer) claims.get("exp")) ?
                 jwtUtil.generateToken(claims, 60 * 24) : refreshToken;
 
-
-        // HttpOnly 쿠키 설정 (새로운 AccessToken)
-//        Cookie newAccessTokenCookie = new Cookie("accessToken", newAccessToken);
-//        newAccessTokenCookie.setHttpOnly(true);
-//        newAccessTokenCookie.setSecure(true);
-//        newAccessTokenCookie.setPath("/");
-//        newAccessTokenCookie.setMaxAge(30 * 60); // 30분
-//        response.addCookie(newAccessTokenCookie);
-
-        // HttpOnly 쿠키 설정 (새로운 RefreshToken이 생성된 경우에만 설정)
-//        if (!newRefreshToken.equals(refreshToken)) {
-//            Cookie newRefreshTokenCookie = new Cookie("refreshToken", newRefreshToken);
-//            newRefreshTokenCookie.setHttpOnly(true);
-//            newRefreshTokenCookie.setSecure(true);
-//            newRefreshTokenCookie.setPath("/");
-//            newRefreshTokenCookie.setMaxAge(60 * 60 * 24); // 1일
-//            response.addCookie(newRefreshTokenCookie);
-//        }
-
-
-        return Map.of("newAccessToken", newAccessToken, "newRefreshToken", newRefreshToken);
+        return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
     }
 
 }
