@@ -99,15 +99,17 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         Long userId = userDTO.getUserId();
-        BuyingBidRequestDto bidRequestDto = BuyingBidRequestDto.builder()
+        BidRequestDto bidRequestDto = BidRequestDto.builder()
                 .modelNum(modelNum)
                 .productSize(size)
                 .type(type)
                 .userId(userId)
                 .build();
-        BuyingBidResponseDto buyingBidResponseDto = productService.selectBuyingBid(bidRequestDto);
+        BidResponseDto bidResponseDto = productService.selectBidInfo(bidRequestDto);
 
-        return new ResponseEntity<>(buyingBidResponseDto, HttpStatus.OK);
+
+
+        return new ResponseEntity<>(bidResponseDto, HttpStatus.OK);
 
     }
 
@@ -115,15 +117,15 @@ public class ProductController {
     @PostMapping("/details/{modelNum}/bid")
     public ResponseEntity<?> bidApplication(
             @PathVariable String modelNum,
-            @RequestBody BidRequestDto bidRequestDto,
+            @RequestBody InsertBidDto insertBidDto,
             @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
         Long userId = userDTO.getUserId();
-        bidRequestDto.setUserId(userId);
-        bidRequestDto.setModelNum(modelNum);
-        productService.saveTemporaryBid(bidRequestDto);
+        insertBidDto.setUserId(userId);
+        insertBidDto.setModelNum(modelNum);
+        productService.saveTemporaryBid(insertBidDto);
         return ResponseEntity.ok("값이 정상적으로 저장되었습니다.");
     }
 

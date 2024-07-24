@@ -305,6 +305,7 @@ public class ProductSearchImpl implements ProductSearch {
     @Override
     public List<GroupByBuyingDto> groupByBuyingSize(String modelNum) {
         List<GroupByBuyingDto> groupByBuyingDtoList = queryFactory.select(Projections.bean(GroupByBuyingDto.class,
+                        buying.buyingBiddingId.as("buyProductId"),
                         product.productImg,
                         product.productName,
                         product.modelNum,
@@ -330,13 +331,14 @@ public class ProductSearchImpl implements ProductSearch {
     @Override
     public List<GroupBySalesDto> groupBySalesSize(String modelNum) {
         List<GroupBySalesDto> groupBySalesDtoList = queryFactory.select(Projections.bean(GroupBySalesDto.class,
+                        sales.salesBiddingId.as("salesProductId"),
                         product.productImg,
                         product.productName,
                         product.modelNum,
                         product.productSize,
                         sales.salesBiddingPrice.max().as("productMaxPrice"),
                         product.productId.as("productId"))
-                        )
+                )
                 .from(product)
                 .leftJoin(sales).on(sales.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
@@ -345,13 +347,16 @@ public class ProductSearchImpl implements ProductSearch {
                 .groupBy(product.productSize)
                 .orderBy(sales.salesBiddingPrice.desc())
                 .fetch();
+
+        // 중복 제거 후 리스트 반환
         return groupBySalesDtoList.stream()
                 .distinct()
                 .collect(Collectors.toList());
     }
 
+
     @Override
-    public BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto) {
+    public BidResponseDto BuyingBidResponse(BidRequestDto bidRequestDto) {
 
         JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.min().castToNum(Long.class))
                 .from(buying)
@@ -370,12 +375,14 @@ public class ProductSearchImpl implements ProductSearch {
         Long lowestPriceLong = lowPriceQuery.fetchOne();
         Long highestPriceLong = topPriceQuery.fetchOne();
 
+        log.info("lowestPriceLong : {}   highestPriceLong : {}", lowestPriceLong, highestPriceLong);
+
         // Long 값을 BigDecimal로 변환
         BigDecimal lowestPrice = (lowestPriceLong != null) ? BigDecimal.valueOf(lowestPriceLong) : BigDecimal.ZERO;
         BigDecimal highestPrice = (highestPriceLong != null) ? BigDecimal.valueOf(highestPriceLong) : BigDecimal.ZERO;
 
         // BuyingBidResponseDto 생성 및 설정
-        BuyingBidResponseDto priceValue = BuyingBidResponseDto.builder()
+        BidResponseDto priceValue = BidResponseDto.builder()
                 .productBuyPrice(lowestPrice)
                 .productSalePrice(highestPrice)
                 .build();

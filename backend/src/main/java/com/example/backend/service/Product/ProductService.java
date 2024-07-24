@@ -3,7 +3,6 @@ package com.example.backend.service.Product;
 import com.example.backend.dto.admin.ProductRespDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
-import com.example.backend.dto.requestproduct.RequestProductListDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
@@ -45,9 +44,9 @@ public interface ProductService {
 
     List<PhotoReviewDto> selectPhotoReview(String modelNum);
 
-    BuyingBidResponseDto selectBuyingBid(BuyingBidRequestDto buyingBidRequestDto);
+    BidResponseDto selectBidInfo(BidRequestDto bidRequestDto);
 
-    void saveTemporaryBid(BidRequestDto bidRequestDto);
+    void saveTemporaryBid(InsertBidDto insertBidDto);
 
     AveragePriceResponseDto getAveragePrices(String modelNum);
 

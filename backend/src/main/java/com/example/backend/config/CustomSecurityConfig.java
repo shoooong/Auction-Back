@@ -40,11 +40,11 @@ public class CustomSecurityConfig {
             "/feed/user/**",
             "/inquiry/{inquiryId}/delete",
             "/requestProduct/user/**",
-            "/products/details/**",
+            "/api/products/details/**",
             "/order/**",
             "/coupon/{couponId}/issue",
             "/alarm/subscribe",
-            "/products/details/**"
+            "/products/details/**",
     };
 
     @Bean

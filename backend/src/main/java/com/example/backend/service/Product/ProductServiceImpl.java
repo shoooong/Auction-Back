@@ -424,53 +424,52 @@ public class ProductServiceImpl implements ProductService {
 
     // 상세 상품의 거래 체결 조회
     @Override
-    public BuyingBidResponseDto selectBuyingBid(BuyingBidRequestDto buyingBidRequestDto) {
+    public BidResponseDto selectBidInfo(BidRequestDto bidRequestDto) {
 
-        Long userId = buyingBidRequestDto.getUserId();
+        Long userId = bidRequestDto.getUserId();
         boolean check = userRepository.existsByUserId(userId);
         if (check) {
             log.info("해당 계정은 합격");
             // 상품 기본정보 뽑기
-            Optional<Product> products = productRepository.findBidProductInfo(buyingBidRequestDto.getModelNum(), buyingBidRequestDto.getProductSize());
+            Optional<Product> products = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getProductSize());
             log.info("상품의 기본 정보 확인 : {}", products);
 
             if (products.isEmpty()) {
                 log.info("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
                 throw new IllegalArgumentException("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
-
             }
             // 해당 상품의 사이즈에 대한 가격 뽑기, 구매 / 판매 둘다
-            BuyingBidResponseDto buyingBidResponseDto = productRepository.BuyingBidResponse(buyingBidRequestDto);
-            if (buyingBidResponseDto == null) {
+            BidResponseDto bidResponseDto = productRepository.BuyingBidResponse(bidRequestDto);
+            if (bidResponseDto == null) {
                 log.info("해당 상품의 가격이 존재하지 않습니다.");
                 throw new IllegalArgumentException("해당 상품의 가격이 존재하지 않습니다.");
             }
-            log.info("해당 사이즈에 대한 가격 뽑기 : {}", buyingBidResponseDto);
+            log.info("해당 사이즈에 대한 가격 뽑기 : {}", bidResponseDto);
 
 
-            return BuyingBidResponseDto.builder()
+            return BidResponseDto.builder()
                     .productImg(products.get().getProductImg())
                     .productName(products.get().getProductName())
                     .productSize(products.get().getProductSize())
-                    .productBuyPrice(buyingBidResponseDto.getProductBuyPrice())
-                    .productSalePrice(buyingBidResponseDto.getProductSalePrice())
+                    .productBuyPrice(bidResponseDto.getProductBuyPrice())
+                    .productSalePrice(bidResponseDto.getProductSalePrice())
                     .build();
         }
         return null;
     }
 
     @Override
-    public void saveTemporaryBid(BidRequestDto bidRequestDto) {
-        Users user = userRepository.findById(bidRequestDto.getUserId())
+    public void saveTemporaryBid(InsertBidDto insertBidDto) {
+        Users user = userRepository.findById(insertBidDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
-        Product product = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getSize())
+        Product product = productRepository.findBidProductInfo(insertBidDto.getModelNum(), insertBidDto.getSize())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 상품 ID 입니다."));
 
-        if (bidRequestDto.getType().equals("buy")) {
-            BuyingBidding buyingBidding = bidRequestDto.toBuyingBidding(user, product);
+        if (insertBidDto.getType().equals("buy")) {
+            BuyingBidding buyingBidding = insertBidDto.toBuyingBidding(user, product);
             buyingBiddingRepository.save(buyingBidding);
-        } else if (bidRequestDto.getType().equals("sale")) {
-            SalesBidding salesBidding = bidRequestDto.toSalesBidding(user, product);
+        } else if (insertBidDto.getType().equals("sale")) {
+            SalesBidding salesBidding = insertBidDto.toSalesBidding(user, product);
             salesBiddingRepository.save(salesBidding);
         }
     }

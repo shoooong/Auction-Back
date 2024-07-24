@@ -3,14 +3,13 @@ package com.example.backend.dto.product.Detail;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuyingBidResponseDto {
+public class BidResponseDto {
     private String productImg;
     private String productName;
     private String productSize;

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupByBuyingDto {
+    private Long buyProductId;
     private String productImg;
     private String productName;
     private String modelNum;
