@@ -1,6 +1,6 @@
 package com.example.backend.security.handler;
 
-import com.example.backend.repository.User.RefreshTokenRepository;
+import com.example.backend.repository.User.TokenRepository;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -34,10 +34,10 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claims = userDTO.getClaims();
 
-        String accessToken = jwtUtil.generateToken(claims, 1);
+        String accessToken = jwtUtil.generateToken(claims, 30);
         String refreshToken = jwtUtil.generateToken(claims, 60*24);
 
-        refreshTokenRepository.saveRefreshToken(userDTO.getUsername(), refreshToken, jwtUtil.extractExpiration(refreshToken));
+        tokenRepository.saveToken(userDTO.getUsername(), refreshToken, jwtUtil.extractExpiration(refreshToken));
 
         log.info("redis set key: {}, value: {}", userDTO.getUsername(), refreshToken);
 
