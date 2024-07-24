@@ -1,6 +1,5 @@
 package com.example.backend.security.filter;
 
-import com.example.backend.exception.CustomJWTException;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
@@ -82,15 +81,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         log.info("check uri............" + path);
 
-        // 2) /user/ 로그인과 회원가입 호출 경로 제외
-//        if (path.equals("/luckydraw") || path.matches("^/luckydraw/[^/]+$") ||
-//                path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
-//            return true;
-//        }
-
-//        if (path.equals("/coupon/user"))
-//            return true;
-
         // 3) 이미지 조회 경로 제외
         // TODO: 클라우드 DB 이미지 업로드 성공 시 경로 설정
 
@@ -107,16 +97,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String authHeaderStr = request.getHeader("Authorization");
         log.info("authHeaderStr: {}", authHeaderStr);
 
-        if (pathMatcher.match("/user/refresh", request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
-            if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")) {
-                throw new CustomJWTException("INVALID_AUTHORIZATION_HEADER");
-            }
-
             String accessToken = authHeaderStr.substring(7);
             Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
@@ -144,7 +125,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("JWT Check Error: " + e.getMessage());
-//            throw new CustomJWTException("@ERROR_ACCESS_TOKEN");
 
             response.setContentType("application/json");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
