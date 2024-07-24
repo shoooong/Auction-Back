@@ -4,6 +4,7 @@ import com.example.backend.dto.bookmarkproduct.BookmarkProductDto;
 import com.example.backend.entity.BookmarkProduct;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.Users;
+import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.mypage.BookmarkProductRepository;
@@ -11,6 +12,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,9 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
         this.bookmarkProductRepository = bookmarkProductRepository;
         this.usersRepository = usersRepository;
     }
+
+    @Autowired
+    private SalesBiddingRepository salesBiddingRepository;
 
     // 관심상품 저장
     @Override
@@ -84,6 +90,13 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
                     bookmarkProductDto.setProductImg(bookmarkProduct.getProduct().getProductImg());
                     bookmarkProductDto.setModelNum(bookmarkProduct.getProduct().getModelNum());
                     bookmarkProductDto.setProductSize(bookmarkProduct.getProduct().getProductSize());
+                    bookmarkProductDto.setProductBrand(bookmarkProduct.getProduct().getProductBrand());
+                    bookmarkProductDto.setProductName(bookmarkProduct.getProduct().getProductName());
+
+                    // 가장 낮은 판매 입찰가 조회 및 설정
+                    BigDecimal lowestPrice = salesBiddingRepository.findLowestSalesBiddingPriceByProductId(bookmarkProduct.getProduct().getProductId());
+                    bookmarkProductDto.setSalesBiddingPrice(lowestPrice);
+
                     return bookmarkProductDto;
                 })
                 .collect(Collectors.toList());

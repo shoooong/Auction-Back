@@ -24,6 +24,7 @@ public class BookmarkProductController {
 
     // 관심상품 저장
     @PostMapping("/product/bookmark")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> saveBookmark(@AuthenticationPrincipal UserDTO userDTO,
                                                @RequestParam String modelNum,
                                                @RequestParam String productSize) {

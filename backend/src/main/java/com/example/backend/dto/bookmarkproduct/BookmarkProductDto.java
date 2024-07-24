@@ -2,6 +2,8 @@ package com.example.backend.dto.bookmarkproduct;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
@@ -13,4 +15,7 @@ public class BookmarkProductDto {
     private String productImg;
     private String modelNum;
     private String productSize;
+    private String productBrand;
+    private String productName;
+    private BigDecimal salesBiddingPrice;
 }

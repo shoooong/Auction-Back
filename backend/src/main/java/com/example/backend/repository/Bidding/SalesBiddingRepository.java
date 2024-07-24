@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,4 +49,7 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
 
     //판매 입찰 상태 COMPLETE 인 판매 내역 = 판매 정산 내역 조회
     List<SalesBidding> findBySalesStatusAndUser_UserId(SalesStatus salesStatus, Long userId);
+
+    @Query("SELECT MIN(s.salesBiddingPrice) FROM SalesBidding s WHERE s.product.productId = :productId")
+    BigDecimal findLowestSalesBiddingPriceByProductId(@Param("productId") Long productId);
 }

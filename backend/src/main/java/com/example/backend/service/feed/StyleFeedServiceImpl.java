@@ -99,7 +99,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
         return styleFeedRepository.save(styleFeed);
     }
 
-    // 특정 피드의 좋아요 수 증가
+    // 피드 좋아요
     @Override
     public void increaseLikeCount(Long feedId) {
         StyleFeed styleFeed = styleFeedRepository.findById(feedId)
@@ -172,6 +172,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                     dto.setUserId(feedBookmark.getUser().getUserId());
                     dto.setFeedId(feedBookmark.getStyleFeed().getFeedId());
                     dto.setFeedImage(feedBookmark.getStyleFeed().getFeedImage());
+                    dto.setFeedTitle(feedBookmark.getStyleFeed().getFeedTitle());
                     return dto;
                 })
                 .collect(Collectors.toList());
