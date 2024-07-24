@@ -10,6 +10,7 @@ import com.example.backend.entity.enumData.SalesStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -242,10 +243,15 @@ public class ProductSearchImpl implements ProductSearch {
         return priceValue;
     }
 
+
     @Override
     public List<SalesBiddingDto> recentlyTransaction(String modelNum) {
+        QProduct product = QProduct.product;
+        QSalesBidding sales = QSalesBidding.salesBidding;
+        QBuyingBidding buying = QBuyingBidding.buyingBidding;
 
-        List<SalesBiddingDto> salesBiddingDtoList = queryFactory.select(Projections.bean(SalesBiddingDto.class,
+        // 중복 제거 쿼리 작성
+        return queryFactory.select(Projections.bean(SalesBiddingDto.class,
                         product.productId,
                         product.modelNum,
                         product.productSize,
@@ -256,20 +262,16 @@ public class ProductSearchImpl implements ProductSearch {
                         sales.salesBiddingPrice.as("salesBiddingPrice")
                 ))
                 .from(product)
-                .leftJoin(sales).on(sales.product.eq(product))
-                .leftJoin(buying).on(buying.product.eq(product))
+                .leftJoin(sales).on(sales.product.eq(product).and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
+                .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
-                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
-                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
-                        .and(product.productId.eq(product.productId)))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
                 .orderBy(sales.salesBiddingTime.desc())
+                .distinct()  // 중복 제거
                 .fetch();
-
-        return salesBiddingDtoList.stream()
-                .distinct()
-                .collect(Collectors.toList());
     }
+
+
 
     @Override
     public List<SalesHopeDto> salesHopeInfo(String modelNum) {
@@ -304,6 +306,7 @@ public class ProductSearchImpl implements ProductSearch {
 
     @Override
     public List<GroupByBuyingDto> groupByBuyingSize(String modelNum) {
+        QBuyingBidding subBuying = new QBuyingBidding("subBuying");
         List<GroupByBuyingDto> groupByBuyingDtoList = queryFactory.select(Projections.bean(GroupByBuyingDto.class,
                         buying.buyingBiddingId.as("buyProductId"),
                         product.productImg,
@@ -312,14 +315,20 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productSize,
                         buying.buyingBiddingPrice.min().as("buyingBiddingPrice"),
                         product.productId.as("productId"))
-                        )
+                )
                 .from(product)
                 .leftJoin(buying).on(buying.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
                         .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
-                .groupBy(product.productSize)
-                .orderBy(buying.buyingBiddingPrice.min().asc())
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(buying.buyingBiddingPrice.eq(
+                                JPAExpressions.select(subBuying.buyingBiddingPrice.min())
+                                        .from(subBuying)
+                                        .where(subBuying.product.eq(product)
+                                                .and(subBuying.biddingStatus.eq(BiddingStatus.PROCESS)))
+                        )))
+                .groupBy(product.productSize, buying.buyingBiddingId)
+                .orderBy(buying.buyingBiddingPrice.asc())
                 .fetch();
 
         log.info("GroupByBuyingDtoList Success : {}", groupByBuyingDtoList);
@@ -330,6 +339,7 @@ public class ProductSearchImpl implements ProductSearch {
 
     @Override
     public List<GroupBySalesDto> groupBySalesSize(String modelNum) {
+        QSalesBidding subSales = new QSalesBidding("subSales");
         List<GroupBySalesDto> groupBySalesDtoList = queryFactory.select(Projections.bean(GroupBySalesDto.class,
                         sales.salesBiddingId.as("salesProductId"),
                         product.productImg,
@@ -343,17 +353,21 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(sales).on(sales.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
                         .and(sales.salesStatus.eq(SalesStatus.PROCESS))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
-                .groupBy(product.productSize)
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesBiddingPrice.eq(
+                                JPAExpressions.select(subSales.salesBiddingPrice.max())
+                                        .from(subSales)
+                                        .where(subSales.product.eq(product)
+                                                .and(subSales.salesStatus.eq(SalesStatus.PROCESS)))
+                        )))
+                .groupBy(product.productSize, sales.salesBiddingId)
                 .orderBy(sales.salesBiddingPrice.desc())
                 .fetch();
 
-        // 중복 제거 후 리스트 반환
         return groupBySalesDtoList.stream()
                 .distinct()
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public BidResponseDto BuyingBidResponse(BidRequestDto bidRequestDto) {

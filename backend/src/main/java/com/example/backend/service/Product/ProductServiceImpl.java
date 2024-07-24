@@ -195,7 +195,6 @@ public class ProductServiceImpl implements ProductService {
         LocalDateTime recentlyContractTime = recentlyContractValue.getSalesBiddingTime();
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
-
         RecentlyPriceDto recentlyPriceDto = RecentlyPriceDto.builder()
                 .latestPrice(recentlyContractValue.getLatestPrice())
                 .salesBiddingTime(recentlyContractTime)
@@ -260,6 +259,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return recentlyPriceDto;
     }
+
 
     // 체결 내역 관리(리스트)
     @Override
