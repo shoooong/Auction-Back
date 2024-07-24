@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct, ProductSearch, ShopProduct {
+public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct, ProductSearch, ShopProduct, ShopSearch {
     //상품상태에 따른 상품 찾기
     List<Product> findByProductStatus(ProductStatus productStatus);
 
@@ -94,5 +94,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
             "GROUP BY p.modelNum " +
             "ORDER BY p.productLike DESC")
     List<ProductRankingDto> searchAllProductByLikes(@Param("mainDepartment") String mainDepartment);
+
+
+
 
 }

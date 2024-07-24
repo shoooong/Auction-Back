@@ -31,12 +31,6 @@ public class ShopProductImpl implements ShopProduct {
     QSalesBidding salesBidding = QSalesBidding.salesBidding;
 
     // 필터링
-    private BooleanExpression eqMain(List<String> mainDepartment){
-        if (StringUtils.isBlank(mainDepartment.toString())){
-            return null;
-        }
-        return product.mainDepartment.in(mainDepartment);
-    }
     private BooleanExpression eqSub(List<String> subDepartment){
         if (StringUtils.isBlank(subDepartment.toString())){
             return null;
