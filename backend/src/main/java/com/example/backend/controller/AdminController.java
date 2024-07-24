@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RequestMapping("/admin")
@@ -48,16 +49,9 @@ public class AdminController {
     //요청상품 판매 상품으로 등록 ver2
 
     @PutMapping("/requests/{productId}")
-    public ResponseEntity<?> saveReqProduct(@PathVariable Long productId,@ModelAttribute ProductReqDto productReqDto){
+    public ResponseEntity<?> saveReqProduct(@PathVariable Long productId, @RequestPart(value = "productReqDto") ProductReqDto productReqDto, @RequestPart(value = "productPhoto", required = false) MultipartFile productPhoto){
 
-        if (productReqDto.getProductPhoto().isEmpty()){
-            productReqDto.setProductImg(productReqDto.getProductImg());
-            log.info("============================"+productReqDto.getProductName());
-        }
-
-        adminService.acceptRequest(productId,productReqDto);
-        log.info("============================"+productReqDto.getProductName());
-
+        adminService.acceptRequest(productId, productReqDto,productPhoto);
 
         return new ResponseEntity<>(HttpStatus.OK);
 

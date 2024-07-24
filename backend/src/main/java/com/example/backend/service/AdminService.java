@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -81,44 +82,31 @@ public class AdminService {
 //            return new AdminRespDto.RegProductRespDto(finalRequest);
 //        }
 //    }
-    @Transactional
-    public void acceptRequest(Long productId, ProductReqDto productReqDto){
-        String bucketName = "push";
-        String directoryPath = "shooong/dummy/products";
+@Transactional
+public void acceptRequest(Long productId, ProductReqDto productReqDto, MultipartFile productPhoto) {
+    String bucketName = "push";
+    String directoryPath = "shooong/dummy/products";
+    Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
+    Product request = productPs.orElseThrow();
 
-        Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
-        Product request = productPs.orElseThrow();
-
-        List<Product> registerProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
-        boolean isDuplicate = registerProducts.stream().anyMatch(registered->
-                request.getModelNum().equals(registered.getModelNum())&&
-                request.getProductSize().equals(registered.getProductSize()));
-        if (isDuplicate){
-            throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
-        }else {
-
-
-//            ProductReqDto reqDto = productReqDto.builder()
-//                    .productImg(productReqDto.getProductImg())
-//                    .productName(productReqDto.getProductName())
-//                    .productSize(productReqDto.getProductSize())
-//                    .productBrand(productReqDto.getProductBrand())
-//                    .originalPrice(productReqDto.getOriginalPrice())
-//                    .modelNum(productReqDto.getModelNum())
-//                    .productStatus(ProductStatus.REGISTERED)
-//                    .build();
-
-            // S3에 이미지 업로드
-            String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productReqDto.getProductPhoto());
+    List<Product> registerProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
+    boolean isDuplicate = registerProducts.stream().anyMatch(registered ->
+            request.getModelNum().equals(registered.getModelNum()) &&
+                    request.getProductSize().equals(registered.getProductSize()));
+    if (isDuplicate) {
+        throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
+    } else {
+        if (productPhoto != null && !productPhoto.isEmpty()) {
+            String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productPhoto);
             productReqDto.setProductImg(imageUrl);
-
-            request.registerProduct(productReqDto);
-
         }
 
-
+        request.registerProduct(productReqDto);
 
     }
+    }
+
+
     @Transactional
     //사용자가 요청한 상품, 중복시 삭제
     //중복 판별은 위에서 함
