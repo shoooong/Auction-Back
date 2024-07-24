@@ -42,6 +42,8 @@ public class Users extends BaseEntity {
     @Column(nullable = false)
     private boolean social;
 
+    @Column(nullable = false)
+    private boolean isUnregistered;
 
     public void updateUser(UserModifyReqDto userModifyReqDto, String imageUrl) {
         this.email = userModifyReqDto.getEmail();
@@ -51,5 +53,9 @@ public class Users extends BaseEntity {
         this.nickname = userModifyReqDto.getNickname();
         this.phoneNum = userModifyReqDto.getPhoneNum();
         this.profileImg = imageUrl;
+    }
+
+    public void unregisterUser(boolean isUnregistered) {
+        this.isUnregistered = isUnregistered;
     }
 }

@@ -36,8 +36,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     private static final List<String> AUTHENTICATED_ENDPOINTS = List.of(
         "/api/**",
-        "/*/api/**",
+            "/*/api/**",
             "/mypage/**",
+            "/user/unregister",
             "/luckydraw/*/enter",
             "/feed/user/**",
             "/inquiry/*/delete",

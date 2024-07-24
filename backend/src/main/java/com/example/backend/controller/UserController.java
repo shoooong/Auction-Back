@@ -89,4 +89,18 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // 회원 탈퇴
+    @PostMapping("/unregister")
+    public ResponseEntity<Void> unregisterUser(@RequestHeader("Authorization") String authHeader, @AuthenticationPrincipal UserDTO userDTO) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        tokenBlacklistService.addBlackList(authHeader);
+
+        userService.unregisterUser(userDTO.getUserId());
+
+        return ResponseEntity.ok().build();
+    }
+
 }

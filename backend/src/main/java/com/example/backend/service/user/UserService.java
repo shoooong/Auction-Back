@@ -241,6 +241,7 @@ public class UserService {
    /**
     * 마이페이지 메인 - 모든 정보 조회
     */
+   @Transactional
    public MypageMainDto getMyPageInfo(Long userId) {
       Users user = validateUserId(userId);
 
@@ -262,6 +263,19 @@ public class UserService {
               .saleHistoryDto(saleHistoryDto)
               .bookmarkProductsDto(bookmarkProductService.getLatestBookmarkProducts(userId))
               .build();
+   }
+
+   /**
+    * 회원 탈퇴
+    * isUnregistered = true 로 변경
+    */
+   @Transactional
+   public void unregisterUser(Long userId) {
+      Users user = validateUserId(userId);
+
+      user.unregisterUser(true);
+
+      userRepository.save(user);
    }
 
    /**
