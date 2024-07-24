@@ -158,7 +158,8 @@ public class UserService {
    }
 
    /**
-    * 소셜 로그인 - 해당 이메일을 가진 회원이 없을 경우 회원 등록하기 위해 임시 비밀번호 발급
+    * 임시 비밀번호 발급
+    * 소셜 로그인 시 해당 이메일을 가진 회원이 없을 경우 회원 등록하기 위해 임시 비밀번호 발급
     */
    public String makeTempPassword() {
       SecureRandom random = new SecureRandom();
@@ -172,6 +173,10 @@ public class UserService {
       return buffer.toString();
    }
 
+   /**
+    * @param kakaoAccountList 카카오에서 제공받은 프로필 리스트
+    * @return social(true) 설정된 Users 엔티티
+    */
    public Users makeSocialUser(List<String> kakaoAccountList) {
       String tempPassword = makeTempPassword();
       String email = kakaoAccountList.get(0);
@@ -191,7 +196,7 @@ public class UserService {
 
 
    /**
-    * 회원 정보 수정
+    * 회원 정보 조회
     */
    public UserModifyResDto getUser(Long userId) {
       Users user = validateUserId(userId);
@@ -204,6 +209,11 @@ public class UserService {
               .build();
    }
 
+   /**
+    * 회원 정보 수정
+    * @param userModifyReqDto nickname, phoneNum, password
+    * @param file profileImg
+    */
    @Transactional
    public void modifyUser(UserModifyReqDto userModifyReqDto, MultipartFile file) {
       Users user = userRepository.findByEmail(userModifyReqDto.getEmail())
