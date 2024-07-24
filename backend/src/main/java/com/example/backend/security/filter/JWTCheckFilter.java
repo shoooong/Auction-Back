@@ -58,7 +58,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/product/request",
             "/modifyAnnouncement/**",
             "/deleteAnnouncement/**",
-        "/bid/**"
+            "/bid/**",
+            "/select/bookmark",
+            "/delete/bookmark/**"
+
     );
 
     /**
