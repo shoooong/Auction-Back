@@ -187,9 +187,9 @@ public class ProductController {
     }
 
     // 상품 랭킹
-    @GetMapping("/{mainDepartment}/all_product_likes")
-    public ResponseEntity<?> allProductByLikes(@PathVariable String mainDepartment) {
-        List<ProductRankingDto> productRankingDtos = productService.getAllProductsByLikes(mainDepartment);
+    @GetMapping("/all_product_likes")
+    public ResponseEntity<?> allProductByLikes() {
+        List<ProductRankingDto> productRankingDtos = productService.getAllProductsByLikes();
         return new ResponseEntity<>(productRankingDtos, HttpStatus.OK);
     }
 
