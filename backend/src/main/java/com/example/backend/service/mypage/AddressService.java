@@ -30,6 +30,13 @@ public class AddressService {
     }
 
     /**
+     * 등록된 기본 배송지가 존재하는지 확인
+     */
+    public boolean validateDefaultAddress(Long userId) {
+        return addressRepository.existsDefaultAddressByUserUserId(userId);
+    }
+
+    /**
      * 배송지 등록
      */
     @Transactional
@@ -40,25 +47,29 @@ public class AddressService {
 
         if (existAddress) {
             throw new IllegalStateException("이미 존재하는 주소지입니다.");
+        }
+
+        if (!validateDefaultAddress(userId)) {
+            addressReqDto.setDefaultAddress(true);
         } else {
             updateDefaultAddress(userId, addressReqDto);
-
-            Address address = Address.builder()
-                    .user(Users.builder().userId(userId).build())
-                    .name(addressReqDto.getName())
-                    .addrPhone(addressReqDto.getAddrPhone())
-                    .zonecode(addressReqDto.getZonecode())
-                    .roadAddress(addressReqDto.getRoadAddress())
-                    .jibunAddress(addressReqDto.getJibunAddress())
-                    .detailAddress(addressReqDto.getDetailAddress())
-                    .extraAddress(addressReqDto.getExtraAddress())
-                    .defaultAddress(addressReqDto.isDefaultAddress())
-                    .build();
-
-            addressRepository.save(address);
-
-            return AddressDto.fromEntity(address);
         }
+
+        Address address = Address.builder()
+                .user(Users.builder().userId(userId).build())
+                .name(addressReqDto.getName())
+                .addrPhone(addressReqDto.getAddrPhone())
+                .zonecode(addressReqDto.getZonecode())
+                .roadAddress(addressReqDto.getRoadAddress())
+                .jibunAddress(addressReqDto.getJibunAddress())
+                .detailAddress(addressReqDto.getDetailAddress())
+                .extraAddress(addressReqDto.getExtraAddress())
+                .defaultAddress(addressReqDto.isDefaultAddress())
+                .build();
+
+        addressRepository.save(address);
+
+        return AddressDto.fromEntity(address);
     }
 
     /**
@@ -86,6 +97,16 @@ public class AddressService {
         Address address = validationAddress(userId, addressId);
 
         addressRepository.delete(address);
+
+        List<Address> remainAddresses =  addressRepository.findAllByUserId(userId);
+
+        if (remainAddresses.size() == 1) {
+            Address remainAddress = remainAddresses.get(0);
+            if (!remainAddress.getDefaultAddress()) {
+                remainAddress.updateDefaultAddress(true);
+                addressRepository.save(remainAddress);
+            }
+        }
     }
 
     /**

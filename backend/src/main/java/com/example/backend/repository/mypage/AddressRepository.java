@@ -31,6 +31,11 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     Optional<Address> findByAddressIdAndUserUserId(Long addressId, Long userId);
 
     /**
+     * 기본 배송지가 존재하는지 확인
+     */
+    boolean existsDefaultAddressByUserUserId(Long userId);
+
+    /**
      * 기존 기본 배송지 상태 변경
      */
     @Modifying
