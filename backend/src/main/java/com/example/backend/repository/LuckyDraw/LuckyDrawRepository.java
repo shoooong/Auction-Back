@@ -2,6 +2,8 @@ package com.example.backend.repository.LuckyDraw;
 
 import com.example.backend.entity.LuckyDraw;
 import com.example.backend.entity.enumData.LuckyProcessStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -32,5 +34,6 @@ public interface LuckyDrawRepository extends JpaRepository<LuckyDraw,Long> {
 
 
     //LuckyProcessStatus 상태에 따라 상품 조회
+    Page<LuckyDraw> findByLuckyProcessStatus(LuckyProcessStatus luckyProcessStatus, Pageable pageable);
     List<LuckyDraw> findByLuckyProcessStatus(LuckyProcessStatus luckyProcessStatus);
 }
