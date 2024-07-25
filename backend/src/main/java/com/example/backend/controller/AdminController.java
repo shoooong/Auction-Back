@@ -46,7 +46,7 @@ public class AdminController {
     }
 
     //요청상품 삭제
-    @DeleteMapping("/requests/{productId}")
+    @PostMapping("/requests/{productId}")
     public ResponseEntity<?> deleteReqProduct(@PathVariable Long productId) {
         adminService.deleteRequest(productId);
         return new ResponseEntity<>("중복 요청상품 삭제 완료",HttpStatus.OK);

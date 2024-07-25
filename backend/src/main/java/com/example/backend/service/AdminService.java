@@ -95,9 +95,9 @@ public void acceptRequest(Long productId, ProductReqDto productReqDto, Multipart
     public String deleteRequest(Long productId) {
 
         Optional<Product> productPs = productRepository.findById(productId);
-        productPs.ifPresent(product -> {productRepository.delete(product);});
+        productPs.ifPresent(product -> {product.changeProductStatus(ProductStatus.REJECTED);});
 
-        String message = productId.toString()+"삭제 완료";
+        String message = productId.toString()+"거절 완료";
 
         return message;
     }
