@@ -33,7 +33,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mypage")
+@RequestMapping("/api/mypage")
 @Log4j2
 public class MypageController {
 
