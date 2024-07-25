@@ -20,6 +20,7 @@ public class OrderDto {
     private Long userId;
     private Long productId;
     private Long biddingId;
+    private Long addressId;
     private OrderStatus orderStatus;
     private Long orderPrice;
     private LocalDateTime orderDate;

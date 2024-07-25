@@ -26,27 +26,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/coupon")
 @Log4j2
 public class CouponController {
 
     private final CouponService couponService;
     private final CouponIssueService couponIssueService;
 
-    @GetMapping("/time-attack")
+    @GetMapping("/coupon/time-attack")
     public ResponseEntity<List<CouponDto>> timeAttack(){
         List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
 
         return new ResponseEntity<>(couponDto, HttpStatus.OK);
     }
-    @PostMapping("/api/create")
+    @PostMapping("/api/coupon/create")
     public ResponseEntity<?> couponCreate(@RequestBody CouponCreateDto couponCreateDto){
         couponService.createCoupon(couponCreateDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
     }
 
-    @PostMapping("/api/{couponId}/issue")
+    @PostMapping("/api/coupon/{couponId}/issue")
     public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
         couponIssueService.issueCoupon(couponId, userDTO.getUserId());
 
@@ -55,7 +54,7 @@ public class CouponController {
 
 
 
-    @GetMapping("/api/user")
+    @GetMapping("/api/coupon/user")
     public ResponseEntity<List<UserCouponDto>> userCoupons(@AuthenticationPrincipal UserDTO userDTO){
         List<UserCouponDto> userCoupons= couponIssueService.userCoupons(userDTO.getUserId());
 

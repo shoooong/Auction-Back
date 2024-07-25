@@ -42,6 +42,8 @@ public class BuyingBiddingDto {
 
     private BiddingStatus biddingStatus;
 
+    private Long addressId;
+
 //    public BuyingBidding toEntity() {
 //        return BuyingBidding.builder()
 //            .buyingBiddingId(this.buyingBiddingId)

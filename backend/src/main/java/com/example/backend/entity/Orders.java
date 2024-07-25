@@ -46,6 +46,10 @@ public class Orders extends BaseEntity {
     @JoinColumn(name = "couponID")
     private Coupon coupon;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "addressID")
+    private Address address;
+
     public void changeOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }

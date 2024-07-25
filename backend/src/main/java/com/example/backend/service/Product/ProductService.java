@@ -1,6 +1,7 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.admin.ProductRespDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import org.springframework.data.domain.Pageable;
@@ -55,4 +56,6 @@ public interface ProductService {
     void incrementProductLikes(String modelNum);
 
     List<ProductRankingDto> getAllProductsByLikes(String mainDepartment);
+
+    OrderProductDto getProductOne(Long productId);
 }

@@ -3,13 +3,17 @@ package com.example.backend.controller.order;
 import com.example.backend.dto.orders.AddressInfoDto;
 import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.orders.PaymentDto;
 import com.example.backend.dto.orders.SaleOrderDto;
 import com.example.backend.dto.orders.SalesBiddingDto;
+import com.example.backend.dto.product.ProductResponseDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.service.BuyingBiddingService;
 import com.example.backend.service.OrdersService;
+import com.example.backend.service.Product.ProductService;
+import com.example.backend.service.Product.ProductServiceImpl;
 import com.example.backend.service.SalesBiddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,15 +37,18 @@ public class OrderController {
     private final OrdersService ordersService;
     private final BuyingBiddingService buyingBiddingService;
     private final SalesBiddingService salesBiddingService;
+    private final ProductService productService;
 
-    @PostMapping("/buy")
-    public ResponseEntity<?> buyOrder(@AuthenticationPrincipal UserDTO userDTO,
-        @RequestBody BuyOrderDto buyOrderDto) {
-//        buyOrderDto.setUserId(userDTO.getUserId());
-        ordersService.createBuyOrder(userDTO, buyOrderDto);
+//    @PostMapping("/buy")
+//    public ResponseEntity<?> buyOrder(@AuthenticationPrincipal UserDTO userDTO,
+//        @RequestBody BuyOrderDto buyOrderDto) {
+////        buyOrderDto.setUserId(userDTO.getUserId());
+//        ordersService.createBuyOrder(userDTO, buyOrderDto);
+//
+//        return new ResponseEntity<>(buyOrderDto, HttpStatus.OK);
+//    }
 
-        return new ResponseEntity<>(buyOrderDto, HttpStatus.OK);
-    }
+
 
     @GetMapping("/addr") // 배송지 반환
     public ResponseEntity<?> addrInfo(@AuthenticationPrincipal UserDTO userDTO){
@@ -52,7 +59,7 @@ public class OrderController {
     @PostMapping("/sales") //
     public ResponseEntity<?> salesOrder(@AuthenticationPrincipal UserDTO userDTO, @RequestBody
     SaleOrderDto saleOrderDto) {
-        ordersService.createSaleOrder(userDTO, saleOrderDto);
+//        ordersService.createSaleOrder(userDTO, saleOrderDto);
 
         return new ResponseEntity<>(saleOrderDto, HttpStatus.OK);
     }
@@ -69,11 +76,21 @@ public class OrderController {
         return new ResponseEntity<>(salesBiddingDto, HttpStatus.OK);
     }
 
-    @GetMapping("toss/success")
+    @GetMapping("/toss/success")
     public ResponseEntity<?> tossSuccess(@AuthenticationPrincipal UserDTO userDTO, @RequestBody
         PaymentDto paymentDto){
         return null;
     }
+
+    @GetMapping("/productOne")
+    public ResponseEntity<?> getProduct(@AuthenticationPrincipal UserDTO userDTO, @RequestParam Long productId) {
+        OrderProductDto orderProductDto = productService.getProductOne(productId);
+
+        return new ResponseEntity<>(orderProductDto, HttpStatus.OK);
+
+
+    }
+
 
 
 }

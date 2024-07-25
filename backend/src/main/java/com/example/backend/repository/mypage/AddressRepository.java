@@ -24,6 +24,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
      */
     boolean existsByZonecodeAndRoadAddressAndUserUserId(String zonecode, String roadAddress, Long userId);
 
+
     /**
      * addressId와 userId로 Address 조회
      */
@@ -36,4 +37,5 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     @Query("UPDATE Address a SET a.defaultAddress = false WHERE a.user.userId = :userId AND a.defaultAddress = true")
     void updateDefaultAddress(Long userId);
 
+    Optional<Address> findByUserUserIdAndDefaultAddressTrue(Long userId);
 }

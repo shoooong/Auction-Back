@@ -2,6 +2,7 @@ package com.example.backend.controller.bid;
 
 import com.example.backend.dto.orders.BiddingRequestDto;
 import com.example.backend.dto.orders.BuyOrderDto;
+import com.example.backend.dto.orders.SaleOrderDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.BuyingBiddingService;
 import com.example.backend.service.SalesBiddingService;
@@ -25,23 +26,41 @@ public class BidController {
     private final SalesBiddingService salesBiddingService;
 
 
+//    @PostMapping("/buyingBidding/register")
+//    public ResponseEntity<?> buyingBidding(@AuthenticationPrincipal UserDTO userDTO,
+//        @RequestBody BiddingRequestDto buyingInfo) {
+//
+//        buyingBiddingService.registerBuyingBidding(userDTO, buyingInfo);
+//
+//        return new ResponseEntity<>(buyingInfo, HttpStatus.OK);
+//    }
+
     @PostMapping("/buyingBidding/register")
     public ResponseEntity<?> buyingBidding(@AuthenticationPrincipal UserDTO userDTO,
-        @RequestBody BiddingRequestDto buyingInfo) {
+        @RequestBody BuyOrderDto buyOrderDto) {
 
-        buyingBiddingService.registerBuyingBidding(userDTO, buyingInfo);
+        buyingBiddingService.registerBuyingBidding(userDTO, buyOrderDto);
 
-        return new ResponseEntity<>(buyingInfo, HttpStatus.OK);
+        return new ResponseEntity<>(buyOrderDto, HttpStatus.OK);
     }
 
-    @PostMapping("/salesBidding/register")
-    public ResponseEntity<?> salesBidding(@AuthenticationPrincipal UserDTO userDTO,
-        @RequestBody BiddingRequestDto buyingInfo) {
+//    @PostMapping("/salesBidding/register")
+//    public ResponseEntity<?> salesBidding(@AuthenticationPrincipal UserDTO userDTO,
+//        @RequestBody BiddingRequestDto buyingInfo) {
+//
+//        salesBiddingService.registerSalesBidding(userDTO, buyingInfo);
+//
+//        return new ResponseEntity<>(buyingInfo, HttpStatus.OK);
+//    }
+@PostMapping("/salesBidding/register")
+public ResponseEntity<?> salesBidding(@AuthenticationPrincipal UserDTO userDTO,
+    @RequestBody SaleOrderDto saleOrderDto) {
 
-        salesBiddingService.registerSalesBidding(userDTO, buyingInfo);
+    salesBiddingService.registerSalesBidding(userDTO, saleOrderDto);
 
-        return new ResponseEntity<>(buyingInfo, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(saleOrderDto, HttpStatus.OK);
+}
+
 
 
 
