@@ -21,7 +21,7 @@ public class LuckyDrawAnnouncementController {
     private LuckyDrawAnnouncementService luckyDrawAnnouncementService;
 
     // 이벤트 공지사항 등록
-    @PostMapping("/announcementRegistration")
+    @PostMapping("/api/announcementRegistration")
     @ResponseStatus(HttpStatus.CREATED)
     public LuckyDrawAnnouncement createLuckyDrawAnnouncement(
             @RequestBody LuckyDrawAnnouncementDto luckyDrawAnnouncementDto,
@@ -52,7 +52,7 @@ public class LuckyDrawAnnouncementController {
         return luckyDrawAnnouncementDto;
     }
     // 이벤트 공지사항 조회-관리자
-    @GetMapping("/admin/luckyDrawAnnouncementList")
+    @GetMapping("/api/admin/luckyDrawAnnouncementList")
     public List<LuckyDrawAnnouncementDto> adminLuckyDrawAnnouncementList(){
         List<LuckyDrawAnnouncementDto> announcement = luckyDrawAnnouncementService.getAllAdminLuckyDrawAnnouncementList();
         log.info("관리자 조회 완료{}", announcement);
@@ -60,7 +60,7 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 관리자용 이벤트 공지사항 상세조회
-    @GetMapping("/admin/luckyDrawAnnouncement/{announcementId}")
+    @GetMapping("/api/admin/luckyDrawAnnouncement/{announcementId}")
     public LuckyDrawAnnouncementDto adminLuckyDrawAnnouncement(@PathVariable Long announcementId){
         LuckyDrawAnnouncementDto luckyDrawAnnouncementDto = luckyDrawAnnouncementService.findAdminLuckyDrawAnnouncementById(announcementId);
         log.info("관리자 이벤트 공지사항 상세조회 완료: {}", luckyDrawAnnouncementDto);
@@ -68,7 +68,7 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 이벤트 공지사항 수정
-    @PutMapping("/modifyAnnouncement/{announcementId}")
+    @PutMapping("/api/modifyAnnouncement/{announcementId}")
     public LuckyDrawAnnouncementDto updateLuckyDrawAnnouncement(
             @PathVariable Long announcementId,
             @RequestBody LuckyDrawAnnouncementDto luckyDrawAnnouncementDto,
@@ -82,7 +82,7 @@ public class LuckyDrawAnnouncementController {
     }
 
     // 이벤트 공지사항 삭제
-    @DeleteMapping("/deleteAnnouncement/{announcementId}")
+    @DeleteMapping("/api/deleteAnnouncement/{announcementId}")
     public void deleteLuckyDrawAnnouncement(@PathVariable Long announcementId,
                                             @AuthenticationPrincipal UserDTO userDTO) {
 

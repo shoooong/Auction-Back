@@ -16,14 +16,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/inquiry")
 public class inquiryController {
 
     @Autowired
     private InquiryService inquiryService;
 
     // 1:1 문의 등록
-    @PostMapping("/user/registration")
+    @PostMapping("/api/user/registration")
     @ResponseStatus(HttpStatus.CREATED)
     public void createInquiry(@RequestBody InquiryDto inquiryDto,
                               @AuthenticationPrincipal UserDTO userDTO) {
@@ -34,7 +33,7 @@ public class inquiryController {
     }
 
     // 1:1 문의 조회
-    @GetMapping("/inquiryList")
+    @GetMapping("/api/inquiryList")
     public List<InquiryDto> getAllInquiryList(@AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
             throw new IllegalArgumentException("userDTO is null");
@@ -46,7 +45,7 @@ public class inquiryController {
     }
 
     // 1:1 문의 조회 - 관리자용
-    @GetMapping("/admin/inquiryList")
+    @GetMapping("/api/admin/inquiryList")
     public List<InquiryDto> getAllInquiryListAdmin(@AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null || !userDTO.isRole()) {
             throw new IllegalArgumentException("Access denied");
@@ -58,7 +57,7 @@ public class inquiryController {
 
 
     // 1:1 문의 상세조회
-    @GetMapping("/{inquiryId}")
+    @GetMapping("/api/{inquiryId}")
     public InquiryDto getInquiry(@PathVariable Long inquiryId,
                                  @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null) {
@@ -71,7 +70,7 @@ public class inquiryController {
     }
 
     // 1:1 문의 상세조회 - 관리자용
-    @GetMapping("/admin/{inquiryId}")
+    @GetMapping("/api/admin/{inquiryId}")
     public InquiryDto getInquiryForAdmin(@PathVariable Long inquiryId,
                                          @AuthenticationPrincipal UserDTO userDTO) {
         if (userDTO == null || !userDTO.isRole()) {
@@ -83,7 +82,7 @@ public class inquiryController {
     }
 
     // 1:1 문의 삭제
-    @DeleteMapping("/{inquiryId}/delete")
+    @DeleteMapping("/api/{inquiryId}/delete")
     public void deleteInquiry(@PathVariable Long inquiryId,
                               @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -91,7 +90,7 @@ public class inquiryController {
     }
 
     // 1대1 문의 답변 등록 - 관리자
-    @PostMapping("/inquiryResponseRegistration/{inquiryId}")
+    @PostMapping("/api/inquiryResponseRegistration/{inquiryId}")
     @ResponseStatus(HttpStatus.CREATED)
     public InquiryResponseDto createInquiryResponse(@PathVariable Long inquiryId,
                                                     @RequestBody InquiryResponseDto inquiryResponseDto,
@@ -110,7 +109,7 @@ public class inquiryController {
 
 
     // 1:1 문의 답변 삭제 - 관리자용
-    @DeleteMapping("/admin/delete/{responseId}")
+    @DeleteMapping("/api/admin/delete/{responseId}")
     public void deleteInquiryResponse(@PathVariable Long responseId) {
         inquiryService.deleteInquiryResponse(responseId);
     }

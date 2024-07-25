@@ -557,10 +557,10 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // 피드 랭킹
+    // 상품 랭킹
     @Override
-    public List<ProductRankingDto> getAllProductsByLikes(String mainDepartment) {
-        return productRepository.searchAllProductByLikes(mainDepartment);
+    public List<ProductRankingDto> getAllProductsByLikes() {
+        return productRepository.searchAllProductByLikes();
     }
 
     @Override

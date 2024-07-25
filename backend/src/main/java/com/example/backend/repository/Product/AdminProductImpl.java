@@ -8,9 +8,13 @@ import com.example.backend.entity.enumData.SalesStatus;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,29 +69,35 @@ public class AdminProductImpl implements AdminProduct {
 
     //판매 상품 대분류 소분류별로 조회
     @Override
-    public List<AdminProductDto> getProductsByDepartment(String mainDepartment, String subDepartment) {
-        QProduct product = new QProduct("product");
-        log.info("mainDepartment {} subDepartment from 쿼리디에셀", mainDepartment, subDepartment);
-        return queryFactory.select(
-//                순서 중요
-                        Projections.constructor(AdminProductDto.class,
+    public Page<AdminProductDto> getProductsByDepartment(String mainDepartment, String subDepartment, Pageable pageable) {
+        QProduct product = QProduct.product;
 
+        JPAQuery<AdminProductDto> query = queryFactory.select(
+                        Projections.constructor(AdminProductDto.class,
                                 product.productId,
                                 product.productName,
                                 product.modelNum,
                                 product.productBrand,
                                 product.productSize,
                                 product.mainDepartment,
-                                product.subDepartment
-                        )
+                                product.subDepartment)
                 ).from(product)
                 .where(
-                        eqMain(mainDepartment).and(isRegistered()),
-                        eqSub(subDepartment)
+                        eqMain(mainDepartment),
+                        eqSub(subDepartment),
+                        isRegistered()
                 )
-                .groupBy(product.modelNum)
+                .groupBy(product.modelNum);
+
+        long total = query.fetchCount();
+        List<AdminProductDto> results = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(results, pageable, total);
     }
+
 
     //
 //    //상품상세 조회(모델명 + 사이즈) 기준으로 구분, 사이즈별 구매입찰, 판매입찰 상태 조회,

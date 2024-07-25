@@ -8,6 +8,7 @@ import com.example.backend.service.AdminService;
 import com.example.backend.service.notice.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,8 @@ public class AdminController {
     private final NoticeService noticeService;
     //요청상품 전체조회
     @GetMapping("/requests")
-    public ResponseEntity<?> findReqProduct() {
-        AdminRespDto.ReqProductsRespDto regProductRespDto = adminService.reqProducts();
+    public ResponseEntity<?> findReqProduct(Pageable pageable) {
+        AdminRespDto.ReqProductsRespDto regProductRespDto = adminService.reqProducts(pageable);
         return new ResponseEntity<>(regProductRespDto, HttpStatus.OK);
     }
 
@@ -36,25 +37,12 @@ public class AdminController {
         return new ResponseEntity<>(reqProductRespDto, HttpStatus.OK);
     }
 
-//    // 요청상품 판매상품으로 등록
-//    @PutMapping("/requests/{productId}")
-//    public ResponseEntity<?> acceptReqProduct(@PathVariable Long productId) {
-//        try {
-//            AdminRespDto.RegProductRespDto regProductRespDto = adminService.acceptRequest(productId);
-//            return new ResponseEntity<>(regProductRespDto, HttpStatus.OK);
-//        } catch (RuntimeException e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
     //요청상품 판매 상품으로 등록 ver2
-
     @PutMapping("/requests/{productId}")
     public ResponseEntity<?> saveReqProduct(@PathVariable Long productId, @RequestPart(value = "productReqDto") ProductReqDto productReqDto, @RequestPart(value = "productPhoto", required = false) MultipartFile productPhoto){
 
         adminService.acceptRequest(productId, productReqDto,productPhoto);
-
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 
     //요청상품 삭제
@@ -66,17 +54,15 @@ public class AdminController {
 
     //관리자 상품 카테고리별 조회(대분류, 소분류)
     @GetMapping("/products/{mainDepartment}")
-    public ResponseEntity<?> getProductsByDepartment(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment) {
+    public ResponseEntity<?> getProductsByDepartment(@PathVariable String mainDepartment, @RequestParam(value = "subDepartment", required = false) String subDepartment, Pageable pageable) {
 
-        AdminRespDto.AdminProductResponseDto products= adminService.getProducts(mainDepartment, subDepartment);
+        AdminProductResponseDto products= adminService.getProducts(mainDepartment, subDepartment,pageable);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     //관리자 상품 상세 조회(구매입찰 + 판매입찰)
     @GetMapping("/products/detailed/{modelNum}")
     public ResponseEntity<?> findDetailedProduct(@PathVariable String modelNum, @RequestParam(value = "productSize", required = false) String productSize) {
-        log.info("$$$$$$$$$$$$$$");
-        log.info("modelNum{} productSize{}", modelNum, productSize);
 
         //modelnum을 이용해서 상품 상세 조회, size에 따라 카테고리 조회하듯이 입찰 정보 불러오기
         AdminRespDto.AdminProductDetailRespDto detailedProduct =  adminService.getDetailProduct(modelNum, productSize);
@@ -96,8 +82,8 @@ public class AdminController {
 
     //관리자 럭키드로우 LuckDrawStatus로 다건 조회
     @GetMapping("/luckyList")
-    public ResponseEntity<?> findLuckydarwList(@RequestParam(defaultValue = "READY") LuckyProcessStatus luckyProcessStatus) {
-        AdminRespDto.LuckyDrawsRespDto luckyDrawList = adminService.getLuckyDraws(luckyProcessStatus);
+    public ResponseEntity<?> findLuckydarwList(@RequestParam(defaultValue = "READY") LuckyProcessStatus luckyProcessStatus, Pageable pageable) {
+        AdminRespDto.LuckyDrawsRespDto luckyDrawList = adminService.getLuckyDraws(luckyProcessStatus,pageable);
         return new ResponseEntity<>(luckyDrawList,HttpStatus.OK);
     }
 
@@ -106,10 +92,8 @@ public class AdminController {
     public ResponseEntity<?> findLuckydraw(@PathVariable Long luckyId) {
 
         LuckyDrawsDto luckyOne = adminService.getLucky(luckyId);
-
         return new ResponseEntity<>(luckyOne,HttpStatus.OK);
     }
-
 
     //럭키드로우 상품 등록
     @PostMapping("/luckydraw/insert")
@@ -121,14 +105,4 @@ public class AdminController {
 
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
-
-
-
-
-
-
-
-
-
-
 }
