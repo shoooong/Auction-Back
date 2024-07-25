@@ -26,6 +26,8 @@ public class Orders extends BaseEntity {
 
     private BigDecimal orderPrice;
 
+    private String memo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private Users user;
