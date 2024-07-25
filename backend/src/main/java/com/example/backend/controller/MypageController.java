@@ -98,9 +98,7 @@ public class MypageController {
     // 배송지 등록
     @PostMapping("/address")
     public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-        log.info("addAddress AddressReqDto: {}", addressReqDto);
-        AddressDto addressDto = addressService.addAddress(userId, addressReqDto);
+        AddressDto addressDto = addressService.addAddress(userDTO.getUserId(), addressReqDto);
 
         return ResponseEntity.ok(addressDto);
     }
@@ -118,9 +116,7 @@ public class MypageController {
     // 배송지 삭제
     @DeleteMapping("/address")
     public ResponseEntity<String> deleteAddress(@RequestParam Long addressId, @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-
-        addressService.deleteAddress(userId, addressId);
+        addressService.deleteAddress(userDTO.getUserId(), addressId);
 
         return ResponseEntity.ok("Address deleted successfully!");
     }
