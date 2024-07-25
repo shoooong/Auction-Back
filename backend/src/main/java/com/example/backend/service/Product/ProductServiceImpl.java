@@ -43,10 +43,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository,
-                              BuyingBiddingRepository buyingBiddingRepository,
-                              PhotoReviewRepository photoReviewRepository,
-                              UserRepository userRepository,
-                              SalesBiddingRepository salesBiddingRepository) {
+        BuyingBiddingRepository buyingBiddingRepository,
+        PhotoReviewRepository photoReviewRepository,
+        UserRepository userRepository,
+        SalesBiddingRepository salesBiddingRepository) {
         this.productRepository = productRepository;
         this.buyingBiddingRepository = buyingBiddingRepository;
         this.photoReviewRepository = photoReviewRepository;
@@ -117,45 +117,47 @@ public class ProductServiceImpl implements ProductService {
 
             List<PhotoReviewDto> photoReviewDtoList = selectPhotoReview(modelNum);
 
-            List<GroupByBuyingDto> groupByBuyingDtoList = productRepository.groupByBuyingSize(modelNum);
+            List<GroupByBuyingDto> groupByBuyingDtoList = productRepository.groupByBuyingSize(
+                modelNum);
 
-            List<GroupBySalesDto> groupBySalesDtoList = productRepository.groupBySalesSize(modelNum);
+            List<GroupBySalesDto> groupBySalesDtoList = productRepository.groupBySalesSize(
+                modelNum);
 
             RecentlyPriceDto recentlyContractPrice = selectRecentlyPrice(modelNum);
 
             AveragePriceResponseDto averagePriceResponseDtoList = getAveragePrices(modelNum);
 
             ProductDetailDto productDetailDto = ProductDetailDto.builder()
-                    .productId(product.getProductId())
-                    .productImg(product.getProductImg())
-                    .productBrand(product.getProductBrand())
-                    .modelNum(product.getModelNum())
-                    .productName(product.getProductName())
-                    .createDate(product.getCreateDate())
-                    .originalPrice(product.getOriginalPrice())
-                    .productLike(product.getProductLike())
-                    .subDepartment(product.getSubDepartment())
+                .productId(product.getProductId())
+                .productImg(product.getProductImg())
+                .productBrand(product.getProductBrand())
+                .modelNum(product.getModelNum())
+                .productName(product.getProductName())
+                .createDate(product.getCreateDate())
+                .originalPrice(product.getOriginalPrice())
+                .productLike(product.getProductLike())
+                .subDepartment(product.getSubDepartment())
 
-                    .buyingBiddingPrice(priceValue.getBuyingBiddingPrice())
-                    .salesBiddingPrice(priceValue.getSalesBiddingPrice())
+                .buyingBiddingPrice(priceValue.getBuyingBiddingPrice())
+                .salesBiddingPrice(priceValue.getSalesBiddingPrice())
 
-                    .latestPrice(recentlyContractPrice.getLatestPrice())
-                    .previousPrice(recentlyContractPrice.getPreviousPrice())
-                    .changePercentage(recentlyContractPrice.getChangePercentage())
-                    .recentlyContractDate(recentlyContractPrice.getSalesBiddingTime())
-                    .differenceContract(recentlyContractPrice.getDifferenceContract())
+                .latestPrice(recentlyContractPrice.getLatestPrice())
+                .previousPrice(recentlyContractPrice.getPreviousPrice())
+                .changePercentage(recentlyContractPrice.getChangePercentage())
+                .recentlyContractDate(recentlyContractPrice.getSalesBiddingTime())
+                .differenceContract(recentlyContractPrice.getDifferenceContract())
 
-                    .contractInfoList(contractInfoList)
-                    .buyingHopeList(buyingHopeDtoList)
-                    .salesHopeList(salesHopeDtoList)
+                .contractInfoList(contractInfoList)
+                .buyingHopeList(buyingHopeDtoList)
+                .salesHopeList(salesHopeDtoList)
 
-                    .photoReviewList(photoReviewDtoList)
+                .photoReviewList(photoReviewDtoList)
 
-                    .groupByBuyingList(groupByBuyingDtoList)
-                    .groupBySalesList(groupBySalesDtoList)
+                .groupByBuyingList(groupByBuyingDtoList)
+                .groupBySalesList(groupBySalesDtoList)
 
-                    .averagePriceResponseList(averagePriceResponseDtoList)
-                    .build();
+                .averagePriceResponseList(averagePriceResponseDtoList)
+                .build();
 
             log.info("상세상품 변환 완료 : {}", productDetailDto);
             return productDetailDto;
@@ -167,13 +169,13 @@ public class ProductServiceImpl implements ProductService {
     public void updateDate(Long recentlyProductId) {
         if (isUpdated) {
             productRepository.findProductsByProductId(recentlyProductId)
-                    .ifPresent(product -> {
-                        product.updateLatestDate(LocalDateTime.now());
-                        productRepository.save(product);
-                        log.info("서버 종료 시점 저장 완료 : {}", LocalDateTime.now());
-                        productRepository.flush();
-                        entityManager.clear();
-                    });
+                .ifPresent(product -> {
+                    product.updateLatestDate(LocalDateTime.now());
+                    productRepository.save(product);
+                    log.info("서버 종료 시점 저장 완료 : {}", LocalDateTime.now());
+                    productRepository.flush();
+                    entityManager.clear();
+                });
         }
     }
 
@@ -181,11 +183,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RecentlyPriceDto selectRecentlyPrice(String modelNum) {
-        Optional<Product> oldContractValue = productRepository.findFirstByModelNumOrderByLatestDateDesc(modelNum);
+        Optional<Product> oldContractValue = productRepository.findFirstByModelNumOrderByLatestDateDesc(
+            modelNum);
         lastCheckedTime = oldContractValue.map(Product::getLatestDate).orElse(LocalDateTime.now());
         log.info("!!! 서버가 마지막까지 유지했던 시간 : {}", lastCheckedTime);
 
-        List<SalesBiddingDto> newAllContractSelect = productRepository.recentlyTransaction(modelNum);
+        List<SalesBiddingDto> newAllContractSelect = productRepository.recentlyTransaction(
+            modelNum);
         log.info("최근 체결 내역 조회 : {} ", newAllContractSelect);
         if (newAllContractSelect.isEmpty()) {
             log.info("체결된 거래가 없습니다.");
@@ -197,10 +201,10 @@ public class ProductServiceImpl implements ProductService {
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
         RecentlyPriceDto recentlyPriceDto = RecentlyPriceDto.builder()
-                .latestPrice(recentlyContractValue.getLatestPrice())
-                .salesBiddingTime(recentlyContractTime)
-                .salesBiddingPrice(recentlyContractValue.getSalesBiddingPrice())
-                .build();
+            .latestPrice(recentlyContractValue.getLatestPrice())
+            .salesBiddingTime(recentlyContractTime)
+            .salesBiddingPrice(recentlyContractValue.getSalesBiddingPrice())
+            .build();
 
         if (lastCheckedTime.isBefore(recentlyContractTime)) {
             for (SalesBiddingDto product : newAllContractSelect) {
@@ -213,11 +217,13 @@ public class ProductServiceImpl implements ProductService {
             BigDecimal recentlyContractPrice = recentlyContractValue.getLatestPrice();
             BigDecimal previousContractPrice = oldContractValue.get().getLatestPrice();
 
-            log.info("업데이트 전 recentlyProductId : {}, recentlyContractPrice : {}", recentlyProductId, recentlyContractPrice);
+            log.info("업데이트 전 recentlyProductId : {}, recentlyContractPrice : {}", recentlyProductId,
+                recentlyContractPrice);
 
             if (previousContractPrice != null) {
                 productRepository.updatePreviousPrice(recentlyProductId, previousContractPrice);
-                log.info("Updated previousPrice for productId: {} with price: {}", recentlyProductId, previousContractPrice);
+                log.info("Updated previousPrice for productId: {} with price: {}",
+                    recentlyProductId, previousContractPrice);
             } else {
                 log.warn("previousContractPrice is null, skipping update for previousPrice");
             }
@@ -228,8 +234,8 @@ public class ProductServiceImpl implements ProductService {
 
             BigDecimal result = recentlyContractPrice.subtract(previousContractPrice);
             BigDecimal changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
-                    .divide(previousContractPrice, MathContext.DECIMAL128)
-                    .multiply(BigDecimal.valueOf(100));
+                .divide(previousContractPrice, MathContext.DECIMAL128)
+                .multiply(BigDecimal.valueOf(100));
 
             Long resultAsLong = result.longValueExact();
 
@@ -237,7 +243,8 @@ public class ProductServiceImpl implements ProductService {
             DecimalFormat df = new DecimalFormat("#.#");
             String format = df.format(changePercentage);
             double finalChangePercentage = Double.parseDouble(format);
-            productRepository.updateRecentlyContractPercentage(recentlyProductId, finalChangePercentage);
+            productRepository.updateRecentlyContractPercentage(recentlyProductId,
+                finalChangePercentage);
             productRepository.updateDifferenceContract(recentlyProductId, resultAsLong);
             recentlyPriceDto.setDifferenceContract(resultAsLong);
             recentlyPriceDto.setChangePercentage(finalChangePercentage);
@@ -250,13 +257,13 @@ public class ProductServiceImpl implements ProductService {
         } else {
             log.info("현재 등록된 거래가 최신입니다.");
             return RecentlyPriceDto.builder()
-                    .latestPrice(oldContractValue.get().getLatestPrice())
-                    .differenceContract(oldContractValue.get().getDifferenceContract())
-                    .previousPrice(oldContractValue.get().getPreviousPrice())
-                    .changePercentage(oldContractValue.get().getPreviousPercentage())
-                    .salesBiddingTime(oldContractValue.get().getLatestDate())
-                    .salesBiddingPrice(oldContractValue.get().getLatestPrice())
-                    .build();
+                .latestPrice(oldContractValue.get().getLatestPrice())
+                .differenceContract(oldContractValue.get().getDifferenceContract())
+                .previousPrice(oldContractValue.get().getPreviousPrice())
+                .changePercentage(oldContractValue.get().getPreviousPercentage())
+                .salesBiddingTime(oldContractValue.get().getLatestDate())
+                .salesBiddingPrice(oldContractValue.get().getLatestPrice())
+                .build();
         }
         return recentlyPriceDto;
     }
@@ -269,12 +276,12 @@ public class ProductServiceImpl implements ProductService {
         List<SalesBiddingDto> temp = productRepository.recentlyTransaction(modelNum);
 
         return temp.stream()
-                .map(contractValue -> ProductsContractListDto.builder()
-                        .productSize(contractValue.getProductSize())
-                        .productContractPrice(contractValue.getLatestPrice())
-                        .productContractDate(contractValue.getSalesBiddingTime())
-                        .build())
-                .collect(Collectors.toList());
+            .map(contractValue -> ProductsContractListDto.builder()
+                .productSize(contractValue.getProductSize())
+                .productContractPrice(contractValue.getLatestPrice())
+                .productContractDate(contractValue.getSalesBiddingTime())
+                .build())
+            .collect(Collectors.toList());
     }
 
     // 입찰 판매 희망 내역(리스트)
@@ -313,7 +320,7 @@ public class ProductServiceImpl implements ProductService {
         Map<String, BuyingHopeDto> groupedResults = new LinkedHashMap<>();
 
         Optional<BuyingHopeDto> lowestPrice = temp.stream()
-                .min(Comparator.comparing(BuyingHopeDto::getBuyingBiddingPrice));
+            .min(Comparator.comparing(BuyingHopeDto::getBuyingBiddingPrice));
 
         if (lowestPrice.isPresent()) {
             BuyingHopeDto lowest = lowestPrice.get();
@@ -326,7 +333,8 @@ public class ProductServiceImpl implements ProductService {
 
             // 이미 존재하는 항목이면 수량 증가, 아니면 새로 추가
             groupedResults.merge(key, hope, (existing, newHope) -> {
-                existing.setBuyingQuantity(existing.getBuyingQuantity() + newHope.getBuyingQuantity());
+                existing.setBuyingQuantity(
+                    existing.getBuyingQuantity() + newHope.getBuyingQuantity());
                 return existing;
             });
         }
@@ -335,36 +343,37 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("리스트로 변환 : {}, ", resultList);
 
-
         return resultList.stream()
-                .map(this::convertBuyingDto)
-                .collect(Collectors.toList());
+            .map(this::convertBuyingDto)
+            .collect(Collectors.toList());
     }
 
     private BuyingHopeDto convertBuyingDto(BuyingHopeDto hope) {
         return BuyingHopeDto.builder()
-                .productSize(hope.getProductSize())
-                .buyingQuantity(hope.getBuyingQuantity())
-                .buyingBiddingPrice(hope.getBuyingBiddingPrice())
-                .build();
+            .productSize(hope.getProductSize())
+            .buyingQuantity(hope.getBuyingQuantity())
+            .buyingBiddingPrice(hope.getBuyingBiddingPrice())
+            .build();
     }
 
     @Transactional
     public void addPhotoReview(PhotoRequestDto photoRequestDto) {
         Product product = productRepository.findFirstByModelNum(photoRequestDto.getModelNum())
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
 
         Users user = userRepository.findById(photoRequestDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
 
         PhotoReview photoReview = PhotoReview.builder()
-                .products(product)
-                .user(user)
-                .reviewLike(0)
-                .reviewImg(photoRequestDto.getReviewImg())
-                .reviewId(photoRequestDto.getReviewId())
-                .reviewContent(photoRequestDto.getReviewContent())
-                .build();
+            .products(product)
+            .user(user)
+            .reviewLike(0)
+            .reviewImg(photoRequestDto.getReviewImg())
+            .reviewId(photoRequestDto.getReviewId())
+            .reviewContent(photoRequestDto.getReviewContent())
+            .build();
 
         photoReviewRepository.save(photoReview);
         log.info("성공!!");
@@ -373,26 +382,29 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void updatePhotoReview(PhotoRequestDto photoRequestDto) {
         PhotoReview review = photoReviewRepository.findById(photoRequestDto.getReviewId())
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + photoRequestDto.getReviewId()));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "리뷰를 찾을 수 없습니다: " + photoRequestDto.getReviewId()));
 
         Product product = productRepository.findFirstByModelNum(photoRequestDto.getModelNum())
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "상품을 찾을 수 없습니다: " + photoRequestDto.getModelNum()));
 
         Users user = userRepository.findById(photoRequestDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "사용자를 찾을 수 없습니다: " + photoRequestDto.getUserId()));
 
         if (!review.getUser().getUserId().equals(photoRequestDto.getUserId())) {
             throw new IllegalArgumentException("해당 리뷰를 수정할 권한이 없습니다.");
         }
         // 리뷰 수정
         PhotoReview photoReview = PhotoReview.builder()
-                .products(product)
-                .user(user)
-                .reviewId(review.getReviewId())
-                .reviewLike(0)
-                .reviewImg(photoRequestDto.getReviewImg())
-                .reviewContent(photoRequestDto.getReviewContent())
-                .build();
+            .products(product)
+            .user(user)
+            .reviewId(review.getReviewId())
+            .reviewLike(0)
+            .reviewImg(photoRequestDto.getReviewImg())
+            .reviewContent(photoRequestDto.getReviewContent())
+            .build();
 
         photoReviewRepository.save(photoReview);
         log.info("리뷰가 성공적으로 수정되었습니다.");
@@ -400,7 +412,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deletePhotoReview(Long reviewId, Long userId) {
-        PhotoReview photoReview = photoReviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
+        PhotoReview photoReview = photoReviewRepository.findById(reviewId)
+            .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
 
         if (!photoReview.getUser().getUserId().equals(userId)) {
             throw new IllegalArgumentException("해당 리뷰를 삭제할 권한이 없습니다.");
@@ -414,13 +427,13 @@ public class ProductServiceImpl implements ProductService {
         List<PhotoReview> photoReviewList = photoReviewRepository.findProductStyleReview(modelNum);
 
         return photoReviewList.stream()
-                .map(productStyleReview -> PhotoReviewDto.builder()
-                        .userId(productStyleReview.getUser().getUserId())
-                        .reviewImg(productStyleReview.getReviewImg())
-                        .reviewContent(productStyleReview.getReviewContent())
-                        .reviewLike(productStyleReview.getReviewLike())
-                        .build())
-                .collect(Collectors.toList());
+            .map(productStyleReview -> PhotoReviewDto.builder()
+                .userId(productStyleReview.getUser().getUserId())
+                .reviewImg(productStyleReview.getReviewImg())
+                .reviewContent(productStyleReview.getReviewContent())
+                .reviewLike(productStyleReview.getReviewLike())
+                .build())
+            .collect(Collectors.toList());
     }
 
     // 상세 상품의 거래 체결 조회
@@ -432,7 +445,8 @@ public class ProductServiceImpl implements ProductService {
         if (check) {
             log.info("해당 계정은 합격");
             // 상품 기본정보 뽑기
-            Optional<Product> products = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getProductSize());
+            Optional<Product> products = productRepository.findBidProductInfo(
+                bidRequestDto.getModelNum(), bidRequestDto.getProductSize());
             log.info("상품의 기본 정보 확인 : {}", products);
 
             if (products.isEmpty()) {
@@ -447,14 +461,13 @@ public class ProductServiceImpl implements ProductService {
             }
             log.info("해당 사이즈에 대한 가격 뽑기 : {}", bidResponseDto);
 
-
             return BidResponseDto.builder()
-                    .productImg(products.get().getProductImg())
-                    .productName(products.get().getProductName())
-                    .productSize(products.get().getProductSize())
-                    .productBuyPrice(bidResponseDto.getProductBuyPrice())
-                    .productSalePrice(bidResponseDto.getProductSalePrice())
-                    .build();
+                .productImg(products.get().getProductImg())
+                .productName(products.get().getProductName())
+                .productSize(products.get().getProductSize())
+                .productBuyPrice(bidResponseDto.getProductBuyPrice())
+                .productSalePrice(bidResponseDto.getProductSalePrice())
+                .build();
         }
         return null;
     }
@@ -462,9 +475,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void saveTemporaryBid(InsertBidDto insertBidDto) {
         Users user = userRepository.findById(insertBidDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
-        Product product = productRepository.findBidProductInfo(insertBidDto.getModelNum(), insertBidDto.getSize())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 상품 ID 입니다."));
+            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
+        Product product = productRepository.findBidProductInfo(insertBidDto.getModelNum(),
+                insertBidDto.getSize())
+            .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 상품 ID 입니다."));
 
         if (insertBidDto.getType().equals("buy")) {
             BuyingBidding buyingBidding = insertBidDto.toBuyingBidding(user, product);
@@ -480,44 +494,54 @@ public class ProductServiceImpl implements ProductService {
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime temp = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
-        List<SalesBidding> salesBiddingList = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
+        List<SalesBidding> salesBiddingList = salesBiddingRepository.findFirstByOriginalContractDate(
+            modelNum);
         LocalDateTime firstContractTime = salesBiddingList.get(0).getSalesBiddingTime();
 
         log.info("firstContractTime: {}", firstContractTime);
-        List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, temp, now);
+        List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, temp,
+            now);
 
         if (allContractData.isEmpty()) {
             throw new RuntimeException("No contract data available for model: " + modelNum);
         }
 
-        List<AveragePriceDto> threeDayPrices = calculateAveragePrice(allContractData, now.minusDays(3), now, 3);
-        List<AveragePriceDto> oneMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(1), now, 24);
-        List<AveragePriceDto> sixMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(6), now, 168);
-        List<AveragePriceDto> oneYearPrices = calculateAveragePrice(allContractData, now.minusYears(1), now, 720);
-        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, firstContractTime, now, 720);
+        List<AveragePriceDto> threeDayPrices = calculateAveragePrice(allContractData,
+            now.minusDays(3), now, 3);
+        List<AveragePriceDto> oneMonthPrices = calculateAveragePrice(allContractData,
+            now.minusMonths(1), now, 24);
+        List<AveragePriceDto> sixMonthPrices = calculateAveragePrice(allContractData,
+            now.minusMonths(6), now, 168);
+        List<AveragePriceDto> oneYearPrices = calculateAveragePrice(allContractData,
+            now.minusYears(1), now, 720);
+        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData,
+            firstContractTime, now, 720);
 
         return AveragePriceResponseDto.builder()
-                .threeDayPrices(threeDayPrices)
-                .oneMonthPrices(oneMonthPrices)
-                .sixMonthPrices(sixMonthPrices)
-                .oneYearPrices(oneYearPrices)
-                .totalExecutionPrice(totalExecutionPrice)
-                .build();
+            .threeDayPrices(threeDayPrices)
+            .oneMonthPrices(oneMonthPrices)
+            .sixMonthPrices(sixMonthPrices)
+            .oneYearPrices(oneYearPrices)
+            .totalExecutionPrice(totalExecutionPrice)
+            .build();
     }
 
     @Override
     @Transactional
-    public List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData, LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours) {
+    public List<AveragePriceDto> calculateAveragePrice(List<AveragePriceDto> allContractData,
+        LocalDateTime firstContractDateTime, LocalDateTime endDate, int intervalHours) {
         List<AveragePriceDto> result = new ArrayList<>();
         DecimalFormat df = new DecimalFormat("#");
 
         while (firstContractDateTime.isBefore(endDate)) {
             LocalDateTime nextInterval = firstContractDateTime.plusHours(intervalHours);
 
-            List<AveragePriceDto> intervalData = getAllContractData(allContractData, firstContractDateTime, nextInterval);
+            List<AveragePriceDto> intervalData = getAllContractData(allContractData,
+                firstContractDateTime, nextInterval);
 
             if (intervalData.isEmpty()) {
-                result.add(new AveragePriceDto(firstContractDateTime, BigDecimal.ZERO)); // 체결 내역이 없으면 0
+                result.add(
+                    new AveragePriceDto(firstContractDateTime, BigDecimal.ZERO)); // 체결 내역이 없으면 0
             } else {
                 BigDecimal sum = BigDecimal.ZERO;
                 for (AveragePriceDto data : intervalData) {
@@ -525,7 +549,8 @@ public class ProductServiceImpl implements ProductService {
                         sum = sum.add(data.getAveragePrice());
                     }
                 }
-                BigDecimal average = sum.divide(BigDecimal.valueOf(intervalData.size()), MathContext.DECIMAL128);
+                BigDecimal average = sum.divide(BigDecimal.valueOf(intervalData.size()),
+                    MathContext.DECIMAL128);
 
                 BigDecimal formattedAverage = new BigDecimal(df.format(average));
                 result.add(new AveragePriceDto(firstContractDateTime, formattedAverage));
@@ -538,10 +563,13 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
-    public List<AveragePriceDto> getAllContractData(List<AveragePriceDto> allContractData, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<AveragePriceDto> getAllContractData(List<AveragePriceDto> allContractData,
+        LocalDateTime startDate, LocalDateTime endDate) {
         return allContractData.stream()
-                .filter(data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime().isBefore(endDate))
-                .collect(Collectors.toList());
+            .filter(
+                data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime()
+                    .isBefore(endDate))
+            .collect(Collectors.toList());
     }
 
     // 상품 좋아요
@@ -557,15 +585,17 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // 상품 랭킹
+
     @Override
     public List<ProductRankingDto> getAllProductsByLikes() {
         return productRepository.searchAllProductByLikes();
     }
 
+
     @Override
     public OrderProductDto getProductOne(Long productId) {
-        Product product = productRepository.findProductsByProductId(productId).orElseThrow(()->new RuntimeException("not found product"));
+        Product product = productRepository.findProductsByProductId(productId)
+            .orElseThrow(() -> new RuntimeException("not found product"));
 
         System.out.println("product = " + product);
         OrderProductDto orderProductDto = OrderProductDto.builder()
@@ -580,4 +610,5 @@ public class ProductServiceImpl implements ProductService {
 
         return orderProductDto;
     }
+
 }
