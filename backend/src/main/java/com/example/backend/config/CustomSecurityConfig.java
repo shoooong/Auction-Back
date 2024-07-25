@@ -36,8 +36,7 @@ public class CustomSecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     private static final String[] AUTHENTICATED_ENDPOINTS = {
-            "/mypage/**",
-            "/luckydraw/{luckyId}/enter",
+            "/api/**",
             "/feed/user/**",
             "/inquiry/{inquiryId}/delete",
             "/requestProduct/user/**",
