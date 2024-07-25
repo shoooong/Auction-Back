@@ -25,7 +25,7 @@ public class AdminRespDto {
         private int totalPages;
         private long totalElements;
         private int number;
-        private int size;
+        private int pageSize;
         private boolean isLast;
 
         public ReqProductsRespDto(Page<Product> products) {
@@ -33,7 +33,7 @@ public class AdminRespDto {
             this.totalPages = products.getTotalPages();
             this.totalElements = products.getTotalElements();
             this.number = products.getNumber();
-            this.size = products.getSize();
+            this.pageSize = products.getSize();
             this.isLast = products.isLast();
         }
         @Setter

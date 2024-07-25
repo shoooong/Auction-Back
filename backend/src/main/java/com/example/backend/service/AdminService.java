@@ -52,7 +52,6 @@ public class AdminService {
     public AdminRespDto.ReqProductsRespDto reqProducts(Pageable pageable){
         Page<Product> products = productRepository.findByProductStatus(ProductStatus.REQUEST,pageable);
         return new AdminRespDto.ReqProductsRespDto(products);
-
     }
 
     // 요청상품 단건 조회
