@@ -6,6 +6,8 @@ import com.example.backend.dto.product.ProductRankingDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +19,7 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct, ProductSearch, ShopProduct, ShopSearch {
     //상품상태에 따른 상품 찾기
+    Page<Product> findByProductStatus(ProductStatus productStatus, Pageable pageable);
     List<Product> findByProductStatus(ProductStatus productStatus);
 
     //상품아이디와 상품상태에 따른 상품 찾기
