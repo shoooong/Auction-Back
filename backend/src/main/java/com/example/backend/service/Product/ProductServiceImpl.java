@@ -1,6 +1,7 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.admin.ProductRespDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.entity.*;
@@ -560,5 +561,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductRankingDto> getAllProductsByLikes(String mainDepartment) {
         return productRepository.searchAllProductByLikes(mainDepartment);
+    }
+
+    @Override
+    public OrderProductDto getProductOne(Long productId) {
+        Product product = productRepository.findProductsByProductId(productId).orElseThrow(()->new RuntimeException("not found product"));
+
+        System.out.println("product = " + product);
+        OrderProductDto orderProductDto = OrderProductDto.builder()
+            .productId(product.getProductId())
+            .productImg(product.getProductImg())
+            .productBrand(product.getProductBrand())
+            .productName(product.getProductName())
+            .modelNum(product.getModelNum())
+            .productSize(product.getProductSize())
+            .subDepartment(product.getSubDepartment())
+            .build();
+
+        return orderProductDto;
     }
 }
