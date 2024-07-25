@@ -250,7 +250,6 @@ public class ProductSearchImpl implements ProductSearch {
         QSalesBidding sales = QSalesBidding.salesBidding;
         QBuyingBidding buying = QBuyingBidding.buyingBidding;
 
-        // 중복 제거 쿼리 작성
         return queryFactory.select(Projections.bean(SalesBiddingDto.class,
                         product.productId,
                         product.modelNum,
@@ -265,13 +264,12 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(sales).on(sales.product.eq(product).and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
                 .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesBiddingTime.isNotNull()))
                 .orderBy(sales.salesBiddingTime.desc())
-                .distinct()  // 중복 제거
+                .distinct()
                 .fetch();
     }
-
-
 
     @Override
     public List<SalesHopeDto> salesHopeInfo(String modelNum) {
