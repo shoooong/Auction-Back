@@ -4,10 +4,12 @@ import com.example.backend.dto.user.UserDTO;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.service.user.RefreshTokenService;
+import com.example.backend.service.user.TokenBlacklistService;
 import com.example.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final JWTUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // 일반회원 회원가입
     @PostMapping("/register")
@@ -72,6 +75,18 @@ public class UserController {
         String refreshToken = token.get("refreshToken");
 
         return refreshTokenService.refreshToken(authHeader, refreshToken);
+    }
+
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        tokenBlacklistService.addBlackList(authHeader);
+
+        return ResponseEntity.ok().build();
     }
 
 }

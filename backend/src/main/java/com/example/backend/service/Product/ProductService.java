@@ -54,5 +54,5 @@ public interface ProductService {
 
     void incrementProductLikes(String modelNum);
 
-    List<ProductRankingDto> getAllProductsByLikes(String mainDepartment);
+    List<ProductRankingDto> getAllProductsByLikes();
 }
