@@ -21,8 +21,9 @@ public class ProductResponseDto {
     private BigDecimal biddingPrice;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime registerDate;
+    private BigDecimal originalPrice;
 
-    public ProductResponseDto(Long productId, String productImg, String productBrand, String productName, String modelNum, BigDecimal buyingBiddingPrice, LocalDateTime createDate) {
+    public ProductResponseDto(Long productId, String productImg, String productBrand, String productName, String modelNum, BigDecimal buyingBiddingPrice, LocalDateTime createDate, BigDecimal originalPrice) {
         this.productId = productId;
         this.productImg = productImg;
         this.productBrand = productBrand;
@@ -30,5 +31,6 @@ public class ProductResponseDto {
         this.modelNum = modelNum;
         this.biddingPrice = buyingBiddingPrice;
         this.registerDate = createDate;
+        this.originalPrice = originalPrice;
     }
 }

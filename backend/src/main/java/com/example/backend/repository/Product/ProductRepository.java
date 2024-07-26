@@ -25,6 +25,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     //상품아이디와 상품상태에 따른 상품 찾기
     Optional<Product> findByProductIdAndProductStatus(Long productId, ProductStatus productStatus);
 
+    List<Product> findByModelNum(String modelNum);
+
     // 상품 모델번호에 따른 1개의 정보만 가져오기 - 모델번호가 똑같다는 것은 같은 상품이라는 것
     @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED'")
     List<Product> findAllByModelNumAndStatus(@Param("modelNum") String modelNum);

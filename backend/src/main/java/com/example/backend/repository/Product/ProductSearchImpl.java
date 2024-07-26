@@ -87,7 +87,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -110,7 +111,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -134,7 +136,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -158,7 +161,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         sales.salesBiddingPrice.max().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(sales).on(product.productId.eq(sales.product.productId))
@@ -182,7 +186,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))

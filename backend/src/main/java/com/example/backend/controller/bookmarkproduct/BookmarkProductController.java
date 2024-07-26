@@ -57,4 +57,10 @@ public class BookmarkProductController {
         Long userId = userDTO.getUserId();
         bookmarkProductService.deleteBookmark(bookmarkProductId, userId);
     }
+
+    // 해당 모델에 대한 북마크 수 조회
+    @GetMapping("/product/bookmarkCount")
+    public long getBookmarkCountByModelNum(@RequestParam String modelNum) {
+        return bookmarkProductService.getBookmarkCountByModelNum(modelNum);
+    }
 }
