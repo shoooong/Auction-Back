@@ -45,9 +45,6 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
 
     Optional<SalesBidding> findBySalesBiddingIdAndUserUserId(Long salesBiddingId, Long userId);
 
-    @Query("SELECT s FROM SalesBidding s LEFT JOIN Product p on s.product.productId = p.productId WHERE p.modelNum = :modelNum ORDER BY s.salesBiddingTime asc")
-    List<SalesBidding> findFirstByOriginalContractDate(@Param("modelNum") String modelNum);
-
     //판매 입찰 상태 COMPLETE 인 판매 내역 = 판매 정산 내역 조회
     List<SalesBidding> findBySalesStatusAndUser_UserId(SalesStatus salesStatus, Long userId);
 

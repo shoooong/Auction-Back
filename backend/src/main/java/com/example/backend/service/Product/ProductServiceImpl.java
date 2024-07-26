@@ -271,7 +271,7 @@ public class ProductServiceImpl implements ProductService {
         return temp.stream()
                 .map(contractValue -> ProductsContractListDto.builder()
                         .productSize(contractValue.getProductSize())
-                        .productContractPrice(contractValue.getLatestPrice())
+                        .productContractPrice(contractValue.getSalesBiddingPrice())
                         .productContractDate(contractValue.getSalesBiddingTime())
                         .build())
                 .collect(Collectors.toList());
@@ -479,11 +479,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime temp = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
-        List<SalesBidding> salesBiddingList = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
-
-        LocalDateTime firstContractTime = salesBiddingList.isEmpty() ? now : salesBiddingList.get(0).getSalesBiddingTime();
-        log.info("firstContractTime: {}", firstContractTime);
+        LocalDateTime temp = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
 
         List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, temp, now);
 
@@ -491,7 +487,7 @@ public class ProductServiceImpl implements ProductService {
         List<AveragePriceDto> oneMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(1), now, 24);
         List<AveragePriceDto> sixMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(6), now, 168);
         List<AveragePriceDto> oneYearPrices = calculateAveragePrice(allContractData, now.minusYears(1), now, 720);
-        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, firstContractTime, now, 720);
+        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, now.minusYears(2), now, 720);
 
         return AveragePriceResponseDto.builder()
                 .threeDayPrices(threeDayPrices)
