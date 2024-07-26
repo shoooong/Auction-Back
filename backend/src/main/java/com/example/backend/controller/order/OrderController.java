@@ -64,11 +64,13 @@ public class OrderController {
     }
 
 
-    @GetMapping("/buy") // 결제 완료 후 주문 완료 페이지
+    // 구매 입찰 정보 가져오기(즉시판매)
+    @GetMapping("/buy") // 결제 완료 후 주문 완료 페이지,
     public ResponseEntity<?> buyInfo(@RequestParam Long buyingBiddingId){
         BuyingBiddingDto buyingBiddingDto = buyingBiddingService.getBuyingBiddingDto(buyingBiddingId);
         return new ResponseEntity<>(buyingBiddingDto, HttpStatus.OK);
     }
+    // 판매 입찰 정보 가져오기(즉시구매)
     @GetMapping("/sales") // 결제 완료 후 주문 완료 페이지
     public ResponseEntity<?> salesInfo(@RequestParam Long salesBiddingId){
         SalesBiddingDto salesBiddingDto = salesBiddingService.getSalesBiddingDto(salesBiddingId);
@@ -89,7 +91,6 @@ public class OrderController {
 
 
     }
-
 
 
 }
