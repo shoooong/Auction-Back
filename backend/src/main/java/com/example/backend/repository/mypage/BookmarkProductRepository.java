@@ -2,6 +2,7 @@ package com.example.backend.repository.mypage;
 
 import com.example.backend.entity.BookmarkProduct;
 import com.example.backend.entity.FeedBookmark;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,9 @@ public interface BookmarkProductRepository extends JpaRepository<BookmarkProduct
     boolean existsByUser_UserIdAndProduct_ProductId(Long userId, Long productId);
 
     List<BookmarkProduct> findByUser_UserId(Long userId);
+
+    @Query("SELECT COUNT(bp) FROM BookmarkProduct bp WHERE bp.product.modelNum = :modelNum")
+    long countByModelNum(@Param("modelNum") String modelNum);
 
     // 회원 관심상품과 같은 모델번호를 가진 전체 상품Id 조회
 //    @Query("SELECT p.productId FROM Users u " +
