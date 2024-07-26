@@ -102,6 +102,7 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
                 .collect(Collectors.toList());
     }
 
+    // 본인 관심상품 조회
     @Override
     public void deleteBookmark(final long bookmarkProductId, Long userId ) {
 
@@ -112,5 +113,11 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
             throw new RuntimeException("User is not authorized to delete bookmark");
         }
         bookmarkProductRepository.delete(bookmarkProduct);
+    }
+
+    // 해당 상품에 대한 북마크 수 조회
+    @Override
+    public long getBookmarkCountByModelNum(String modelNum) {
+        return bookmarkProductRepository.countByModelNum(modelNum);
     }
 }

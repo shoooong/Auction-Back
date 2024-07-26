@@ -6,6 +6,8 @@ import com.example.backend.dto.product.ProductRankingDto;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.ProductStatus;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,10 +19,13 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, AdminProduct, ProductSearch, ShopProduct, ShopSearch {
     //상품상태에 따른 상품 찾기
+    Page<Product> findByProductStatus(ProductStatus productStatus, Pageable pageable);
     List<Product> findByProductStatus(ProductStatus productStatus);
 
     //상품아이디와 상품상태에 따른 상품 찾기
     Optional<Product> findByProductIdAndProductStatus(Long productId, ProductStatus productStatus);
+
+    List<Product> findByModelNum(String modelNum);
 
     // 상품 모델번호에 따른 1개의 정보만 가져오기 - 모델번호가 똑같다는 것은 같은 상품이라는 것
     @Query("SELECT p FROM Product p WHERE p.modelNum = :modelNum AND p.productStatus = 'REGISTERED'")
@@ -87,13 +92,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     Optional<Product> findByModelNumAndProductSize(String modelNum, String productSize);
     List<Product> findAllByModelNum(String modelNum);
 
-    // 좋아요순으로 대분류 상품 조회
-    @Query("SELECT DISTINCT new com.example.backend.dto.product.ProductRankingDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum, bb.buyingBiddingPrice, p.createDate, p.productLike) " +
+    // 좋아요순으로 상품 조회
+    @Query("SELECT DISTINCT new com.example.backend.dto.product.ProductRankingDto(p.productId, p.productImg, p.productBrand, p.productName, p.modelNum, bb.buyingBiddingPrice, p.createDate, p.productLike, p.mainDepartment) " +
             "FROM Product p LEFT JOIN BuyingBidding bb ON p.productId = bb.product.productId " +
-            "WHERE p.mainDepartment = :mainDepartment " +
             "GROUP BY p.modelNum " +
             "ORDER BY p.productLike DESC")
-    List<ProductRankingDto> searchAllProductByLikes(@Param("mainDepartment") String mainDepartment);
+    List<ProductRankingDto> searchAllProductByLikes();
+
 
 
 

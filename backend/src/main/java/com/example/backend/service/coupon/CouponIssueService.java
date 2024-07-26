@@ -7,6 +7,13 @@ import com.example.backend.entity.Coupon;
 import com.example.backend.entity.CouponIssue;
 import com.example.backend.entity.Users;
 import com.example.backend.entity.enumData.CouponCondition;
+import com.example.backend.exception.CouponConditionNotFoundException;
+import com.example.backend.exception.CouponLimitExceededException;
+import com.example.backend.exception.CouponNotFoundException;
+import com.example.backend.exception.CouponNotInPeriodException;
+import com.example.backend.exception.DuplicateCouponException;
+import com.example.backend.exception.ErrorCode;
+import com.example.backend.exception.UserNotFoundException;
 import com.example.backend.producer.CouponCreateProducer;
 import com.example.backend.repository.CouponIssue.CouponIssueRepository;
 import com.example.backend.repository.CouponIssue.RedisRepository;
@@ -16,6 +23,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -40,9 +48,9 @@ public class CouponIssueService {
         /* MySQL에 Coupon 저장
         * */
         Users user = userRepository.findById(Long.valueOf(userId))
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
         Coupon coupon = couponRepository.findById(Long.valueOf(couponId))
-            .orElseThrow(() -> new RuntimeException("Coupon not found"));
+            .orElseThrow(() -> new CouponNotFoundException(ErrorCode.COUPON_NOT_FOUND));
 
         CouponIssueDto couponIssueDto = new CouponIssueDto();
         CouponIssue couponIssue = couponIssueDto.toEntity(user, coupon);
@@ -51,43 +59,82 @@ public class CouponIssueService {
 
 
     }
-
-
     public void issueCoupon(Long couponId, Long userId) {
 
-        // 해당 쿠폰 정책 발급수 INCR
-        Long issuedCount = redisRepository.couponIssuedCount(couponId);
-        Long MAX_QUANTITY = Long.valueOf(
-            redisRepository.getCouponCondition(couponId, CouponCondition.MAX_QUANTITY.name()));
+        try {
+            // 해당 쿠폰 정책 발급수 INCR
+            Long issuedCount = redisRepository.couponIssuedCount(couponId);
+            Long MAX_QUANTITY = Long.valueOf(redisRepository.getCouponCondition(couponId, CouponCondition.MAX_QUANTITY.name()));
 
-        if (issuedCount != null && issuedCount > MAX_QUANTITY) { //
-            redisRepository.issuedCancel(couponId);
-            System.out.println("쿠폰 발급 수 초과");
-            return;
+            if (issuedCount != null && issuedCount > MAX_QUANTITY) {
+                redisRepository.issuedCancel(couponId);
+                throw new CouponLimitExceededException(ErrorCode.COUPON_LIMIT_ISSUE);
+            }
+
+            String startDate = redisRepository.getCouponCondition(couponId, CouponCondition.START_DATE.name());
+            String endDate = redisRepository.getCouponCondition(couponId, CouponCondition.END_DATE.name());
+            LocalDateTime startDateTime = LocalDateTime.parse(startDate);
+            LocalDateTime endDateTime = LocalDateTime.parse(endDate);
+
+            LocalDateTime currentDateTime = LocalDateTime.now();
+
+            if (currentDateTime.isBefore(startDateTime) || currentDateTime.isAfter(endDateTime)) {
+                throw new CouponNotInPeriodException(ErrorCode.COUPON_NOT_IN_PERIOD);
+            }
+
+            Optional.ofNullable(redisRepository.registerCouponUser(couponId, userId))
+                .filter(apply -> apply == 1)
+                .orElseThrow(() -> {
+                    redisRepository.issuedCancel(couponId);
+                    throw new DuplicateCouponException(ErrorCode.ISSUANCE_DUPLICATE_COUPON);
+                });
+
+            couponCreateProducer.create(couponId, userId);
+        } catch (CouponConditionNotFoundException e) {
+            throw new RuntimeException("Failed to issue coupon: " + e.getMessage(), e);
         }
-
-
-        String startDate = redisRepository.getCouponCondition(couponId, CouponCondition.START_DATE.name());
-        String endDate = redisRepository.getCouponCondition(couponId, CouponCondition.END_DATE.name());
-        LocalDateTime startDateTime = LocalDateTime.parse(startDate);
-        LocalDateTime endDateTime = LocalDateTime.parse(endDate);
-
-        LocalDateTime currentDateTime = LocalDateTime.now();
-
-
-        if (currentDateTime.isBefore(startDateTime) || currentDateTime.isAfter(endDateTime)) {
-            System.out.println("쿠폰 발급 시간이 아닙니다.");
-            return;
-        }
-
-        Long apply = redisRepository.registerCouponUser(couponId, userId);
-        if (apply != 1) {
-            System.out.println("이미 발급 받음");
-            redisRepository.issuedCancel(couponId);
-            return;
-        }
-        couponCreateProducer.create(couponId, userId);
     }
+
+//    public void issueCoupon(Long couponId, Long userId) {
+//
+//        // 해당 쿠폰 정책 발급수 INCR
+//        Long issuedCount = redisRepository.couponIssuedCount(couponId);
+//        Long MAX_QUANTITY = Long.valueOf(
+//            redisRepository.getCouponCondition(couponId, CouponCondition.MAX_QUANTITY.name()));
+//
+//        if (issuedCount != null && issuedCount > MAX_QUANTITY) { //
+//            redisRepository.issuedCancel(couponId);
+//            throw new CouponLimitExceededException(ErrorCode.COUPON_NOT_FOUND);
+//        }
+//
+//
+//        String startDate = redisRepository.getCouponCondition(couponId, CouponCondition.START_DATE.name());
+//        String endDate = redisRepository.getCouponCondition(couponId, CouponCondition.END_DATE.name());
+//        LocalDateTime startDateTime = LocalDateTime.parse(startDate);
+//        LocalDateTime endDateTime = LocalDateTime.parse(endDate);
+//
+//        LocalDateTime currentDateTime = LocalDateTime.now();
+//
+//
+//        if (currentDateTime.isBefore(startDateTime) || currentDateTime.isAfter(endDateTime)) {
+//            throw new CouponNotInPeriodException(ErrorCode.COUPON_NOT_IN_PERIOD);
+//        }
+//
+//        Optional.ofNullable(redisRepository.registerCouponUser(couponId, userId))
+//            .filter(apply -> apply == 1)
+//            .orElseThrow(() -> {
+//                redisRepository.issuedCancel(couponId);
+//                throw new DuplicateCouponException(ErrorCode.ISSUANCE_DUPLICATE_COUPON);
+//            });
+//
+//
+//        Long apply = redisRepository.registerCouponUser(couponId, userId);
+//        if (apply != 1) {
+//            redisRepository.issuedCancel(couponId);
+//            throw new DuplicateCouponException(ErrorCode.ISSUANCE_DUPLICATE_COUPON);
+//        }
+//        couponCreateProducer.create(couponId, userId);
+//    }
 //    public List<CouponIssueDto> userCoupons(Long userId) {
 //        List<CouponIssue> coupon = couponIssueRepository.findUnusedCouponsByUserId(userId);
 //        for(CouponIssue couponIssue : coupon) {

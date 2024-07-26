@@ -18,4 +18,5 @@ public class BookmarkProductDto {
     private String productBrand;
     private String productName;
     private BigDecimal salesBiddingPrice;
+    private String mainDepartment;
 }

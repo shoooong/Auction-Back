@@ -63,6 +63,7 @@ public class UserService {
               user.isRole());
    }
 
+   @Transactional
    public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
          throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
@@ -89,21 +90,24 @@ public class UserService {
       userRepository.save(user);
    }
 
+   @Transactional
    public UserDTO getKakaoMember(String accessToken) {
 
       List<String> kakaoAccountList = getProfileFromKakaoToken(accessToken);
-//        String email = kakaoAccountList.get(0);
-//
-//        Users user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+      String email = kakaoAccountList.get(0);
+
+      Users user = userRepository.findByEmail(email).orElse(null);
+
+      if (user != null) {
+         return entityToDTO(user);
+      }
 
       Users socialUser = makeSocialUser(kakaoAccountList);
 
       userRepository.save(socialUser);
 
-      UserDTO userDTO = entityToDTO(socialUser);
-
-      return userDTO;
+      return entityToDTO(socialUser);
    }
 
 
@@ -174,7 +178,7 @@ public class UserService {
    }
 
    /**
-    * @param kakaoAccountList 카카오에서 제공받은 프로필 리스트
+    * @param kakaoAccountList 카카오에서 제공받은 프로필(리스트)
     * @return social(true) 설정된 Users 엔티티
     */
    public Users makeSocialUser(List<String> kakaoAccountList) {

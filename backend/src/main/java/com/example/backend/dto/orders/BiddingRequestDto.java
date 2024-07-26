@@ -14,6 +14,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class BiddingRequestDto {
     private Long productId; // 상품 아이디
-    private BigDecimal price; // 구매 희망가, 즉시구매기
+    private BigDecimal price; // 구매 희망가, 즉시구매가
     private Long exp; // 입찰기간
 }

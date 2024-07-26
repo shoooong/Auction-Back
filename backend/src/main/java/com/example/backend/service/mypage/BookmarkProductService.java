@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +30,7 @@ public class BookmarkProductService {
         Long nowLowPrice = buyingBiddingRepository.findLowPrice(productIdList);
         log.info("nowLowPrice for productIdList {}: {}", productIdList, nowLowPrice);
 
-        return nowLowPrice;
+        return Optional.ofNullable(nowLowPrice).orElse(0L);
     }
 
     public List<BookmarkProductsDto> getAllBookmarkProducts(Long userId) {

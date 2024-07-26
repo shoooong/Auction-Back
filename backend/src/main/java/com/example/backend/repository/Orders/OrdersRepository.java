@@ -62,5 +62,6 @@ public interface OrdersRepository extends JpaRepository<Orders, Long>,OrdersCust
     @Query("SELECT a FROM Address a WHERE a.user.userId = :userId AND a.defaultAddress = true")
     Optional<Address> findDefaultAddress(Long userId);
 
+    Optional<Orders> findByOrderId(Long orderId);
 
 }

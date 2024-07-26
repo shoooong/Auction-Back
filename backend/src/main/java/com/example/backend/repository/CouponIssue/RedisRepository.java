@@ -1,20 +1,101 @@
 package com.example.backend.repository.CouponIssue;
 
 import com.example.backend.entity.enumData.CouponCondition;
-import java.util.Map;
+import com.example.backend.exception.CouponConditionNotFoundException;
+import com.example.backend.exception.ErrorCode;
+import com.example.backend.exception.RedisOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
+//
+//@Repository
+//public class RedisRepository {
+//
+//    private static final String COUPON_TYPE_KEY = "coupon:time-attack:condition";
+//
+//    @Autowired
+//    private RedisTemplate<String, String> redisTemplate;
+//    private HashOperations<String, String, String> hashOperations;
+//
+//    @Autowired
+//    public RedisRepository(RedisTemplate<String, String> redisTemplate) {
+//        this.redisTemplate = redisTemplate;
+//        this.hashOperations = redisTemplate.opsForHash();
+//    }
+//
+//    public Long couponIssuedCount(Long couponId) {
+//        try {
+//            String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
+//            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+//            return valueOperations.increment(issuedCountKey);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to increment issued count for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public void issuedCancel(Long couponId) {
+//        try {
+//            String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
+//            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+//            valueOperations.decrement(issuedCountKey);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to decrement issued count for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public Long registerCouponUser(Long couponId, Long userId) {
+//        try {
+//            String userSetKey = COUPON_TYPE_KEY + couponId + ":users";
+//            return redisTemplate.opsForSet().add(userSetKey, String.valueOf(userId));
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to register user ID: " + userId + " for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public void saveCouponCondition(String couponId, CouponCondition conditionKey, String conditionValue) {
+//        try {
+//            hashOperations.put(COUPON_TYPE_KEY + ":" + couponId, conditionKey.name(), conditionValue);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to save condition " + conditionKey.name() + " for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public String getCouponCondition(Long couponId, String conditionKey) {
+//        try {
+//            return hashOperations.get(COUPON_TYPE_KEY + ":" + couponId, conditionKey);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to get condition " + conditionKey + " for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public Map<String, String> getAllCouponConditions(Long couponId) {
+//        try {
+//            return hashOperations.entries(COUPON_TYPE_KEY + ":" + couponId);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to get all conditions for coupon ID: " + couponId, e);
+//        }
+//    }
+//
+//    public void deleteCouponConditions(Long couponId) {
+//        try {
+//            redisTemplate.delete(COUPON_TYPE_KEY + ":" + couponId);
+//        } catch (Exception e) {
+//            throw new RedisOperationException("Failed to delete conditions for coupon ID: " + couponId, e);
+//        }
+//    }
+//}
 @Repository
 public class RedisRepository {
+
+    private static final String COUPON_TYPE_KEY = "coupon:time-attack:condition";
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     private HashOperations<String, String, String> hashOperations;
-
 
     @Autowired
     public RedisRepository(RedisTemplate<String, String> redisTemplate) {
@@ -22,52 +103,69 @@ public class RedisRepository {
         this.hashOperations = redisTemplate.opsForHash();
     }
 
-    private static final String COUPON_TYPE_KEY= "coupon:time-attack:condition";
-
-
     public Long couponIssuedCount(Long couponId) {
-        String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        return valueOperations.increment(issuedCountKey);
+        try {
+            String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
+            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+            return valueOperations.increment(issuedCountKey);
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to increment issued count for coupon ID: " + couponId, e);
+        }
     }
 
     public void issuedCancel(Long couponId) {
-        String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.decrement(issuedCountKey);
+        try {
+            String issuedCountKey = COUPON_TYPE_KEY + couponId + ":issued:count";
+            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+            valueOperations.decrement(issuedCountKey);
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to decrement issued count for coupon ID: " + couponId, e);
+        }
     }
 
     public Long registerCouponUser(Long couponId, Long userId) {
-        String userSetKey = COUPON_TYPE_KEY + couponId + ":users";
-        return redisTemplate.opsForSet().add(userSetKey, String.valueOf(userId));
+        try {
+            String userSetKey = COUPON_TYPE_KEY + couponId + ":users";
+            return redisTemplate.opsForSet().add(userSetKey, String.valueOf(userId));
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to register user ID: " + userId + " for coupon ID: " + couponId, e);
+        }
     }
 
-
-    // 쿠폰의 발급 조건 저장, conditionKey(발급조건이름), conditionValue(발급조건)
     public void saveCouponCondition(String couponId, CouponCondition conditionKey, String conditionValue) {
-        hashOperations.put(COUPON_TYPE_KEY + ":" + couponId, conditionKey.name(), conditionValue);
+        try {
+            hashOperations.put(COUPON_TYPE_KEY + ":" + couponId, conditionKey.name(), conditionValue);
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to save condition " + conditionKey.name() + " for coupon ID: " + couponId, e);
+        }
     }
 
-    // 해당 쿠폰의 특정 발급 조건 검색
     public String getCouponCondition(Long couponId, String conditionKey) {
-        return hashOperations.get(COUPON_TYPE_KEY + ":" + couponId, conditionKey);
+        try {
+            String condition = hashOperations.get(COUPON_TYPE_KEY + ":" + couponId, conditionKey);
+            if (condition == null) {
+//                throw new CouponConditionNotFoundException("Condition " + conditionKey + " not found for coupon ID: " + couponId);
+                throw new CouponConditionNotFoundException(ErrorCode.COUPON_NOT_FOUND_CONDITION);
+            }
+            return condition;
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to get condition " + conditionKey + " for coupon ID: " + couponId, e);
+        }
     }
 
-
-    // 해당 쿠폰의 모든 발급 조건 조회
     public Map<String, String> getAllCouponConditions(Long couponId) {
-        return hashOperations.entries(COUPON_TYPE_KEY + ":" + couponId);
+        try {
+            return hashOperations.entries(COUPON_TYPE_KEY + ":" + couponId);
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to get all conditions for coupon ID: " + couponId, e);
+        }
     }
 
-
-    // 해당 쿠폰의 모든 발급 조건 삭제
     public void deleteCouponConditions(Long couponId) {
-        redisTemplate.delete(COUPON_TYPE_KEY + ":" + couponId);
+        try {
+            redisTemplate.delete(COUPON_TYPE_KEY + ":" + couponId);
+        } catch (Exception e) {
+            throw new RedisOperationException("Failed to delete conditions for coupon ID: " + couponId, e);
+        }
     }
-
-    /* Coupon 생성시 발급 조건 저장
-     * 발급 가능한 날짜, 총 발급 수량
-     * */
-
-
 }

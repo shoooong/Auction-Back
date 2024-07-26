@@ -1,11 +1,17 @@
 package com.example.backend.dto.mypage.addressSettings;
 
 import com.example.backend.entity.Address;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Getter
 @Builder
+@Getter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class AddressDto {
 
     private Long addressId;

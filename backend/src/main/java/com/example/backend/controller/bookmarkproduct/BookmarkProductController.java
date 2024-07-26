@@ -23,7 +23,7 @@ public class BookmarkProductController {
     }
 
     // 관심상품 저장
-    @PostMapping("/product/bookmark")
+    @PostMapping("/api/product/bookmark")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> saveBookmark(@AuthenticationPrincipal UserDTO userDTO,
                                                @RequestParam String modelNum,
@@ -56,5 +56,11 @@ public class BookmarkProductController {
                                @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         bookmarkProductService.deleteBookmark(bookmarkProductId, userId);
+    }
+
+    // 해당 모델에 대한 북마크 수 조회
+    @GetMapping("/product/bookmarkCount")
+    public long getBookmarkCountByModelNum(@RequestParam String modelNum) {
+        return bookmarkProductService.getBookmarkCountByModelNum(modelNum);
     }
 }

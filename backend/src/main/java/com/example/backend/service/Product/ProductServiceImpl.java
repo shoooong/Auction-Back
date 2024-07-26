@@ -1,6 +1,7 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.admin.ProductRespDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.entity.*;
@@ -270,7 +271,7 @@ public class ProductServiceImpl implements ProductService {
         return temp.stream()
                 .map(contractValue -> ProductsContractListDto.builder()
                         .productSize(contractValue.getProductSize())
-                        .productContractPrice(contractValue.getLatestPrice())
+                        .productContractPrice(contractValue.getSalesBiddingPrice())
                         .productContractDate(contractValue.getSalesBiddingTime())
                         .build())
                 .collect(Collectors.toList());
@@ -478,22 +479,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime temp = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
-        List<SalesBidding> salesBiddingList = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
-        LocalDateTime firstContractTime = salesBiddingList.get(0).getSalesBiddingTime();
+        LocalDateTime temp = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
 
-        log.info("firstContractTime: {}", firstContractTime);
         List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, temp, now);
-
-        if (allContractData.isEmpty()) {
-            throw new RuntimeException("No contract data available for model: " + modelNum);
-        }
 
         List<AveragePriceDto> threeDayPrices = calculateAveragePrice(allContractData, now.minusDays(3), now, 3);
         List<AveragePriceDto> oneMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(1), now, 24);
         List<AveragePriceDto> sixMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(6), now, 168);
         List<AveragePriceDto> oneYearPrices = calculateAveragePrice(allContractData, now.minusYears(1), now, 720);
-        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, firstContractTime, now, 720);
+        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, now.minusYears(2), now, 720);
 
         return AveragePriceResponseDto.builder()
                 .threeDayPrices(threeDayPrices)
@@ -503,6 +497,7 @@ public class ProductServiceImpl implements ProductService {
                 .totalExecutionPrice(totalExecutionPrice)
                 .build();
     }
+
 
     @Override
     @Transactional
@@ -537,6 +532,7 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+
     public List<AveragePriceDto> getAllContractData(List<AveragePriceDto> allContractData, LocalDateTime startDate, LocalDateTime endDate) {
         return allContractData.stream()
                 .filter(data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime().isBefore(endDate))
@@ -558,7 +554,26 @@ public class ProductServiceImpl implements ProductService {
 
     // 피드 랭킹
     @Override
-    public List<ProductRankingDto> getAllProductsByLikes(String mainDepartment) {
-        return productRepository.searchAllProductByLikes(mainDepartment);
+    public List<ProductRankingDto> getAllProductsByLikes() {
+        return productRepository.searchAllProductByLikes();
+    }
+
+    @Override
+    public OrderProductDto getProductOne(Long productId) {
+        Product product = productRepository.findProductsByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("not found product"));
+
+        System.out.println("product = " + product);
+        OrderProductDto orderProductDto = OrderProductDto.builder()
+                .productId(product.getProductId())
+                .productImg(product.getProductImg())
+                .productBrand(product.getProductBrand())
+                .productName(product.getProductName())
+                .modelNum(product.getModelNum())
+                .productSize(product.getProductSize())
+                .subDepartment(product.getSubDepartment())
+                .build();
+
+        return orderProductDto;
     }
 }

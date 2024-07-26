@@ -12,6 +12,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressInfoDto {
+    private Long addressId;
     private String name;
     private String addrPhone;
     private String roadAddress;

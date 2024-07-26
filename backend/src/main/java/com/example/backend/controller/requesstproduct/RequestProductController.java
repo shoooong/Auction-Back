@@ -33,7 +33,7 @@ public class RequestProductController {
 
         List<RequestProductDto> requestProductDtos = new ArrayList<>();
         for(MultipartFile file : files) {
-            String fileName = objectStorageService.uploadFile(bucketName, "shooong/", file);
+            String fileName = objectStorageService.uploadFile(bucketName, "shooong/products/", file);
             if(fileName != null) {
                 RequestProductDto requestProductDto1 = new RequestProductDto();
                 requestProductDto1.setProductImg(fileName);
