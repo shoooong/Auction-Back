@@ -60,7 +60,9 @@ public class OrdersService {
      */
 
     public AddressInfoDto getDefaultAddress(Long userId){
-        Address address = ordersRepository.findDefaultAddress(userId).orElseThrow(() -> new RuntimeException("Address not found"));
+        Address address = ordersRepository.findDefaultAddress(userId).orElse(null);
+
+        if(address == null) { return null; }
         return AddressInfoDto.builder()
             .addressId(address.getAddressId())
             .name(address.getName())
