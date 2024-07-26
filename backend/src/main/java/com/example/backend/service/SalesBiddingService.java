@@ -66,7 +66,7 @@ public class SalesBiddingService {
 
     // 판매입찰 등록
     @Transactional
-    public void registerSalesBidding(UserDTO userDTO, SaleOrderDto saleOrderDto) {
+    public Long registerSalesBidding(UserDTO userDTO, SaleOrderDto saleOrderDto) {
         Product product = productRepository.findById(saleOrderDto.getProductId())
             .orElseThrow(() -> new RuntimeException("Product not valid"));
 
@@ -107,7 +107,8 @@ public class SalesBiddingService {
 //        salesBidding.changeSalesStatus(SalesStatus.COMPLETE);
 
 
-        ordersRepository.save(order);
+        return ordersRepository.save(order).getOrderId();
+
     }
 
     /**

@@ -2,11 +2,15 @@ package com.example.backend.service;
 
 import static com.example.backend.entity.enumData.BiddingStatus.COMPLETE;
 
+import com.example.backend.dto.mypage.addressSettings.AddressDto;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
 import com.example.backend.dto.orders.AddressInfoDto;
 import com.example.backend.dto.orders.BuyOrderDto;
+import com.example.backend.dto.orders.BuyingBiddingDto;
+import com.example.backend.dto.orders.OrderDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.orders.SaleOrderDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.Address;
@@ -65,6 +69,20 @@ public class OrdersService {
             .roadAddress(address.getRoadAddress())
             .detailAddress(address.getDetailAddress())
             .build();
+    }
+
+    public OrderDto getOrderOne(Long orderId){
+        Orders order = ordersRepository.findByOrderId(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        OrderDto orderDto = OrderDto.builder()
+            .orderId(order.getOrderId())
+            .orderPrice(order.getOrderPrice())
+            .orderStatus(order.getOrderStatus())
+            .orderDate(order.getCreateDate())
+            .product(new OrderProductDto().fromEntity(order.getProduct()))
+            .address(new AddressDto().fromEntity(order.getAddress()))
+            .biddingBidding(new BuyingBiddingDto())
+            .build();
+        return orderDto;
     }
 
     /**

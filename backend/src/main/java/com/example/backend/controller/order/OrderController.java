@@ -3,6 +3,7 @@ package com.example.backend.controller.order;
 import com.example.backend.dto.orders.AddressInfoDto;
 import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
+import com.example.backend.dto.orders.OrderDto;
 import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.orders.PaymentDto;
 import com.example.backend.dto.orders.SaleOrderDto;
@@ -90,6 +91,12 @@ public class OrderController {
         return new ResponseEntity<>(orderProductDto, HttpStatus.OK);
 
 
+    }
+
+    @GetMapping("/orderOne")
+    public ResponseEntity<?> getOrder(@AuthenticationPrincipal UserDTO userDTO, @RequestParam Long orderId) {
+        OrderDto orderDto = ordersService.getOrderOne(orderId);
+        return new ResponseEntity<>(orderDto, HttpStatus.OK);
     }
 
 

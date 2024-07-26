@@ -77,7 +77,7 @@ public class BuyingBiddingService {
      * 구매입찰
      */
     @Transactional
-    public void registerBuyingBidding(UserDTO userDTO, BuyOrderDto buyOrderDto) {
+    public Long registerBuyingBidding(UserDTO userDTO, BuyOrderDto buyOrderDto) {
 
         Product product = productRepository.findById(buyOrderDto.getProductId())
             .orElseThrow(() -> new RuntimeException("Product not valid"));
@@ -133,8 +133,9 @@ public class BuyingBiddingService {
 
         buyingBidding.changeBiddingStatus(BiddingStatus.COMPLETE);
 
+        Long orderId = ordersRepository.save(order).getOrderId();
 
-        ordersRepository.save(order);
+        return orderId;
     }
 
 

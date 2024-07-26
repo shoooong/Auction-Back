@@ -39,9 +39,9 @@ public class BidController {
     public ResponseEntity<?> buyingBidding(@AuthenticationPrincipal UserDTO userDTO,
         @RequestBody BuyOrderDto buyOrderDto) {
 
-        buyingBiddingService.registerBuyingBidding(userDTO, buyOrderDto);
+        Long orderId = buyingBiddingService.registerBuyingBidding(userDTO, buyOrderDto);
 
-        return new ResponseEntity<>(buyOrderDto, HttpStatus.OK);
+        return new ResponseEntity<>(orderId, HttpStatus.OK);
     }
 
 //    @PostMapping("/salesBidding/register")
@@ -56,9 +56,9 @@ public class BidController {
 public ResponseEntity<?> salesBidding(@AuthenticationPrincipal UserDTO userDTO,
     @RequestBody SaleOrderDto saleOrderDto) {
 
-    salesBiddingService.registerSalesBidding(userDTO, saleOrderDto);
+    Long orderId = salesBiddingService.registerSalesBidding(userDTO, saleOrderDto);
 
-    return new ResponseEntity<>(saleOrderDto, HttpStatus.OK);
+    return new ResponseEntity<>(orderId, HttpStatus.OK);
 }
 
 
