@@ -35,7 +35,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SalesBiddingService {
+public class    SalesBiddingService {
 
     private final SalesBiddingRepository salesBiddingRepository;
     private final ProductRepository productRepository;

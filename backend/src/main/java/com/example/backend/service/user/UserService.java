@@ -288,7 +288,7 @@ public class UserService {
    public void unregisterUser(Long userId) {
       Users user = validateUserId(userId);
 
-      user.unregisterUser(true);
+      user.unregisterUser( true);
 
       userRepository.save(user);
    }
