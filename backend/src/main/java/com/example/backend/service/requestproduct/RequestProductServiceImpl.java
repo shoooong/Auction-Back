@@ -8,6 +8,7 @@ import com.example.backend.repository.requestproduct.RequestProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,8 @@ public class RequestProductServiceImpl implements RequestProductService {
     // 미등록 상품 등록 요청글 조회
     @Override
     public List<RequestProductListDto> getRequestProducts() {
-        List<Product> products = requestProductRepository.findByProductStatus(ProductStatus.REQUEST);
+        List<ProductStatus> statuses = List.of(ProductStatus.REQUEST, ProductStatus.REJECTED);
+        List<Product> products = requestProductRepository.findByProductStatusIn(statuses);
         return products.stream().map(product ->
                 RequestProductListDto.builder()
                         .productId(product.getProductId())
@@ -52,9 +54,13 @@ public class RequestProductServiceImpl implements RequestProductService {
         ).collect(Collectors.toList());
     }
 
+    //  미등록 상품 등록 요청글 상세 조회
     @Override
     public RequestProductDto getRequestProductById(Long productId) {
-        Optional<Product> product = requestProductRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
+        // REQUEST 또는 REJECTED 상태의 상품을 조회
+        Optional<Product> product = requestProductRepository.findByProductIdAndProductStatusIn(
+                productId, Arrays.asList(ProductStatus.REQUEST, ProductStatus.REJECTED)
+        );
         return product.map(p -> RequestProductDto.builder()
                 .productId(p.getProductId())
                 .productImg(p.getProductImg())
