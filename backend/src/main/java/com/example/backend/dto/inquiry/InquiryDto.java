@@ -19,5 +19,6 @@ public class InquiryDto {
     private LocalDateTime createdDate;
     private LocalDateTime modifyDate;
     private Long userId;
+    private String nickName;
     private String response;
 }

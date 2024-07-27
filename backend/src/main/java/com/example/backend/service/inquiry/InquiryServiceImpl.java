@@ -87,6 +87,7 @@ public class InquiryServiceImpl implements InquiryService{
                     dto.setCreatedDate(inquiry.getCreateDate());
                     dto.setModifyDate(inquiry.getModifyDate());
                     dto.setUserId(inquiry.getUser().getUserId());
+                    dto.setNickName(inquiry.getUser().getNickname());
 
                     List<InquiryResponse> responses = inquiryResponseRepository.findByInquiry_InquiryId(inquiry.getInquiryId());
                     if (responses != null && !responses.isEmpty()) {
@@ -119,7 +120,7 @@ public class InquiryServiceImpl implements InquiryService{
                 .createdDate(inquiry.getCreateDate())
                 .modifyDate(inquiry.getModifyDate())
                 .userId(inquiry.getUser().getUserId())
-                .response(responseDtos.toString())  // 여전히 문자열로 저장하려는 경우
+                .response(responseDtos.toString())
                 .build();
     }
 

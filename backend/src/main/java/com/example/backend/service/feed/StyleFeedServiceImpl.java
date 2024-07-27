@@ -43,7 +43,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getLikeCount(),
                         styleFeed.getCreateDate(),
                         styleFeed.getModifyDate(),
-                        styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
+                        styleFeed.getUser().getUserId(),
+                        styleFeed.getUser().getNickname()
                 ))
                 .collect(Collectors.toList());
     }
@@ -62,7 +63,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                         styleFeed.getLikeCount(),
                         styleFeed.getCreateDate(),
                         styleFeed.getModifyDate(),
-                        styleFeed.getUser() != null ? styleFeed.getUser().getUserId() : null
+                        styleFeed.getUser().getUserId(),
+                        styleFeed.getUser().getNickname()
                 ))
                 .collect(Collectors.toList());
     }
@@ -80,7 +82,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 styleFeed.getLikeCount(),
                 styleFeed.getCreateDate(),
                 styleFeed.getModifyDate(),
-                styleFeed.getUser().getUserId()
+                styleFeed.getUser().getUserId(),
+                styleFeed.getUser().getNickname()
         );
     }
 
@@ -138,7 +141,8 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                 updatedFeed.getLikeCount(),
                 updatedFeed.getCreateDate(),
                 updatedFeed.getModifyDate(),
-                updatedFeed.getUser().getUserId()
+                updatedFeed.getUser().getUserId(),
+                updatedFeed.getUser().getNickname()
         );
     }
 
@@ -173,6 +177,7 @@ public class StyleFeedServiceImpl implements StyleFeedService {
                     dto.setFeedId(feedBookmark.getStyleFeed().getFeedId());
                     dto.setFeedImage(feedBookmark.getStyleFeed().getFeedImage());
                     dto.setFeedTitle(feedBookmark.getStyleFeed().getFeedTitle());
+                    dto.setNickName(feedBookmark.getUser().getNickname());
                     return dto;
                 })
                 .collect(Collectors.toList());
