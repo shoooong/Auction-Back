@@ -59,38 +59,42 @@ public class AdminService {
         //productId로 상품찾기
         Optional<Product> reqProduct = productRepository.findById(productId);
         Product result = reqProduct.orElseThrow();
+        if (result.getModelNum()==null){
+            result.setModelNum("test-modelNum");
+        }
+
         return new AdminRespDto.ReqProductRespDto(result);
     }
 
-@Transactional
-public void acceptRequest(Long productId, ProductReqDto productReqDto, MultipartFile productPhoto) {
-    String bucketName = "push";
-    String directoryPath = "shooong/products/";
-    Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
-    Product request = productPs.orElseThrow();
+    @Transactional
+    public void acceptRequest(Long productId, ProductReqDto productReqDto, MultipartFile productPhoto) {
+        String bucketName = "push";
+        String directoryPath = "shooong/products/";
+        Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
+        Product request = productPs.orElseThrow();
 
 //    Pageable pageable = PageRequest.ofSize(10);
-    List<Product> registerProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
+        List<Product> registerProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
 
-    boolean isDuplicate = registerProducts.stream().anyMatch(registered ->
-            request.getModelNum().equals(registered.getModelNum()) &&
-                    request.getProductSize().equals(registered.getProductSize()));
-    if (isDuplicate) {
-        throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
-    } else {
-        if (productPhoto != null && !productPhoto.isEmpty()) {
-            String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productPhoto);
-            productReqDto.setProductImg(imageUrl);
+        boolean isDuplicate = registerProducts.stream().anyMatch(registered ->
+                productReqDto.getModelNum().equals(registered.getModelNum()) &&
+                        productReqDto.getProductSize().equals(registered.getProductSize()));
+        if (isDuplicate) {
+            throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
+        } else {
+            if (productPhoto != null && !productPhoto.isEmpty()) {
+                String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productPhoto);
+                productReqDto.setProductImg(imageUrl);
+            }
+
+            request.registerProduct(productReqDto);
+
         }
-
-        request.registerProduct(productReqDto);
-
-    }
     }
 
 
     @Transactional
-    //사용자가 요청한 상품, 중복시 삭제
+    //사용자가 요청한 상품, 중복시 거절
     //중복 판별은 위에서 함
     public String deleteRequest(Long productId) {
 
@@ -169,8 +173,8 @@ public void acceptRequest(Long productId, ProductReqDto productReqDto, Multipart
     //test
     //매주 첫째주 11시에 시작
     //럭키 드로우 상품 상태 READY -> PROCESS
-//    @Scheduled(cron = "0 0 11 ? * MON")
-    @Scheduled(cron = "0 52 14 * * MON")
+    @Scheduled(cron = "0 30 20 ? * FRI")
+//    @Scheduled(cron = "0 52 14 * * MON")
     @Transactional
     public void cronJob() {
         //스케줄 실행시, 데이터 베이스에 저장되어 있는 럭키드로우 데이터 startDate, endDate, LuckDate 등록
@@ -179,12 +183,13 @@ public void acceptRequest(Long productId, ProductReqDto productReqDto, Multipart
         List<LuckyDraw> ready = luckyDrawRepository.findByLuckyProcessStatus(LuckyProcessStatus.READY);
 
         //시작 날짜 매주 월요일 11:00:00
-        LocalDateTime startDate = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+//        LocalDateTime startDate = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime startDate = LocalDateTime.now();
         // 마감 날짜 시작 날짜 + 7
-        LocalDateTime endDate = startDate.plusDays(7).withHour(11).withMinute(0).withSecond(0).withNano(0);
-//        LocalDateTime endDate = startDate.plusDays(0).withHour(19).withMinute(50).withSecond(0).withNano(0);
+//        LocalDateTime endDate = startDate.plusDays(7).withHour(11).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endDate = startDate.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         // 발표일 : 마감 날짜 + 1 18:00:00
-        LocalDateTime luckDate = endDate.plusDays(1).withHour(18).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime luckDate = endDate.plusDays(1).withHour(0).withMinute(1).withSecond(0).withNano(0);
         //상품 등록
         for (LuckyDraw luckyDraw : ready) {
             luckyDraw.changeDate(startDate, endDate, luckDate);
@@ -230,3 +235,4 @@ public void acceptRequest(Long productId, ProductReqDto productReqDto, Multipart
 
 
 }
+

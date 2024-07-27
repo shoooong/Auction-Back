@@ -41,11 +41,14 @@ public class AdminController {
     @PutMapping("/requests/{productId}")
     public ResponseEntity<?> saveReqProduct(@PathVariable Long productId, @RequestPart(value = "productReqDto") ProductReqDto productReqDto, @RequestPart(value = "productPhoto", required = false) MultipartFile productPhoto){
 
+        if (productReqDto.getModelNum()== null){
+            productReqDto.setModelNum("");
+        }
         adminService.acceptRequest(productId, productReqDto,productPhoto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //요청상품 삭제
+    //요청상품 거절
     @PostMapping("/requests/{productId}")
     public ResponseEntity<?> deleteReqProduct(@PathVariable Long productId) {
         adminService.deleteRequest(productId);
