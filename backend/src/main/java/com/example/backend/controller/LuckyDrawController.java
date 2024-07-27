@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("luckydraw")
 @Log4j2
 public class LuckyDrawController {
 
@@ -29,7 +28,7 @@ public class LuckyDrawController {
     /**
      * 럭키드로우 메인
      */
-    @GetMapping("")
+    @GetMapping("/luckydraw")
     public List<LuckyDrawsDto> luckyDraws() {
         return luckyDrawService.getAllLuckyDraws();
     }
@@ -37,7 +36,7 @@ public class LuckyDrawController {
     /**
      * 럭키드로우 상세
      */
-    @GetMapping("/{luckyId}")
+    @GetMapping("/luckydraw/{luckyId}")
     public LuckyDrawsDto luckyDrawById(@PathVariable("luckyId") Long luckyId) {
         return luckyDrawService.getLuckyDrawById(luckyId);
     }
@@ -46,7 +45,7 @@ public class LuckyDrawController {
     /**
      * 사용자 럭키드로우 응모
      */
-    @PostMapping("/{luckyId}/enter")
+    @PostMapping("/api/luckydraw/{luckyId}/enter")
     public ResponseEntity<DrawDto> enterLuckyDraw(@PathVariable Long luckyId, @AuthenticationPrincipal UserDTO userDTO) {
 
         Long userId = userDTO.getUserId();

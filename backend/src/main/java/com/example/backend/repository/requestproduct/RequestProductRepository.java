@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByProductStatus(ProductStatus productStatus);
+
+    List<Product> findByProductStatusIn(List<ProductStatus> productStatus);
+    Optional<Product> findByProductIdAndProductStatusIn(Long productId, List<ProductStatus> statuses);
     Optional<Product> findByProductIdAndProductStatus(Long productId, ProductStatus productStatus);
 }

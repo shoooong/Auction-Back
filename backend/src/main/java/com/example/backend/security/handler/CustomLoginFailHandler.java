@@ -1,10 +1,12 @@
 package com.example.backend.security.handler;
 
+import com.example.backend.exception.CustomUserException;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -23,12 +25,16 @@ public class CustomLoginFailHandler implements AuthenticationFailureHandler {
         log.info("Login failed..." + exception);
 
         Gson gson = new Gson();
-
-        String jsonStr = gson.toJson(Map.of("error", "LOGIN_ERROR"));
-
-        response.setContentType("application/json");
         PrintWriter printWriter = response.getWriter();
-        printWriter.println(jsonStr);
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+        if (exception.getCause() instanceof CustomUserException) {
+            printWriter.println(gson.toJson(Map.of("error", "UNREGISTER_USER")));
+        } else {
+            printWriter.println(gson.toJson(Map.of("error", "LOGIN_ERROR")));
+        }
+
         printWriter.close();
     }
 }

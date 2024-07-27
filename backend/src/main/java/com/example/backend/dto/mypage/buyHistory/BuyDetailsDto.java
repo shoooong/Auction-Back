@@ -1,6 +1,6 @@
 package com.example.backend.dto.mypage.buyHistory;
 
-import com.example.backend.entity.enumData.OrderStatus;
+import com.example.backend.entity.enumData.BiddingStatus;
 import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,13 +14,13 @@ public class BuyDetailsDto {
     private String productSize;
 
     private BigDecimal orderPrice;
-    private OrderStatus orderStatus;
+    private BiddingStatus biddingStatus;
 
-    public BuyDetailsDto(String productImg, String productName, String productSize, BigDecimal orderPrice, OrderStatus orderStatus) {
+    public BuyDetailsDto(String productImg, String productName, String productSize, BigDecimal orderPrice, BiddingStatus biddingStatus) {
         this.productImg = productImg;
         this.productName = productName;
         this.productSize = productSize;
         this.orderPrice = orderPrice;
-        this.orderStatus = orderStatus;
+        this.biddingStatus = biddingStatus;
     }
 }

@@ -10,6 +10,7 @@ import com.example.backend.dto.user.UserModifyResDto;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
+import com.example.backend.service.BuyingBiddingService;
 import com.example.backend.service.OrdersService;
 import com.example.backend.service.SalesBiddingService;
 import com.example.backend.service.UserCouponService;
@@ -43,14 +44,13 @@ public class UserService {
    private final UserRepository userRepository;
    private final PasswordEncoder passwordEncoder;
 
-   private final OrdersService ordersService;
    private final SalesBiddingService salesBiddingService;
+   private final BuyingBiddingService buyingBiddingService;
    private final UserCouponService userCouponService;
    private final BookmarkProductService bookmarkProductService;
-
    private final ObjectStorageService objectStorageService;
 
-    public UserDTO entityToDTO(Users user) {
+   public UserDTO entityToDTO(Users user) {
        return new UserDTO(
               user.getUserId(),
               user.getEmail(),
@@ -63,6 +63,7 @@ public class UserService {
               user.isRole());
    }
 
+   @Transactional
    public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
          throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
@@ -89,21 +90,24 @@ public class UserService {
       userRepository.save(user);
    }
 
+   @Transactional
    public UserDTO getKakaoMember(String accessToken) {
 
       List<String> kakaoAccountList = getProfileFromKakaoToken(accessToken);
-//        String email = kakaoAccountList.get(0);
-//
-//        Users user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+      String email = kakaoAccountList.get(0);
+
+      Users user = userRepository.findByEmail(email).orElse(null);
+
+      if (user != null) {
+         return entityToDTO(user);
+      }
 
       Users socialUser = makeSocialUser(kakaoAccountList);
 
       userRepository.save(socialUser);
 
-      UserDTO userDTO = entityToDTO(socialUser);
-
-      return userDTO;
+      return entityToDTO(socialUser);
    }
 
 
@@ -158,7 +162,8 @@ public class UserService {
    }
 
    /**
-    * 소셜 로그인 - 해당 이메일을 가진 회원이 없을 경우 회원 등록하기 위해 임시 비밀번호 발급
+    * 임시 비밀번호 발급
+    * 소셜 로그인 시 해당 이메일을 가진 회원이 없을 경우 회원 등록하기 위해 임시 비밀번호 발급
     */
    public String makeTempPassword() {
       SecureRandom random = new SecureRandom();
@@ -172,6 +177,10 @@ public class UserService {
       return buffer.toString();
    }
 
+   /**
+    * @param kakaoAccountList 카카오에서 제공받은 프로필(리스트)
+    * @return social(true) 설정된 Users 엔티티
+    */
    public Users makeSocialUser(List<String> kakaoAccountList) {
       String tempPassword = makeTempPassword();
       String email = kakaoAccountList.get(0);
@@ -191,7 +200,7 @@ public class UserService {
 
 
    /**
-    * 회원 정보 수정
+    * 회원 정보 조회
     */
    public UserModifyResDto getUser(Long userId) {
       Users user = validateUserId(userId);
@@ -204,6 +213,11 @@ public class UserService {
               .build();
    }
 
+   /**
+    * 회원 정보 수정
+    * @param userModifyReqDto nickname, phoneNum, password
+    * @param file profileImg
+    */
    @Transactional
    public void modifyUser(UserModifyReqDto userModifyReqDto, MultipartFile file) {
       Users user = userRepository.findByEmail(userModifyReqDto.getEmail())
@@ -231,6 +245,7 @@ public class UserService {
    /**
     * 마이페이지 메인 - 모든 정보 조회
     */
+   @Transactional
    public MypageMainDto getMyPageInfo(Long userId) {
       Users user = validateUserId(userId);
 
@@ -242,7 +257,7 @@ public class UserService {
               .build();
 
       Long couponCount = userCouponService.getValidCouponCount(userId);
-      BuyHistoryAllDto buyHistoryAllDto = ordersService.getRecentBuyHistory(userId);
+      BuyHistoryAllDto buyHistoryAllDto = buyingBiddingService.getRecentBuyHistory(userId);
       SaleHistoryDto saleHistoryDto = salesBiddingService.getRecentSaleHistory(userId);
 
       return MypageMainDto.builder()
@@ -252,6 +267,19 @@ public class UserService {
               .saleHistoryDto(saleHistoryDto)
               .bookmarkProductsDto(bookmarkProductService.getLatestBookmarkProducts(userId))
               .build();
+   }
+
+   /**
+    * 회원 탈퇴
+    * isUnregistered = true 로 변경
+    */
+   @Transactional
+   public void unregisterUser(Long userId) {
+      Users user = validateUserId(userId);
+
+      user.unregisterUser(true);
+
+      userRepository.save(user);
    }
 
    /**

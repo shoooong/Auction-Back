@@ -33,7 +33,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mypage")
+@RequestMapping("/api/mypage")
 @Log4j2
 public class MypageController {
 
@@ -98,9 +98,7 @@ public class MypageController {
     // 배송지 등록
     @PostMapping("/address")
     public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressReqDto addressReqDto, @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-        log.info("addAddress AddressReqDto: {}", addressReqDto);
-        AddressDto addressDto = addressService.addAddress(userId, addressReqDto);
+        AddressDto addressDto = addressService.addAddress(userDTO.getUserId(), addressReqDto);
 
         return ResponseEntity.ok(addressDto);
     }
@@ -118,9 +116,7 @@ public class MypageController {
     // 배송지 삭제
     @DeleteMapping("/address")
     public ResponseEntity<String> deleteAddress(@RequestParam Long addressId, @AuthenticationPrincipal UserDTO userDTO) {
-        Long userId = userDTO.getUserId();
-
-        addressService.deleteAddress(userId, addressId);
+        addressService.deleteAddress(userDTO.getUserId(), addressId);
 
         return ResponseEntity.ok("Address deleted successfully!");
     }
@@ -177,7 +173,7 @@ public class MypageController {
     public ResponseEntity<BuyHistoryAllDto> getAllBuyHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        BuyHistoryAllDto buyHistoryAllDto = ordersService.getAllBuyHistory(userId);
+        BuyHistoryAllDto buyHistoryAllDto = buyingBiddingService.getAllBuyHistory(userId);
 
         return ResponseEntity.ok(buyHistoryAllDto);
     }
@@ -186,14 +182,14 @@ public class MypageController {
     public List<BuyDetailsProcessDto> getBuyHistoryProcess(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        return ordersService.getBuyHistoryProcess(userId);
+        return buyingBiddingService.getBuyHistoryProcess(userId);
     }
     // 종료
     @GetMapping("/buyHistory/complete")
     public List<BuyDetailsDto> getBuyHistoryComplete(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        return ordersService.getBuyHistoryComplete(userId);
+        return buyingBiddingService.getBuyHistoryComplete(userId);
     }
     // 입찰 취소
     @PutMapping("/buyHistory/process")

@@ -1,8 +1,7 @@
 package com.example.backend.controller.shop;
 
 import com.example.backend.dto.product.AllProductDto;
-import com.example.backend.service.ShopService;
-import io.lettuce.core.dynamic.annotation.Param;
+import com.example.backend.service.shop.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Log4j2
 @RequiredArgsConstructor

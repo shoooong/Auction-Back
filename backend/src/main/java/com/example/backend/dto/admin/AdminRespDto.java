@@ -8,6 +8,7 @@ import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,9 +22,19 @@ public class AdminRespDto {
     @Getter
     public static class ReqProductsRespDto {
         private List<ProductDto> products = new ArrayList<>();
+        private int totalPages;
+        private long totalElements;
+        private int number;
+        private int pageSize;
+        private boolean isLast;
 
-        public ReqProductsRespDto(List<Product> products) {
+        public ReqProductsRespDto(Page<Product> products) {
             this.products = products.stream().map(ProductDto::new).collect(Collectors.toList());
+            this.totalPages = products.getTotalPages();
+            this.totalElements = products.getTotalElements();
+            this.number = products.getNumber();
+            this.pageSize = products.getSize();
+            this.isLast = products.isLast();
         }
         @Setter
         @Getter
@@ -114,7 +125,7 @@ public class AdminRespDto {
         private LuckyProcessStatus luckyProcessStatus;
         private List<LuckyDrawDto> luckyDraws = new ArrayList<>();
 
-        public LuckyDrawsRespDto(LuckyProcessStatus luckyProcessStatus,List<LuckyDraw> luckyDraws) {
+        public LuckyDrawsRespDto(LuckyProcessStatus luckyProcessStatus,Page<LuckyDraw> luckyDraws) {
             this.luckyProcessStatus = luckyProcessStatus;
             this.luckyDraws = luckyDraws.stream().map(LuckyDrawDto::new).collect(Collectors.toList());
         }
@@ -135,20 +146,6 @@ public class AdminRespDto {
     }
 
 
-    //상품 전체 대분류 소분류별 조회 응답 Dto
-    @Getter
-    @Setter
-    public static class AdminProductResponseDto {
-        private String mainDepartment;
-        private String subDepartment;
-        private List<AdminProductDto> products;
-
-        public AdminProductResponseDto(String mainDepartment, String subDepartment, List<AdminProductDto> products) {
-            this.mainDepartment = mainDepartment;
-            this.subDepartment = subDepartment;
-            this.products = products;
-        }
-    }
 
     //상품 상세 응답 Dto
     @Getter

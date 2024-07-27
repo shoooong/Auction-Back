@@ -10,6 +10,7 @@ import com.example.backend.entity.enumData.SalesStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -86,7 +87,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -109,7 +111,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -133,7 +136,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -157,7 +161,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         sales.salesBiddingPrice.max().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(sales).on(product.productId.eq(sales.product.productId))
@@ -181,7 +186,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productName,
                         product.modelNum,
                         buying.buyingBiddingPrice.min().as("biddingPrice"),
-                        product.createDate.as("registerDate")
+                        product.createDate.as("registerDate"),
+                        product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(buying).on(product.productId.eq(buying.product.productId))
@@ -242,10 +248,14 @@ public class ProductSearchImpl implements ProductSearch {
         return priceValue;
     }
 
+
     @Override
     public List<SalesBiddingDto> recentlyTransaction(String modelNum) {
+        QProduct product = QProduct.product;
+        QSalesBidding sales = QSalesBidding.salesBidding;
+        QBuyingBidding buying = QBuyingBidding.buyingBidding;
 
-        List<SalesBiddingDto> salesBiddingDtoList = queryFactory.select(Projections.bean(SalesBiddingDto.class,
+        return queryFactory.select(Projections.bean(SalesBiddingDto.class,
                         product.productId,
                         product.modelNum,
                         product.productSize,
@@ -256,19 +266,14 @@ public class ProductSearchImpl implements ProductSearch {
                         sales.salesBiddingPrice.as("salesBiddingPrice")
                 ))
                 .from(product)
-                .leftJoin(sales).on(sales.product.eq(product))
-                .leftJoin(buying).on(buying.product.eq(product))
+                .leftJoin(sales).on(sales.product.eq(product).and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
+                .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
-                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE))
-                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
-                        .and(product.productId.eq(product.productId)))
+                        .and(sales.salesBiddingTime.isNotNull()))
                 .orderBy(sales.salesBiddingTime.desc())
-                .fetch();
-
-        return salesBiddingDtoList.stream()
                 .distinct()
-                .collect(Collectors.toList());
+                .fetch();
     }
 
     @Override
@@ -304,21 +309,29 @@ public class ProductSearchImpl implements ProductSearch {
 
     @Override
     public List<GroupByBuyingDto> groupByBuyingSize(String modelNum) {
+        QBuyingBidding subBuying = new QBuyingBidding("subBuying");
         List<GroupByBuyingDto> groupByBuyingDtoList = queryFactory.select(Projections.bean(GroupByBuyingDto.class,
+                        buying.buyingBiddingId.as("buyProductId"),
                         product.productImg,
                         product.productName,
                         product.modelNum,
                         product.productSize,
                         buying.buyingBiddingPrice.min().as("buyingBiddingPrice"),
                         product.productId.as("productId"))
-                        )
+                )
                 .from(product)
                 .leftJoin(buying).on(buying.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
                         .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
-                .groupBy(product.productSize)
-                .orderBy(buying.buyingBiddingPrice.min().asc())
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(buying.buyingBiddingPrice.eq(
+                                JPAExpressions.select(subBuying.buyingBiddingPrice.min())
+                                        .from(subBuying)
+                                        .where(subBuying.product.eq(product)
+                                                .and(subBuying.biddingStatus.eq(BiddingStatus.PROCESS)))
+                        )))
+                .groupBy(product.productSize, buying.buyingBiddingId)
+                .orderBy(buying.buyingBiddingPrice.asc())
                 .fetch();
 
         log.info("GroupByBuyingDtoList Success : {}", groupByBuyingDtoList);
@@ -329,29 +342,38 @@ public class ProductSearchImpl implements ProductSearch {
 
     @Override
     public List<GroupBySalesDto> groupBySalesSize(String modelNum) {
+        QSalesBidding subSales = new QSalesBidding("subSales");
         List<GroupBySalesDto> groupBySalesDtoList = queryFactory.select(Projections.bean(GroupBySalesDto.class,
+                        sales.salesBiddingId.as("salesProductId"),
                         product.productImg,
                         product.productName,
                         product.modelNum,
                         product.productSize,
                         sales.salesBiddingPrice.max().as("productMaxPrice"),
                         product.productId.as("productId"))
-                        )
+                )
                 .from(product)
                 .leftJoin(sales).on(sales.product.eq(product))
                 .where(product.modelNum.eq(modelNum)
                         .and(sales.salesStatus.eq(SalesStatus.PROCESS))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
-                .groupBy(product.productSize)
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesBiddingPrice.eq(
+                                JPAExpressions.select(subSales.salesBiddingPrice.max())
+                                        .from(subSales)
+                                        .where(subSales.product.eq(product)
+                                                .and(subSales.salesStatus.eq(SalesStatus.PROCESS)))
+                        )))
+                .groupBy(product.productSize, sales.salesBiddingId)
                 .orderBy(sales.salesBiddingPrice.desc())
                 .fetch();
+
         return groupBySalesDtoList.stream()
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto) {
+    public BidResponseDto BuyingBidResponse(BidRequestDto bidRequestDto) {
 
         JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.min().castToNum(Long.class))
                 .from(buying)
@@ -370,12 +392,14 @@ public class ProductSearchImpl implements ProductSearch {
         Long lowestPriceLong = lowPriceQuery.fetchOne();
         Long highestPriceLong = topPriceQuery.fetchOne();
 
+        log.info("lowestPriceLong : {}   highestPriceLong : {}", lowestPriceLong, highestPriceLong);
+
         // Long 값을 BigDecimal로 변환
         BigDecimal lowestPrice = (lowestPriceLong != null) ? BigDecimal.valueOf(lowestPriceLong) : BigDecimal.ZERO;
         BigDecimal highestPrice = (highestPriceLong != null) ? BigDecimal.valueOf(highestPriceLong) : BigDecimal.ZERO;
 
         // BuyingBidResponseDto 생성 및 설정
-        BuyingBidResponseDto priceValue = BuyingBidResponseDto.builder()
+        BidResponseDto priceValue = BidResponseDto.builder()
                 .productBuyPrice(lowestPrice)
                 .productSalePrice(highestPrice)
                 .build();

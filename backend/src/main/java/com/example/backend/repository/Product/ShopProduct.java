@@ -9,6 +9,5 @@ import java.util.List;
 public interface ShopProduct{
     Slice<AllProductDto> allProduct(Pageable pageable);
 
-
     Slice<AllProductDto> getProductsBySubDepartment(Pageable pageable, List<String> subDepartment);
 }

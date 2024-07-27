@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -28,15 +30,25 @@ public class AlarmService {
 
     private final static Long DEFAULT_TIMEOUT = 3600000L;
     private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
+    private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
     private final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
     public SseEmitter subscribe(Long userId){
+//        String emitterId = userId+"_"+System.currentTimeMillis();
         userEmitters.put(userId, emitter);
 
         // 기존 알람 데이터 전송
         sendAlarmNotification(userId);
-        sendHeartBeat();
+
+//        if (!lastEventId.isEmpty()) {
+//            Map<String, Object> events = eventCache.entrySet().stream().filter(entry -> entry.getKey().startsWith(emitterId))
+//                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//
+//            events.entrySet().stream()
+//                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+//                    .forEach(entry -> sendAlarmNotification(userId));
+//        }
 
         // 상황별 emitter 삭제 처리
         emitter.onCompletion(() -> userEmitters.remove(userId));
@@ -47,20 +59,34 @@ public class AlarmService {
     }
 
     @Scheduled(fixedRate = 45 * 1000)
-    public void sendHeartBeat(){
+    public void sendHeartBeat() {
+        List<Long> userEmitterKeys = new ArrayList<>(userEmitters.keySet());
+        List<Long> failedEmitters = new ArrayList<>();
 
-        SseEmitter dummyEmitter = new SseEmitter(DEFAULT_TIMEOUT);
-        try {
-            dummyEmitter.send(SseEmitter.event()
-                    .comment("alarm beat"));
-            log.info("슬기 alarm beat");
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Long userId : userEmitterKeys) {
+            try {
+                SseEmitter emitter = userEmitters.get(userId);
+
+                if (emitter == null) {
+                    failedEmitters.add(userId);
+                    continue;
+                }
+
+                emitter.send(SseEmitter.event()
+                        .id(String.valueOf(userId))
+                        .name("beat")
+                        .data("alarm beat"));
+            } catch (IOException e) {
+                failedEmitters.add(userId);
+                emitter.complete();
+            }
         }
+        failedEmitters.forEach(userEmitters::remove);
     }
 
     // 알림들 가져오기
     @Async
+    @Transactional
     public void sendAlarmNotification(Long userId) {
         List<ResponseAlarmDto> list = alarmRepository.findByUsersUserId(userId).stream().map(ResponseAlarmDto::fromEntity).collect(toList());
         SseEmitter emitter = userEmitters.get(userId);

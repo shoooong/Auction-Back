@@ -19,9 +19,7 @@ public class ProductReqDto {
     private String productName;
     private BigDecimal originalPrice;
     private String productSize;
-    private ProductStatus productStatus;
-    //수정용
-    private MultipartFile productPhoto;
+
 
 
 

@@ -1,5 +1,7 @@
 package com.example.backend.security.filter;
 
+import com.example.backend.exception.CustomJWTException;
+import com.example.backend.repository.User.TokenRepository;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.dto.user.UserDTO;
 import com.google.gson.Gson;
@@ -29,11 +31,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final JWTUtil jwtUtil;
+    private final TokenRepository tokenRepository;
 
 
     private static final List<String> AUTHENTICATED_ENDPOINTS = List.of(
-            "/mypage/**",
-            "/luckydraw/*/enter",
+        "/api/**",
+        "/*/api/**",
             "/feed/user/**",
             "/inquiry/*/delete",
             "/requestProduct/user/**",
@@ -50,10 +53,16 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             "/inquiry/user/registration",
             "/notice/user/**",
             "/inquiry/**",
-            "/products/details/**",
+            "/api/products/details/**",
             "/announcementRegistration",
-            "/api/bookmark",
-            "/product/request"
+            "/product/bookmark",
+            "/product/request",
+            "/modifyAnnouncement/**",
+            "/deleteAnnouncement/**",
+            "/bid/**",
+            "/select/bookmark",
+            "/delete/bookmark/**"
+
     );
 
     /**
@@ -73,15 +82,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         log.info("check uri............" + path);
 
-        // 2) /user/ 로그인과 회원가입 호출 경로 제외
-//        if (path.equals("/luckydraw") || path.matches("^/luckydraw/[^/]+$") ||
-//                path.equals("/user/kakao") || path.equals("/user/login") || path.equals("/user/register") || path.equals("/user/register/admin")) {
-//            return true;
-//        }
-
-//        if (path.equals("/coupon/user"))
-//            return true;
-
         // 3) 이미지 조회 경로 제외
         // TODO: 클라우드 DB 이미지 업로드 성공 시 경로 설정
 
@@ -95,11 +95,15 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("------------------JWTCheckFilter...-----------------");
 
-        String authHeaderStr = request.getHeader("Authorization");
-        log.info("authHeaderStr: {}", authHeaderStr);
+        String authHeader = request.getHeader("Authorization");
 
         try {
-            String accessToken = authHeaderStr.substring(7);
+            String accessToken = authHeader.substring(7);
+
+            if (tokenRepository.isBlacklist(accessToken)) {
+                throw new CustomJWTException("TOKEN_BLACKLISTED");
+            }
+
             Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
             log.info("###JWT claims: {}", claims);
@@ -126,7 +130,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("JWT Check Error: " + e.getMessage());
-//            throw new CustomJWTException("@ERROR_ACCESS_TOKEN");
 
             response.setContentType("application/json");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

@@ -40,7 +40,7 @@ public interface ProductSearch {
 
     List<GroupBySalesDto> groupBySalesSize(String modelNum);
 
-    BuyingBidResponseDto BuyingBidResponse(BuyingBidRequestDto bidRequestDto);
+    BidResponseDto BuyingBidResponse(BidRequestDto bidRequestDto);
 
     List<AveragePriceDto> getAllContractData(String modelNum, LocalDateTime startDate, LocalDateTime endDate);
 

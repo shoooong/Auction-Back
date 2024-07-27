@@ -63,4 +63,8 @@ public class Address {
         this.extraAddress = addressReqDto.getExtraAddress();
         this.defaultAddress = addressReqDto.isDefaultAddress();
     }
+
+    public void updateDefaultAddress(Boolean isDefaultAddress) {
+        this.defaultAddress = isDefaultAddress;
+    }
 }

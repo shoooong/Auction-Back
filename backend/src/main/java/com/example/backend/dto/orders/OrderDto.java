@@ -1,7 +1,13 @@
 package com.example.backend.dto.orders;
 
+import com.example.backend.dto.admin.AdminRespDto.ReqProductsRespDto.ProductDto;
+import com.example.backend.dto.mypage.addressSettings.AddressDto;
+import com.example.backend.dto.requestproduct.RequestProductDto;
+import com.example.backend.entity.Address;
 import com.example.backend.entity.BuyingBidding;
+import com.example.backend.entity.Product;
 import com.example.backend.entity.enumData.OrderStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,10 +24,11 @@ import lombok.ToString;
 public class OrderDto {
     private Long orderId;
     private Long userId;
-    private Long productId;
-    private Long biddingId;
+    private OrderProductDto product;
+    private BuyingBiddingDto biddingBidding;
+    private AddressDto address;
     private OrderStatus orderStatus;
-    private Long orderPrice;
+    private BigDecimal orderPrice;
     private LocalDateTime orderDate;
 
 }

@@ -6,6 +6,8 @@ import com.example.backend.dto.coupon.CouponDto;
 import com.example.backend.dto.coupon.CouponIssueDto;
 import com.example.backend.dto.coupon.UserCouponDto;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.entity.enumData.AlarmType;
+import com.example.backend.service.alarm.AlarmService;
 import com.example.backend.service.coupon.CouponIssueService;
 import com.example.backend.service.coupon.CouponService;
 import java.util.List;
@@ -26,35 +28,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/coupon")
 @Log4j2
 public class CouponController {
 
     private final CouponService couponService;
     private final CouponIssueService couponIssueService;
 
-    @PostMapping("/create")
+    private final AlarmService alarmService;
+
+    @GetMapping("/coupon/time-attack")
+    public ResponseEntity<List<CouponDto>> timeAttack(){
+        List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
+
+        return new ResponseEntity<>(couponDto, HttpStatus.OK);
+    }
+    @PostMapping("/api/coupon/create")
     public ResponseEntity<?> couponCreate(@RequestBody CouponCreateDto couponCreateDto){
         couponService.createCoupon(couponCreateDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(couponCreateDto);
     }
 
-    @PostMapping("/{couponId}/issue")
+    @PostMapping("/api/coupon/{couponId}/issue")
     public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
         couponIssueService.issueCoupon(couponId, userDTO.getUserId());
+
+        // 알림 전송
+        alarmService.sendNotification(userDTO.getUserId(), AlarmType.COUPON);
 
         return ResponseEntity.ok(200);
     }
 
-    @GetMapping("/time-attack")
-    public ResponseEntity<List<CouponDto>> timeAttack(){
-        List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
 
-        return new ResponseEntity<>(couponDto, HttpStatus.OK);
-    }
 
-    @GetMapping("/user")
+    @GetMapping("/api/coupon/user")
     public ResponseEntity<List<UserCouponDto>> userCoupons(@AuthenticationPrincipal UserDTO userDTO){
         List<UserCouponDto> userCoupons= couponIssueService.userCoupons(userDTO.getUserId());
 

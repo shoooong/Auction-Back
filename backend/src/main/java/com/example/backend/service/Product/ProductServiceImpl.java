@@ -1,6 +1,7 @@
 package com.example.backend.service.Product;
 
 import com.example.backend.dto.admin.ProductRespDto;
+import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.entity.*;
@@ -146,6 +147,7 @@ public class ProductServiceImpl implements ProductService {
 
                     .contractInfoList(contractInfoList)
                     .buyingHopeList(buyingHopeDtoList)
+                    .salesHopeList(salesHopeDtoList)
 
                     .photoReviewList(photoReviewDtoList)
 
@@ -193,7 +195,6 @@ public class ProductServiceImpl implements ProductService {
         SalesBiddingDto recentlyContractValue = newAllContractSelect.get(0);
         LocalDateTime recentlyContractTime = recentlyContractValue.getSalesBiddingTime();
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
-
 
         RecentlyPriceDto recentlyPriceDto = RecentlyPriceDto.builder()
                 .latestPrice(recentlyContractValue.getLatestPrice())
@@ -260,6 +261,7 @@ public class ProductServiceImpl implements ProductService {
         return recentlyPriceDto;
     }
 
+
     // 체결 내역 관리(리스트)
     @Override
     public List<ProductsContractListDto> selectSalesContract(String modelNum) {
@@ -269,7 +271,7 @@ public class ProductServiceImpl implements ProductService {
         return temp.stream()
                 .map(contractValue -> ProductsContractListDto.builder()
                         .productSize(contractValue.getProductSize())
-                        .productContractPrice(contractValue.getLatestPrice())
+                        .productContractPrice(contractValue.getSalesBiddingPrice())
                         .productContractDate(contractValue.getSalesBiddingTime())
                         .build())
                 .collect(Collectors.toList());
@@ -360,6 +362,7 @@ public class ProductServiceImpl implements ProductService {
                 .user(user)
                 .reviewLike(0)
                 .reviewImg(photoRequestDto.getReviewImg())
+                .reviewId(photoRequestDto.getReviewId())
                 .reviewContent(photoRequestDto.getReviewContent())
                 .build();
 
@@ -422,53 +425,52 @@ public class ProductServiceImpl implements ProductService {
 
     // 상세 상품의 거래 체결 조회
     @Override
-    public BuyingBidResponseDto selectBuyingBid(BuyingBidRequestDto buyingBidRequestDto) {
+    public BidResponseDto selectBidInfo(BidRequestDto bidRequestDto) {
 
-        Long userId = buyingBidRequestDto.getUserId();
+        Long userId = bidRequestDto.getUserId();
         boolean check = userRepository.existsByUserId(userId);
         if (check) {
             log.info("해당 계정은 합격");
             // 상품 기본정보 뽑기
-            Optional<Product> products = productRepository.findBidProductInfo(buyingBidRequestDto.getModelNum(), buyingBidRequestDto.getProductSize());
+            Optional<Product> products = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getProductSize());
             log.info("상품의 기본 정보 확인 : {}", products);
 
             if (products.isEmpty()) {
                 log.info("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
                 throw new IllegalArgumentException("해당 상품의 모델번호나 사이즈가 일치하지 않습니다.");
-
             }
             // 해당 상품의 사이즈에 대한 가격 뽑기, 구매 / 판매 둘다
-            BuyingBidResponseDto buyingBidResponseDto = productRepository.BuyingBidResponse(buyingBidRequestDto);
-            if (buyingBidResponseDto == null) {
+            BidResponseDto bidResponseDto = productRepository.BuyingBidResponse(bidRequestDto);
+            if (bidResponseDto == null) {
                 log.info("해당 상품의 가격이 존재하지 않습니다.");
                 throw new IllegalArgumentException("해당 상품의 가격이 존재하지 않습니다.");
             }
-            log.info("해당 사이즈에 대한 가격 뽑기 : {}", buyingBidResponseDto);
+            log.info("해당 사이즈에 대한 가격 뽑기 : {}", bidResponseDto);
 
 
-            return BuyingBidResponseDto.builder()
+            return BidResponseDto.builder()
                     .productImg(products.get().getProductImg())
                     .productName(products.get().getProductName())
                     .productSize(products.get().getProductSize())
-                    .productBuyPrice(buyingBidResponseDto.getProductBuyPrice())
-                    .productSalePrice(buyingBidResponseDto.getProductSalePrice())
+                    .productBuyPrice(bidResponseDto.getProductBuyPrice())
+                    .productSalePrice(bidResponseDto.getProductSalePrice())
                     .build();
         }
         return null;
     }
 
     @Override
-    public void saveTemporaryBid(BidRequestDto bidRequestDto) {
-        Users user = userRepository.findById(bidRequestDto.getUserId())
+    public void saveTemporaryBid(InsertBidDto insertBidDto) {
+        Users user = userRepository.findById(insertBidDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
-        Product product = productRepository.findBidProductInfo(bidRequestDto.getModelNum(), bidRequestDto.getSize())
+        Product product = productRepository.findBidProductInfo(insertBidDto.getModelNum(), insertBidDto.getSize())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 상품 ID 입니다."));
 
-        if (bidRequestDto.getType().equals("buy")) {
-            BuyingBidding buyingBidding = bidRequestDto.toBuyingBidding(user, product);
+        if (insertBidDto.getType().equals("buy")) {
+            BuyingBidding buyingBidding = insertBidDto.toBuyingBidding(user, product);
             buyingBiddingRepository.save(buyingBidding);
-        } else if (bidRequestDto.getType().equals("sale")) {
-            SalesBidding salesBidding = bidRequestDto.toSalesBidding(user, product);
+        } else if (insertBidDto.getType().equals("sale")) {
+            SalesBidding salesBidding = insertBidDto.toSalesBidding(user, product);
             salesBiddingRepository.save(salesBidding);
         }
     }
@@ -477,22 +479,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public AveragePriceResponseDto getAveragePrices(String modelNum) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime temp = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
-        List<SalesBidding> salesBiddingList = salesBiddingRepository.findFirstByOriginalContractDate(modelNum);
-        LocalDateTime firstContractTime = salesBiddingList.get(0).getSalesBiddingTime();
+        LocalDateTime temp = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
 
-        log.info("firstContractTime: {}", firstContractTime);
         List<AveragePriceDto> allContractData = productRepository.getAllContractData(modelNum, temp, now);
-
-        if (allContractData.isEmpty()) {
-            throw new RuntimeException("No contract data available for model: " + modelNum);
-        }
 
         List<AveragePriceDto> threeDayPrices = calculateAveragePrice(allContractData, now.minusDays(3), now, 3);
         List<AveragePriceDto> oneMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(1), now, 24);
         List<AveragePriceDto> sixMonthPrices = calculateAveragePrice(allContractData, now.minusMonths(6), now, 168);
         List<AveragePriceDto> oneYearPrices = calculateAveragePrice(allContractData, now.minusYears(1), now, 720);
-        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, firstContractTime, now, 720);
+        List<AveragePriceDto> totalExecutionPrice = calculateAveragePrice(allContractData, now.minusYears(2), now, 720);
 
         return AveragePriceResponseDto.builder()
                 .threeDayPrices(threeDayPrices)
@@ -502,6 +497,7 @@ public class ProductServiceImpl implements ProductService {
                 .totalExecutionPrice(totalExecutionPrice)
                 .build();
     }
+
 
     @Override
     @Transactional
@@ -536,6 +532,7 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+
     public List<AveragePriceDto> getAllContractData(List<AveragePriceDto> allContractData, LocalDateTime startDate, LocalDateTime endDate) {
         return allContractData.stream()
                 .filter(data -> data.getContractDateTime().isAfter(startDate) && data.getContractDateTime().isBefore(endDate))
@@ -557,7 +554,26 @@ public class ProductServiceImpl implements ProductService {
 
     // 피드 랭킹
     @Override
-    public List<ProductRankingDto> getAllProductsByLikes(String mainDepartment) {
-        return productRepository.searchAllProductByLikes(mainDepartment);
+    public List<ProductRankingDto> getAllProductsByLikes() {
+        return productRepository.searchAllProductByLikes();
+    }
+
+    @Override
+    public OrderProductDto getProductOne(Long productId) {
+        Product product = productRepository.findProductsByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("not found product"));
+
+        System.out.println("product = " + product);
+        OrderProductDto orderProductDto = OrderProductDto.builder()
+                .productId(product.getProductId())
+                .productImg(product.getProductImg())
+                .productBrand(product.getProductBrand())
+                .productName(product.getProductName())
+                .modelNum(product.getModelNum())
+                .productSize(product.getProductSize())
+                .subDepartment(product.getSubDepartment())
+                .build();
+
+        return orderProductDto;
     }
 }

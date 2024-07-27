@@ -22,10 +22,13 @@ import com.example.backend.service.objectstorage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,10 +49,9 @@ public class AdminService {
     private final OrdersRepository ordersRepository;
 
     //요청상품 다건 조회
-    public AdminRespDto.ReqProductsRespDto reqProducts(){
-        List<Product> products = productRepository.findByProductStatus(ProductStatus.REQUEST);
+    public AdminRespDto.ReqProductsRespDto reqProducts(Pageable pageable){
+        Page<Product> products = productRepository.findByProductStatus(ProductStatus.REQUEST,pageable);
         return new AdminRespDto.ReqProductsRespDto(products);
-
     }
 
     // 요청상품 단건 조회
@@ -57,87 +59,57 @@ public class AdminService {
         //productId로 상품찾기
         Optional<Product> reqProduct = productRepository.findById(productId);
         Product result = reqProduct.orElseThrow();
+        if (result.getModelNum()==null){
+            result.setModelNum("test-modelNum");
+        }
+
         return new AdminRespDto.ReqProductRespDto(result);
     }
-//    //요청상품 판매상품으로 등록
-//    @Transactional
-//    public AdminRespDto.RegProductRespDto acceptRequest(Long productId) {
-//        Optional<Product> result = productRepository.findByProductIdAndProductStatus(productId,ProductStatus.REQUEST);
-//        Product request = result.orElseThrow();
-//
-//        //모델번호 + 사이즈로 중복값이 있는지 판별
-//        List<Product> registeredProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
-//        Product finalRequest = request;
-//        boolean isDuplicate = registeredProducts.stream().anyMatch(registered ->
-//                finalRequest.getModelNum().equals(registered.getModelNum()) &&
-//                        finalRequest.getProductSize().equals(registered.getProductSize())
-//        );
-//        if (isDuplicate) {
-//            // 중복이면
-//            throw new RuntimeException("이미 기존 상품에 등록되어 있습니다.");
-//        } else {
-//
-//            finalRequest.changeProductStatus(ProductStatus.REGISTERED);
-//            return new AdminRespDto.RegProductRespDto(finalRequest);
-//        }
-//    }
-    @Transactional
-    public void acceptRequest(Long productId, ProductReqDto productReqDto){
-        String bucketName = "push";
-        String directoryPath = "shooong/dummy/products";
 
+    @Transactional
+    public void acceptRequest(Long productId, ProductReqDto productReqDto, MultipartFile productPhoto) {
+        String bucketName = "push";
+        String directoryPath = "shooong/products/";
         Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
         Product request = productPs.orElseThrow();
 
+//    Pageable pageable = PageRequest.ofSize(10);
         List<Product> registerProducts = productRepository.findByProductStatus(ProductStatus.REGISTERED);
-        boolean isDuplicate = registerProducts.stream().anyMatch(registered->
-                request.getModelNum().equals(registered.getModelNum())&&
-                request.getProductSize().equals(registered.getProductSize()));
-        if (isDuplicate){
+
+        boolean isDuplicate = registerProducts.stream().anyMatch(registered ->
+                productReqDto.getModelNum().equals(registered.getModelNum()) &&
+                        productReqDto.getProductSize().equals(registered.getProductSize()));
+        if (isDuplicate) {
             throw new RuntimeException("이미 기존 상품으로 등록되어 있습니다.");
-        }else {
-
-
-//            ProductReqDto reqDto = productReqDto.builder()
-//                    .productImg(productReqDto.getProductImg())
-//                    .productName(productReqDto.getProductName())
-//                    .productSize(productReqDto.getProductSize())
-//                    .productBrand(productReqDto.getProductBrand())
-//                    .originalPrice(productReqDto.getOriginalPrice())
-//                    .modelNum(productReqDto.getModelNum())
-//                    .productStatus(ProductStatus.REGISTERED)
-//                    .build();
-
-            // S3에 이미지 업로드
-            String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productReqDto.getProductPhoto());
-            productReqDto.setProductImg(imageUrl);
+        } else {
+            if (productPhoto != null && !productPhoto.isEmpty()) {
+                String imageUrl = objectStorageService.uploadFile(bucketName, directoryPath, productPhoto);
+                productReqDto.setProductImg(imageUrl);
+            }
 
             request.registerProduct(productReqDto);
 
         }
-
-
-
     }
+
+
     @Transactional
-    //사용자가 요청한 상품, 중복시 삭제
+    //사용자가 요청한 상품, 중복시 거절
     //중복 판별은 위에서 함
     public String deleteRequest(Long productId) {
 
         Optional<Product> productPs = productRepository.findById(productId);
-        productPs.ifPresent(product -> {productRepository.delete(product);});
+        productPs.ifPresent(product -> {product.changeProductStatus(ProductStatus.REJECTED);});
 
-        String message = productId.toString()+"삭제 완료";
+        String message = productId.toString()+"거절 완료";
 
         return message;
     }
 
     //판매상품 관리(카테고리별)조회
-    public AdminRespDto.AdminProductResponseDto getProducts(String mainDepartment, String subDepartment) {
-        List<AdminProductDto> adminProductDto = productRepository.getProductsByDepartment(mainDepartment, subDepartment);
-
-        log.info("productId" + adminProductDto.get(0).getProductId());
-        return new AdminRespDto.AdminProductResponseDto(mainDepartment,subDepartment,adminProductDto);
+    public AdminProductResponseDto getProducts(String mainDepartment, String subDepartment, Pageable pageable) {
+        Page<AdminProductDto> adminProductDtoPage = productRepository.getProductsByDepartment(mainDepartment, subDepartment, pageable);
+        return new AdminProductResponseDto(mainDepartment, subDepartment, adminProductDtoPage);
     }
 
     //상품상세 조회 + 판매입찰 + 구매입찰 정보
@@ -201,8 +173,8 @@ public class AdminService {
     //test
     //매주 첫째주 11시에 시작
     //럭키 드로우 상품 상태 READY -> PROCESS
-//    @Scheduled(cron = "0 0 11 ? * MON")
-    @Scheduled(cron = "0 52 14 * * MON")
+    @Scheduled(cron = "0 30 20 ? * FRI")
+//    @Scheduled(cron = "0 52 14 * * MON")
     @Transactional
     public void cronJob() {
         //스케줄 실행시, 데이터 베이스에 저장되어 있는 럭키드로우 데이터 startDate, endDate, LuckDate 등록
@@ -211,12 +183,13 @@ public class AdminService {
         List<LuckyDraw> ready = luckyDrawRepository.findByLuckyProcessStatus(LuckyProcessStatus.READY);
 
         //시작 날짜 매주 월요일 11:00:00
-        LocalDateTime startDate = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+//        LocalDateTime startDate = LocalDateTime.now().withHour(11).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime startDate = LocalDateTime.now();
         // 마감 날짜 시작 날짜 + 7
-        LocalDateTime endDate = startDate.plusDays(7).withHour(11).withMinute(0).withSecond(0).withNano(0);
-//        LocalDateTime endDate = startDate.plusDays(0).withHour(19).withMinute(50).withSecond(0).withNano(0);
+//        LocalDateTime endDate = startDate.plusDays(7).withHour(11).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endDate = startDate.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         // 발표일 : 마감 날짜 + 1 18:00:00
-        LocalDateTime luckDate = endDate.plusDays(1).withHour(18).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime luckDate = endDate.plusDays(1).withHour(0).withMinute(1).withSecond(0).withNano(0);
         //상품 등록
         for (LuckyDraw luckyDraw : ready) {
             luckyDraw.changeDate(startDate, endDate, luckDate);
@@ -226,9 +199,9 @@ public class AdminService {
     }
 
     //관리자 페이지 럭키드로우 상품 다건 조회
-    public AdminRespDto.LuckyDrawsRespDto getLuckyDraws(LuckyProcessStatus luckyProcessStatus) {
+    public AdminRespDto.LuckyDrawsRespDto getLuckyDraws(LuckyProcessStatus luckyProcessStatus, Pageable pageable) {
 
-        List<LuckyDraw> luckyDrawList = luckyDrawRepository.findByLuckyProcessStatus(luckyProcessStatus);
+        Page<LuckyDraw> luckyDrawList = luckyDrawRepository.findByLuckyProcessStatus(luckyProcessStatus, pageable);
 
         return new AdminRespDto.LuckyDrawsRespDto(luckyProcessStatus,luckyDrawList);
 
@@ -262,3 +235,4 @@ public class AdminService {
 
 
 }
+

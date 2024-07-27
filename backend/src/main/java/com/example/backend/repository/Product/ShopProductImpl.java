@@ -3,6 +3,7 @@ package com.example.backend.repository.Product;
 import com.example.backend.dto.product.AllProductDto;
 import com.example.backend.entity.QBuyingBidding;
 import com.example.backend.entity.QProduct;
+import com.example.backend.entity.QSalesBidding;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.ProductStatus;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
@@ -27,14 +28,9 @@ public class ShopProductImpl implements ShopProduct {
 
     QProduct product = QProduct.product;
     QBuyingBidding buyingBidding = QBuyingBidding.buyingBidding;
+    QSalesBidding salesBidding = QSalesBidding.salesBidding;
 
     // 필터링
-    private BooleanExpression eqMain(List<String> mainDepartment){
-        if (StringUtils.isBlank(mainDepartment.toString())){
-            return null;
-        }
-        return product.mainDepartment.in(mainDepartment);
-    }
     private BooleanExpression eqSub(List<String> subDepartment){
         if (StringUtils.isBlank(subDepartment.toString())){
             return null;
@@ -62,8 +58,8 @@ public class ShopProductImpl implements ShopProduct {
                         ))
                 .from(product)
                 .leftJoin(buyingBidding).on(product.productId.eq(buyingBidding.product.productId))
-                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED"))
-                        .and(buyingBidding.biddingStatus.eq(BiddingStatus.valueOf("PROCESS"))))
+                .leftJoin(salesBidding).on(product.productId.eq(salesBidding.product.productId))
+                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED")))
                 .groupBy(product.modelNum)
                 .offset(pageable.getOffset())
                 .limit(pageSize + 1)
@@ -97,8 +93,7 @@ public class ShopProductImpl implements ShopProduct {
                 ))
                 .from(product)
                 .leftJoin(buyingBidding).on(product.productId.eq(buyingBidding.product.productId))
-                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED"))
-                        .and(buyingBidding.biddingStatus.eq(BiddingStatus.valueOf("PROCESS"))), eqSub(subDepartment))
+                .where(product.productStatus.eq(ProductStatus.valueOf("REGISTERED")), eqSub(subDepartment))
                 .groupBy(product.modelNum)
                 .offset(pageable.getOffset())
                 .limit(pageSize + 1)

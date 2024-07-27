@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Log4j2
-@RequestMapping("/feed")
 public class StyleFeedController {
 
     @Autowired
@@ -32,7 +31,7 @@ public class StyleFeedController {
     private String bucketName = "push";
 
     // 피드 등록
-    @PostMapping("/user/feedRegistration")
+    @PostMapping("/api/user/feedRegistration")
     @ResponseStatus(HttpStatus.CREATED)
     public void createStyleFeed(@ModelAttribute StyleFeedDto styleFeedDto,
                                 @AuthenticationPrincipal UserDTO userDTO,
@@ -65,7 +64,7 @@ public class StyleFeedController {
         return styleFeeds;
     }
 
-    // 좋아요 순으로 피드 조회
+    // 좋아요 순으로 피드 조회(랭킹)
     @GetMapping("/feedRanking")
     public List<StyleFeedDto> getAllStyleFeedRanking() {
         List<StyleFeedDto> styleFeeds = styleFeedService.getAllStyleFeedRanking();
@@ -82,7 +81,7 @@ public class StyleFeedController {
     }
 
     // 피드 수정
-    @PutMapping("/user/modifyFeed/{feedId}")
+    @PutMapping("/api/user/modifyFeed/{feedId}")
     public StyleFeedDto updateStyleFeed(@PathVariable Long feedId,
                                         @RequestBody StyleFeedDto styleFeedDto,
                                         @AuthenticationPrincipal UserDTO userDTO) {
@@ -94,7 +93,7 @@ public class StyleFeedController {
 
 
     // 피드 삭제
-    @DeleteMapping("/user/deleteFeed/{feedId}")
+    @DeleteMapping("/api/user/deleteFeed/{feedId}")
     public void deleteStyleFeed(@PathVariable Long feedId,
                                 @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -103,7 +102,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 저장
-    @PostMapping("/user/saveFeedBookmark")
+    @PostMapping("/api/user/saveFeedBookmark")
     @ResponseStatus(HttpStatus.CREATED)
     public FeedBookmarkDto createFeedBookmark(@RequestBody FeedBookmarkDto feedBookmarkDTO,
                                               @AuthenticationPrincipal UserDTO userDTO) throws IOException {
@@ -116,7 +115,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 조회
-    @GetMapping("/feedBookmark")
+    @GetMapping("/api/feedBookmark")
     public List<FeedBookmarkDto> getUserFeedBookmarks(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
         List<FeedBookmarkDto> feedBookmarks = styleFeedService.getUserFeedBookmarks(userId);
@@ -125,7 +124,7 @@ public class StyleFeedController {
     }
 
     // 관심피드 삭제
-    @DeleteMapping("/user/deleteFeedBookmark/{styleSavedId}")
+    @DeleteMapping("/api/user/deleteFeedBookmark/{styleSavedId}")
     public void deleteFeedBookmark(@PathVariable Long styleSavedId,
                                    @AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
@@ -133,7 +132,7 @@ public class StyleFeedController {
     }
 
     // 피드 좋아요 추가
-    @PostMapping("/user/likeFeed/{feedId}")
+    @PostMapping("/api/user/likeFeed/{feedId}")
     @ResponseStatus(HttpStatus.OK)
     public void likeStyleFeed(@PathVariable Long feedId) {
         styleFeedService.increaseLikeCount(feedId);

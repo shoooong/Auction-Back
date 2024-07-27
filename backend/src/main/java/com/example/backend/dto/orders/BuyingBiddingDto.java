@@ -42,16 +42,15 @@ public class BuyingBiddingDto {
 
     private BiddingStatus biddingStatus;
 
-//    public BuyingBidding toEntity() {
-//        return BuyingBidding.builder()
-//            .buyingBiddingId(this.buyingBiddingId)
-//            .product(this.prordcuㅅ)
-//            .buyingBiddingPrice(this.buyingBiddingPrice)
-//            .buyingQuantity(this.buyingQuantity)
-//            .buyingBiddingTime(this.buyingBiddingTime)
-//            .biddingStatus(this.biddingStatus)
-//            .build();
-//    }
-//}
+    private Long addressId;
+
+    public static BuyingBiddingDto fromEntity(BuyingBidding buyingBidding) {
+        return BuyingBiddingDto.builder()
+            .buyingBiddingId(buyingBidding.getBuyingBiddingId())
+            .buyingQuantity(buyingBidding.getBuyingQuantity())
+            .buyingBiddingTime(buyingBidding.getBuyingBiddingTime())
+            .biddingStatus(buyingBidding.getBiddingStatus())
+            .build();
+    }
 
 }

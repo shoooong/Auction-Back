@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Log4j2
-@RequestMapping("/notice")
 public class NoticeController {
 
     @Autowired
@@ -28,7 +27,7 @@ public class NoticeController {
     private LuckyDrawAnnouncementService luckyDrawAnnouncementService;
 
     // 공지사항 등록
-    @PostMapping("/user/noticeRegistration")
+    @PostMapping("/api/user/noticeRegistration")
     @ResponseStatus(HttpStatus.CREATED)
     public void createNotice(@RequestBody NoticeDto noticeDto,
                              @AuthenticationPrincipal UserDTO userDTO) {
@@ -59,21 +58,21 @@ public class NoticeController {
     }
 
     // 공지사항 조회-관리자
-    @GetMapping("/admin/noticeList")
+    @GetMapping("/api/admin/noticeList")
     public List<NoticeDto> getAllNoticeListForAdmin(){
         List<NoticeDto> notices = noticeService.getAllNoticeListForAdmin();
         return notices;
     }
 
     // 공지사항 상세조회-관리자
-    @GetMapping("/admin/notice/{noticeId}")
+    @GetMapping("/api/admin/notice/{noticeId}")
     public NoticeDto getNoticeByIdForAdmin(@PathVariable Long noticeId){
         NoticeDto noticeDto = noticeService.getNoticeByIdForAdmin(noticeId);
         return noticeDto;
     }
 
     // 공지사항 수정
-    @PutMapping("/user/modifyNotice/{noticeId}")
+    @PutMapping("/api/user/modifyNotice/{noticeId}")
     public NoticeDto updateNotice(@PathVariable Long noticeId,
                                   @RequestBody NoticeDto noticeDto,
                                   @AuthenticationPrincipal UserDTO userDTO) {
@@ -86,7 +85,7 @@ public class NoticeController {
 
 
     // 공지사항 삭제
-    @DeleteMapping("/user/deleteNotice/{noticeId}")
+    @DeleteMapping("/api/user/deleteNotice/{noticeId}")
     public void deleteNotice(@PathVariable Long noticeId,
                              @AuthenticationPrincipal UserDTO userDTO) {
         if (!userDTO.isRole()) {
@@ -99,6 +98,20 @@ public class NoticeController {
     // 공지사항 전체 조회
     @GetMapping("/user/combinedNoticeList")
     public CombinedNoticeDto getCombinedNoticeList() {
+        List<NoticeDto> notices = noticeService.getAllNoticeList();
+        List<LuckyDrawAnnouncementDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
+
+        CombinedNoticeDto combinedNotice = new CombinedNoticeDto();
+        combinedNotice.setNotices(notices);
+        combinedNotice.setLuckyDrawAnnouncements(luckyDrawAnnouncements);
+
+        log.info("통합 공지사항 조회 완료: {}", combinedNotice);
+        return combinedNotice;
+    }
+
+    // 공지사항 전체 조회-관리자
+    @GetMapping("/api/admin/user/combinedNoticeList")
+    public CombinedNoticeDto getCombinedNoticeListAdmin() {
         List<NoticeDto> notices = noticeService.getAllNoticeList();
         List<LuckyDrawAnnouncementDto> luckyDrawAnnouncements = luckyDrawAnnouncementService.getAllLuckyDrawAnnouncementList();
 
