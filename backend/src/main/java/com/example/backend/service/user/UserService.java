@@ -10,6 +10,7 @@ import com.example.backend.dto.user.UserModifyResDto;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
+import com.example.backend.service.BuyingBiddingService;
 import com.example.backend.service.OrdersService;
 import com.example.backend.service.SalesBiddingService;
 import com.example.backend.service.UserCouponService;
@@ -43,14 +44,13 @@ public class UserService {
    private final UserRepository userRepository;
    private final PasswordEncoder passwordEncoder;
 
-   private final OrdersService ordersService;
    private final SalesBiddingService salesBiddingService;
+   private final BuyingBiddingService buyingBiddingService;
    private final UserCouponService userCouponService;
    private final BookmarkProductService bookmarkProductService;
-
    private final ObjectStorageService objectStorageService;
 
-    public UserDTO entityToDTO(Users user) {
+   public UserDTO entityToDTO(Users user) {
        return new UserDTO(
               user.getUserId(),
               user.getEmail(),
@@ -257,7 +257,7 @@ public class UserService {
               .build();
 
       Long couponCount = userCouponService.getValidCouponCount(userId);
-      BuyHistoryAllDto buyHistoryAllDto = ordersService.getRecentBuyHistory(userId);
+      BuyHistoryAllDto buyHistoryAllDto = buyingBiddingService.getRecentBuyHistory(userId);
       SaleHistoryDto saleHistoryDto = salesBiddingService.getRecentSaleHistory(userId);
 
       return MypageMainDto.builder()

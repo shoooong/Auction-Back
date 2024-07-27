@@ -173,7 +173,7 @@ public class MypageController {
     public ResponseEntity<BuyHistoryAllDto> getAllBuyHistory(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        BuyHistoryAllDto buyHistoryAllDto = ordersService.getAllBuyHistory(userId);
+        BuyHistoryAllDto buyHistoryAllDto = buyingBiddingService.getAllBuyHistory(userId);
 
         return ResponseEntity.ok(buyHistoryAllDto);
     }
@@ -182,14 +182,14 @@ public class MypageController {
     public List<BuyDetailsProcessDto> getBuyHistoryProcess(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        return ordersService.getBuyHistoryProcess(userId);
+        return buyingBiddingService.getBuyHistoryProcess(userId);
     }
     // 종료
     @GetMapping("/buyHistory/complete")
     public List<BuyDetailsDto> getBuyHistoryComplete(@AuthenticationPrincipal UserDTO userDTO) {
         Long userId = userDTO.getUserId();
 
-        return ordersService.getBuyHistoryComplete(userId);
+        return buyingBiddingService.getBuyHistoryComplete(userId);
     }
     // 입찰 취소
     @PutMapping("/buyHistory/process")

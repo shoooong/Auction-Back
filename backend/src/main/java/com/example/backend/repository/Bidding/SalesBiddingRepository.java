@@ -19,8 +19,7 @@ import java.util.Optional;
 public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long> {
 
     // 전체 구매 입찰 건수
-    @Query("SELECT COUNT(s) FROM SalesBidding s WHERE s.user.userId = :userId")
-    Long countAllByUserId(Long userId);
+    Long countAllByUserUserId(Long userId);
 
     // 상태별 건수
     @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SalesStatusCountDto(s.salesStatus, COUNT(s)) " +
@@ -33,14 +32,14 @@ public interface SalesBiddingRepository extends JpaRepository<SalesBidding, Long
     @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesBiddingId, s.salesBiddingPrice, s.salesStatus) " +
             "FROM SalesBidding s JOIN s.product p JOIN s.user u " +
             "WHERE u.userId = :userId " +
-            "ORDER BY s.salesBiddingTime DESC")
+            "ORDER BY s.modifyDate DESC")
     List<SaleDetailsDto> findSaleDetailsByUserId(Long userId);
 
     // 판매 입찰 상세 정보 - 최근 3건 조회
     @Query("SELECT new com.example.backend.dto.mypage.saleHistory.SaleDetailsDto(p.productImg, p.productName, p.productSize, s.salesBiddingId, s.salesBiddingPrice, s.salesStatus) " +
             "FROM SalesBidding s JOIN s.product p JOIN s.user u " +
             "WHERE u.userId = :userId " +
-            "ORDER BY s.salesBiddingTime DESC")
+            "ORDER BY s.modifyDate DESC")
     List<SaleDetailsDto> findRecentSaleDetailsByUserId(Long userId, Pageable pageable);
 
     Optional<SalesBidding> findBySalesBiddingIdAndUserUserId(Long salesBiddingId, Long userId);

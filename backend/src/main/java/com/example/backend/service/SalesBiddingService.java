@@ -144,7 +144,7 @@ public class SalesBiddingService {
      * 판매 입찰 시간 기준 최신순 정렬
      */
     public SaleHistoryDto getSaleHistory(Long userId) {
-        Long allCount = salesBiddingRepository.countAllByUserId(userId);
+        Long allCount = salesBiddingRepository.countAllByUserUserId(userId);
         List<SalesStatusCountDto> SalesStatusCountDto = salesBiddingRepository.countSalesStatus(userId);
         List<SaleDetailsDto> saleDetailsDTO = salesBiddingRepository.findSaleDetailsByUserId(userId);
 
@@ -156,7 +156,7 @@ public class SalesBiddingService {
     }
 
     public SaleHistoryDto getRecentSaleHistory(Long userId) {
-        Long allCount = salesBiddingRepository.countAllByUserId(userId);
+        Long allCount = salesBiddingRepository.countAllByUserUserId(userId);
         List<SalesStatusCountDto> SalesStatusCountDto = salesBiddingRepository.countSalesStatus(userId);
         List<SaleDetailsDto> saleDetailsDTO = salesBiddingRepository.findRecentSaleDetailsByUserId(userId, PageRequest.of(0, 3));
 

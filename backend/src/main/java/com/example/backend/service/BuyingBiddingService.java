@@ -3,7 +3,9 @@ package com.example.backend.service;
 import static com.example.backend.entity.enumData.BiddingStatus.PROCESS;
 import static com.example.backend.entity.enumData.SalesStatus.COMPLETE;
 
-import com.example.backend.dto.orders.BiddingRequestDto;
+import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
+import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
+import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
 import com.example.backend.dto.orders.OrderProductDto;
@@ -31,9 +33,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -205,5 +209,49 @@ public class BuyingBiddingService {
             order.changeOrderStatus(OrderStatus.CANCEL);
             ordersRepository.save(order);
         });
+    }
+
+
+    /**
+     * 구매 내역
+     * 전체/입찰 중/종료 건수 및 조건별 구매 내역 (상품사진, 상품명, 상품사이즈, 결제금액, 주문상태) 주문날짜 기준 최신순 정렬
+     */
+    public BuyHistoryAllDto getAllBuyHistory(Long userId) {
+        Long allCount = buyingBiddingRepository.countAllByUserUserId(userId);
+        Long processCount = buyingBiddingRepository.countProcessByUserId(userId);
+        Long completeCount = buyingBiddingRepository.countCompleteByUserId(userId);
+
+        List<BuyDetailsDto> buyDetailsDto = buyingBiddingRepository.findAllBuyDetails(userId);
+
+        return BuyHistoryAllDto.builder()
+                .allCount(allCount)
+                .processCount(processCount)
+                .completeCount(completeCount)
+                .buyingDetails(buyDetailsDto)
+                .build();
+    }
+
+    public List<BuyDetailsProcessDto> getBuyHistoryProcess(Long userId) {
+        return buyingBiddingRepository.findBuyDetailsProcess(userId);
+    }
+
+    public List<BuyDetailsDto> getBuyHistoryComplete(Long userId) {
+        return buyingBiddingRepository.findBuyDetailsComplete(userId);
+    }
+
+    public BuyHistoryAllDto getRecentBuyHistory(Long userId) {
+        Long allCount = buyingBiddingRepository.countAllByUserUserId(userId);
+        Long processCount = buyingBiddingRepository.countProcessByUserId(userId);
+        Long completeCount = buyingBiddingRepository.countCompleteByUserId(userId);
+
+        List<BuyDetailsDto> buyDetailsDto = buyingBiddingRepository.findRecentBuyDetails(
+                userId, PageRequest.of(0, 3));
+
+        return BuyHistoryAllDto.builder()
+                .allCount(allCount)
+                .processCount(processCount)
+                .completeCount(completeCount)
+                .buyingDetails(buyDetailsDto)
+                .build();
     }
 }
