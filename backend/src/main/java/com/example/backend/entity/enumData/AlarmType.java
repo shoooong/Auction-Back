@@ -5,5 +5,6 @@ public enum AlarmType {
     ONETOONE,
     LUCKY,
     LUCKYAPPLY,
-    SALES
+    SALES,
+    COUPON
 }

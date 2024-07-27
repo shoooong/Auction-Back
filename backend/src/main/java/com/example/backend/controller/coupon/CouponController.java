@@ -6,6 +6,8 @@ import com.example.backend.dto.coupon.CouponDto;
 import com.example.backend.dto.coupon.CouponIssueDto;
 import com.example.backend.dto.coupon.UserCouponDto;
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.entity.enumData.AlarmType;
+import com.example.backend.service.alarm.AlarmService;
 import com.example.backend.service.coupon.CouponIssueService;
 import com.example.backend.service.coupon.CouponService;
 import java.util.List;
@@ -32,6 +34,8 @@ public class CouponController {
     private final CouponService couponService;
     private final CouponIssueService couponIssueService;
 
+    private final AlarmService alarmService;
+
     @GetMapping("/coupon/time-attack")
     public ResponseEntity<List<CouponDto>> timeAttack(){
         List<CouponDto> couponDto = couponService.searchCouponsByTitle("timeAttack");
@@ -48,6 +52,9 @@ public class CouponController {
     @PostMapping("/api/coupon/{couponId}/issue")
     public ResponseEntity<?> couponIssue(@PathVariable Long couponId, @AuthenticationPrincipal UserDTO userDTO){
         couponIssueService.issueCoupon(couponId, userDTO.getUserId());
+
+        // 알림 전송
+        alarmService.sendNotification(userDTO.getUserId(), AlarmType.COUPON);
 
         return ResponseEntity.ok(200);
     }
