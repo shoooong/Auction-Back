@@ -77,7 +77,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(true);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60 * 10);
+        accessTokenCookie.setMaxAge(60 * 60);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
@@ -85,20 +85,20 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(60 * 60 * 24);
 
-        Cookie isLoginCookie = new Cookie("isLogin", "true");
-        isLoginCookie.setHttpOnly(false);
-        isLoginCookie.setSecure(false);
-        isLoginCookie.setPath("/");
-        isLoginCookie.setMaxAge(60 * 10);
+        Cookie userInfoCookie = new Cookie("userInfo", null);
+        userInfoCookie.setHttpOnly(true);
+        userInfoCookie.setSecure(true);
+        userInfoCookie.setPath("/");
+        userInfoCookie.setMaxAge(60 * 60);
 
         // 쿠키를 응답에 추가
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-        response.addCookie(isLoginCookie);
+        response.addCookie(userInfoCookie);
 
 
-        claims.remove("accessToken");
-        claims.remove("refreshToken");
+//        claims.remove("accessToken");
+//        claims.remove("refreshToken");
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(claims);

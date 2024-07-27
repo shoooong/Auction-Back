@@ -6,12 +6,17 @@ import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.security.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import com.example.backend.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RestController
@@ -22,6 +27,23 @@ public class UserController {
 
     private final UserService userService;
     private final JWTUtil jwtUtil;
+
+
+    @GetMapping("/check")
+    public ResponseEntity<?> checkAuth(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("userInfo".equals(cookie.getName())) {
+                    String userInfoJson = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                    return ResponseEntity.ok().body(userInfoJson);
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+    }
+
+
 
     // 로그인
     @PostMapping("/login")
