@@ -32,16 +32,14 @@ import java.util.stream.Collectors;
 @Service
 @Log4j2
 @Transactional
-@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final BuyingBiddingRepository buyingBiddingRepository;
-    private PhotoReviewRepository photoReviewRepository;
-    private UserRepository userRepository;
-    private SalesBiddingRepository salesBiddingRepository;
+    private final PhotoReviewRepository photoReviewRepository;
+    private final UserRepository userRepository;
+    private final SalesBiddingRepository salesBiddingRepository;
 
-    @Autowired
     public ProductServiceImpl(ProductRepository productRepository,
                               BuyingBiddingRepository buyingBiddingRepository,
                               PhotoReviewRepository photoReviewRepository,
@@ -109,22 +107,42 @@ public class ProductServiceImpl implements ProductService {
 
             ProductDetailDto priceValue = productRepository.searchProductPrice(modelNum);
 
+            log.info("priceValue : {}", priceValue);
+
             List<ProductsContractListDto> contractInfoList = selectSalesContract(modelNum);
+
+            log.info("contractInfoList : {}", contractInfoList);
 
             List<SalesHopeDto> salesHopeDtoList = selectSalesHope(modelNum);
 
+            log.info("salesHopeDtoList : {}", salesHopeDtoList);
+
             List<BuyingHopeDto> buyingHopeDtoList = selectBuyingHope(modelNum);
+
+            log.info("buyingHopeDtoList : {}", buyingHopeDtoList);
 
             List<PhotoReviewDto> photoReviewDtoList = selectPhotoReview(modelNum);
 
+            log.info("photoReviewDtoList : {}", photoReviewDtoList);
+
             List<GroupByBuyingDto> groupByBuyingDtoList = productRepository.groupByBuyingSize(modelNum);
+
+            log.info("groupByBuyingDtoList : {}", groupByBuyingDtoList);
 
             List<GroupBySalesDto> groupBySalesDtoList = productRepository.groupBySalesSize(modelNum);
 
+            log.info("groupBySalesDtoList : {}", groupBySalesDtoList);
+
             RecentlyPriceDto recentlyContractPrice = selectRecentlyPrice(modelNum);
+
+            log.info("recentlyContractPrice : {}", recentlyContractPrice);
 
             AveragePriceResponseDto averagePriceResponseDtoList = getAveragePrices(modelNum);
 
+            log.info("averagePriceResponseDtoList : {}", averagePriceResponseDtoList);
+
+
+            // 업데이트(SaleStatus=COMPLETE)가 이뤄지면 상세 상품 변환 이 안나옴
             // 빈 리스트 또는 기본 값 설정
             if (contractInfoList == null) {
                 contractInfoList = new ArrayList<>();
@@ -253,9 +271,13 @@ public class ProductServiceImpl implements ProductService {
             entityManager.clear(); // 엔티티 매니저 캐시 비우기
 
             BigDecimal result = recentlyContractPrice.subtract(previousContractPrice);
-            BigDecimal changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
-                    .divide(previousContractPrice, MathContext.DECIMAL128)
-                    .multiply(BigDecimal.valueOf(100));
+            BigDecimal changePercentageBD = BigDecimal.ZERO;
+            if(previousContractPrice.compareTo(BigDecimal.ZERO) != 0) {
+                log.info("앙ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
+                changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
+                        .divide(previousContractPrice, MathContext.DECIMAL128)
+                        .multiply(BigDecimal.valueOf(100));
+            }
 
             Long resultAsLong = result.longValueExact();
 
