@@ -125,6 +125,32 @@ public class ProductServiceImpl implements ProductService {
 
             AveragePriceResponseDto averagePriceResponseDtoList = getAveragePrices(modelNum);
 
+            // 빈 리스트 또는 기본 값 설정
+            if (contractInfoList == null) {
+                contractInfoList = new ArrayList<>();
+            }
+            if (salesHopeDtoList == null) {
+                salesHopeDtoList = new ArrayList<>();
+            }
+            if (buyingHopeDtoList == null) {
+                buyingHopeDtoList = new ArrayList<>();
+            }
+            if (photoReviewDtoList == null) {
+                photoReviewDtoList = new ArrayList<>();
+            }
+            if (groupByBuyingDtoList == null) {
+                groupByBuyingDtoList = new ArrayList<>();
+            }
+            if (groupBySalesDtoList == null) {
+                groupBySalesDtoList = new ArrayList<>();
+            }
+            if (recentlyContractPrice == null) {
+                recentlyContractPrice = new RecentlyPriceDto();
+            }
+            if (averagePriceResponseDtoList == null) {
+                averagePriceResponseDtoList = new AveragePriceResponseDto();
+            }
+
             ProductDetailDto productDetailDto = ProductDetailDto.builder()
                     .productId(product.getProductId())
                     .productImg(product.getProductImg())
