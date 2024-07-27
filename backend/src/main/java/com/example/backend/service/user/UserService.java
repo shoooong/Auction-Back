@@ -11,7 +11,6 @@ import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.BuyingBiddingService;
-import com.example.backend.service.OrdersService;
 import com.example.backend.service.SalesBiddingService;
 import com.example.backend.service.UserCouponService;
 import com.example.backend.service.mypage.BookmarkProductService;
@@ -66,7 +65,7 @@ public class UserService {
    @Transactional
    public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
-         throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+         throw new IllegalArgumentException("이미 회원가입되어 있는 이메일입니다.");
       }
 
       String imageUrl = "";
