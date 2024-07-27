@@ -1,6 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.user.UserDTO;
+import com.example.backend.dto.user.UserFindEmailReqDto;
+import com.example.backend.dto.user.UserFindEmailResDto;
 import com.example.backend.dto.user.UserRegisterDTO;
 import com.example.backend.security.JWTUtil;
 import com.example.backend.service.user.RefreshTokenService;
@@ -42,6 +44,18 @@ public class UserController {
 
         userService.registerUser(userRegisterDTO, file,  true);
         return ResponseEntity.ok("Admin registered successfully");
+    }
+
+    // 이메일 찾기
+    @PostMapping("/findEmail")
+    public ResponseEntity<?> findEmail(@RequestBody UserFindEmailReqDto userFindEmailReqDto) {
+        UserFindEmailResDto userFindEmailResDto = userService.findEmail(userFindEmailReqDto.getNickname(), userFindEmailReqDto.getPhoneNum());
+
+        if (userFindEmailResDto != null) {
+            return ResponseEntity.ok(userFindEmailResDto);
+        } else {
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        }
     }
 
     // 로그인

@@ -4,10 +4,7 @@ import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.main.ProfileDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
-import com.example.backend.dto.user.UserDTO;
-import com.example.backend.dto.user.UserModifyReqDto;
-import com.example.backend.dto.user.UserModifyResDto;
-import com.example.backend.dto.user.UserRegisterDTO;
+import com.example.backend.dto.user.*;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.BuyingBiddingService;
@@ -62,6 +59,21 @@ public class UserService {
               user.isRole());
    }
 
+   /**
+    * 이메일 찾기
+    */
+   public UserFindEmailResDto findEmail(String nickname, String phoneNum) {
+      String email = userRepository.findEmail(nickname, phoneNum);
+
+      return new UserFindEmailResDto(email);
+   }
+
+   /**
+    * 회원가입
+    * @param userRegisterDTO 이메일, 비밀번호, 닉네임, 핸드폰번호
+    * @param file 기본 프로필 사진
+    * @param isAdmin 회원유형 구분
+    */
    @Transactional
    public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
