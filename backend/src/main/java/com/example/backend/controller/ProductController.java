@@ -1,10 +1,12 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.admin.ProductRespDto;
+import com.example.backend.dto.feed.StyleFeedDto;
 import com.example.backend.dto.product.*;
 import com.example.backend.dto.product.Detail.*;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.service.Product.ProductService;
+import com.example.backend.service.objectstorage.ObjectStorageService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,9 +27,14 @@ public class ProductController {
 
     private final ProductService productService;
 
+    private ObjectStorageService objectStorageService;
+
+    private String bucketName = "push";
+
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ObjectStorageService objectStorageService) {
         this.productService = productService;
+        this.objectStorageService = objectStorageService;
     }
 
     // 해당 대분류 상품
@@ -129,17 +138,31 @@ public class ProductController {
 
     // 해당 상세 상품에 대한 리뷰 작성
     @PostMapping("/api/products/details/{modelNum}/review")
-    public ResponseEntity<?> productDetailReview(@PathVariable String modelNum, @RequestBody PhotoRequestDto photoRequestDto, @AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<?> productDetailReview(
+            @PathVariable String modelNum,
+            @RequestParam("reviewContent") String reviewContent,
+            @RequestParam("temp_image_data") MultipartFile tempImageData,
+            @AuthenticationPrincipal UserDTO userDTO) {
+
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
+
         Long userId = userDTO.getUserId();
+        PhotoRequestDto photoRequestDto = new PhotoRequestDto();
         photoRequestDto.setUserId(userId);
         photoRequestDto.setModelNum(modelNum);
+        photoRequestDto.setReviewContent(reviewContent);
+
+        String fileName = objectStorageService.uploadFile(bucketName, "shooong/products/", tempImageData);
+        if (fileName != null) {
+            photoRequestDto.setReviewImg(fileName);
+        }
 
         productService.addPhotoReview(photoRequestDto);
         return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
     }
+
 
     // 해당 userId가 일치할 경우 수정 가능 -> > 사실상 사용 X
     @PutMapping("/api/products/details/{modelNum}/review/{reviewId}")

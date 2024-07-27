@@ -65,7 +65,7 @@ public class AdminService {
 @Transactional
 public void acceptRequest(Long productId, ProductReqDto productReqDto, MultipartFile productPhoto) {
     String bucketName = "push";
-    String directoryPath = "shooong/dummy/products";
+    String directoryPath = "shooong/products/";
     Optional<Product> productPs = productRepository.findByProductIdAndProductStatus(productId, ProductStatus.REQUEST);
     Product request = productPs.orElseThrow();
 
