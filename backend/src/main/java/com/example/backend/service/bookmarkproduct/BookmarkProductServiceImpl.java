@@ -67,11 +67,13 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
     }
 
     // 해당 사이즈가 있는지 확인
+    @Override
     public boolean isProductSizeAvailable(String modelNum, String size) {
         return productRepository.existsByModelNumAndProductSize(modelNum, size);
     }
 
     // 해당 상품이 이미 북마크에 저장되어있는지 확인
+    @Override
     public boolean isBookmarkExists(Long userId, Long productId) {
         return bookmarkProductRepository.existsByUser_UserIdAndProduct_ProductId(userId, productId);
     }
@@ -119,5 +121,12 @@ public class BookmarkProductServiceImpl implements BookmarkProductService {
     @Override
     public long getBookmarkCountByModelNum(String modelNum) {
         return bookmarkProductRepository.countByModelNum(modelNum);
+    }
+
+    // 사용자가 특정 상품을 북마크했는지 확인하는 메서드 추가
+    @Override
+    @Transactional
+    public boolean isAnySizeBookmarked(Long userId, String modelNum) {
+        return bookmarkProductRepository.existsByUser_UserIdAndProduct_ModelNum(userId, modelNum);
     }
 }

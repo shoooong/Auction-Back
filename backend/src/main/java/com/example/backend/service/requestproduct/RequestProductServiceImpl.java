@@ -50,6 +50,7 @@ public class RequestProductServiceImpl implements RequestProductService {
                         .productId(product.getProductId())
                         .productBrand(product.getProductBrand())
                         .productName(product.getProductName())
+                        .productStatus(product.getProductStatus())
                         .build()
         ).collect(Collectors.toList());
     }
@@ -57,7 +58,6 @@ public class RequestProductServiceImpl implements RequestProductService {
     //  미등록 상품 등록 요청글 상세 조회
     @Override
     public RequestProductDto getRequestProductById(Long productId) {
-        // REQUEST 또는 REJECTED 상태의 상품을 조회
         Optional<Product> product = requestProductRepository.findByProductIdAndProductStatusIn(
                 productId, Arrays.asList(ProductStatus.REQUEST, ProductStatus.REJECTED)
         );

@@ -63,4 +63,16 @@ public class BookmarkProductController {
     public long getBookmarkCountByModelNum(@RequestParam String modelNum) {
         return bookmarkProductService.getBookmarkCountByModelNum(modelNum);
     }
+
+    // 특정 상품의 어떠한 사이즈라도 북마크했는지 확인
+    @GetMapping("/api/product/bookmark/exists")
+    public ResponseEntity<Boolean> isAnySizeBookmarked(@AuthenticationPrincipal UserDTO userDTO,
+                                                       @RequestParam String modelNum) {
+        try {
+            boolean isBookmarked = bookmarkProductService.isAnySizeBookmarked(userDTO.getUserId(), modelNum);
+            return ResponseEntity.ok(isBookmarked);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
+        }
+    }
 }

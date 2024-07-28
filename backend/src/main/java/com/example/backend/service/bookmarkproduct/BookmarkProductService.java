@@ -13,7 +13,9 @@ public interface BookmarkProductService {
 
     List<BookmarkProductDto> getUserBookmarks(Long userId);
 
-    public void deleteBookmark(final long bookmarkProductId, Long userId );
+    void deleteBookmark(final long bookmarkProductId, Long userId );
 
     long getBookmarkCountByModelNum(String modelNum);
+
+    boolean isAnySizeBookmarked(Long userId, String modelNum);
 }
