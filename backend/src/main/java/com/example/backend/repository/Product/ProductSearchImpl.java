@@ -9,6 +9,8 @@ import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.DateTimeTemplate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -230,12 +233,17 @@ public class ProductSearchImpl implements ProductSearch {
         return priceValue;
     }
 
-
+    // 체결가 계산
     @Override
     public List<SalesBiddingDto> recentlyTransaction(String modelNum) {
         QProduct product = QProduct.product;
         QSalesBidding sales = QSalesBidding.salesBidding;
         QBuyingBidding buying = QBuyingBidding.buyingBidding;
+
+        DateTimeTemplate<String> salesTimeString = Expressions.dateTimeTemplate(
+                String.class, "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", sales.salesBiddingTime);
+        DateTimeTemplate<String> buyingTimeString = Expressions.dateTimeTemplate(
+                String.class, "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", buying.buyingBiddingTime);
 
         return queryFactory.select(Projections.bean(SalesBiddingDto.class,
                         product.productId,
@@ -252,12 +260,18 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
-                        .and(sales.salesBiddingTime.eq(buying.buyingBiddingTime))
+                        .and(salesTimeString.eq(buyingTimeString))
                         .and(sales.salesBiddingPrice.eq(buying.buyingBiddingPrice))
                         .and(sales.salesBiddingTime.isNotNull()))
                 .orderBy(sales.salesBiddingTime.desc())
                 .distinct()
                 .fetch();
+    }
+
+
+
+    private BooleanExpression contractPermitOneSecond(DateTimePath<LocalDateTime> salesTime, DateTimePath<LocalDateTime> buyingTime) {
+        return Expressions.numberTemplate(Long.class, "timestampdiff(SECOND, {0}, {1})", salesTime, buyingTime).loe(1);
     }
 
     @Override
