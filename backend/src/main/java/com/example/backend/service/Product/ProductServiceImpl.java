@@ -230,7 +230,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("!!! 서버가 마지막까지 유지했던 시간 : {}", lastCheckedTime);
 
         List<SalesBiddingDto> newAllContractSelect = productRepository.recentlyTransaction(modelNum);
-        log.info("최근 체결 내역 조회 : {} ", newAllContractSelect);
+        log.info("최근 체결 내역 조회 : {} ", newAllContractSelect.toString());
         if (newAllContractSelect.isEmpty()) {
             log.info("체결된 거래가 없습니다.");
             return new RecentlyPriceDto();
@@ -241,7 +241,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("최근 체결 내역 시간 : {}", recentlyContractTime);
 
         RecentlyPriceDto recentlyPriceDto = RecentlyPriceDto.builder()
-                .latestPrice(recentlyContractValue.getLatestPrice())
+                .latestPrice(recentlyContractValue.getSalesBiddingPrice())
                 .salesBiddingTime(recentlyContractTime)
                 .salesBiddingPrice(recentlyContractValue.getSalesBiddingPrice())
                 .build();
@@ -253,48 +253,47 @@ public class ProductServiceImpl implements ProductService {
                     log.info("기본값 설정 완료");
                 }
             }
-            Long recentlyProductId = recentlyContractValue.getProductId();
-            BigDecimal recentlyContractPrice = recentlyContractValue.getLatestPrice();
-            BigDecimal previousContractPrice = oldContractValue.get().getLatestPrice();
+            List<Product> products = productRepository.findByModelNum(modelNum);
+            for (Product product : products) {
+                BigDecimal recentlyContractPrice = recentlyContractValue.getSalesBiddingPrice();
+                BigDecimal previousContractPrice = product.getLatestPrice();
 
-            log.info("업데이트 전 recentlyProductId : {}, recentlyContractPrice : {}", recentlyProductId, recentlyContractPrice);
+                log.info("업데이트 전 productId : {}, recentlyContractPrice : {}", product.getProductId(), recentlyContractPrice);
 
-            if (previousContractPrice != null) {
-                productRepository.updatePreviousPrice(recentlyProductId, previousContractPrice);
-                log.info("Updated previousPrice for productId: {} with price: {}", recentlyProductId, previousContractPrice);
-            } else {
-                log.warn("previousContractPrice is null, skipping update for previousPrice");
+                if (previousContractPrice != null) {
+                    productRepository.updatePreviousPrice(product.getProductId(), previousContractPrice);
+                    log.info("Updated previousPrice for productId: {} with price: {}", product.getProductId(), previousContractPrice);
+                } else {
+                    log.warn("previousContractPrice is null, skipping update for previousPrice");
+                }
+                productRepository.updateLatestPriceAndDate(product.getProductId(), recentlyContractPrice, recentlyContractTime);
+                log.info("Updated latestPrice for productId: {}", product.getProductId());
+
+                BigDecimal result = recentlyContractPrice.subtract(previousContractPrice != null ? previousContractPrice : BigDecimal.ZERO);
+                BigDecimal changePercentageBD = BigDecimal.ZERO;
+                if (previousContractPrice != null && previousContractPrice.compareTo(BigDecimal.ZERO) != 0) {
+                    changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
+                            .divide(previousContractPrice, MathContext.DECIMAL128)
+                            .multiply(BigDecimal.valueOf(100));
+                }
+
+                Long resultAsLong = result.longValueExact();
+
+                double changePercentage = changePercentageBD.doubleValue();
+                DecimalFormat df = new DecimalFormat("#.#");
+                String format = df.format(changePercentage);
+                double finalChangePercentage = Double.parseDouble(format);
+                productRepository.updateRecentlyContractPercentage(product.getProductId(), finalChangePercentage);
+                productRepository.updateDifferenceContract(product.getProductId(), resultAsLong);
+
+                recentlyPriceDto.setDifferenceContract(resultAsLong);
+                recentlyPriceDto.setChangePercentage(finalChangePercentage);
+                recentlyPriceDto.setPreviousPrice(previousContractPrice);
             }
-            productRepository.updateLatestPrice(recentlyProductId, recentlyContractPrice);
-            log.info("Updated latestPrice for productId: {}", recentlyProductId);
-            productRepository.flush();
-            entityManager.clear(); // 엔티티 매니저 캐시 비우기
-
-            BigDecimal result = recentlyContractPrice.subtract(previousContractPrice);
-            BigDecimal changePercentageBD = BigDecimal.ZERO;
-            if(previousContractPrice.compareTo(BigDecimal.ZERO) != 0) {
-                log.info("앙ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
-                changePercentageBD = recentlyContractPrice.subtract(previousContractPrice)
-                        .divide(previousContractPrice, MathContext.DECIMAL128)
-                        .multiply(BigDecimal.valueOf(100));
-            }
-
-            Long resultAsLong = result.longValueExact();
-
-            double changePercentage = changePercentageBD.doubleValue();
-            DecimalFormat df = new DecimalFormat("#.#");
-            String format = df.format(changePercentage);
-            double finalChangePercentage = Double.parseDouble(format);
-            productRepository.updateRecentlyContractPercentage(recentlyProductId, finalChangePercentage);
-            productRepository.updateDifferenceContract(recentlyProductId, resultAsLong);
-            recentlyPriceDto.setDifferenceContract(resultAsLong);
-            recentlyPriceDto.setChangePercentage(finalChangePercentage);
-            recentlyPriceDto.setPreviousPrice(previousContractPrice);
 
             lastCheckedTime = recentlyContractTime;
             isUpdated = true;
             log.info("최근 체결 내역 업데이트 완료");
-            updateDate(recentlyProductId);
         } else {
             log.info("현재 등록된 거래가 최신입니다.");
             return RecentlyPriceDto.builder()
@@ -308,6 +307,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return recentlyPriceDto;
     }
+
 
 
     // 체결 내역 관리(리스트)

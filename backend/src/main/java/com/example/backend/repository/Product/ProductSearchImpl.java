@@ -252,6 +252,8 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(sales.salesBiddingTime.eq(buying.buyingBiddingTime))
+                        .and(sales.salesBiddingPrice.eq(buying.buyingBiddingPrice))
                         .and(sales.salesBiddingTime.isNotNull()))
                 .orderBy(sales.salesBiddingTime.desc())
                 .distinct()
