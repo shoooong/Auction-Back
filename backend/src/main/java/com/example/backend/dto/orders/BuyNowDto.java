@@ -11,10 +11,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class BuyOrderDto {
-    private Long productId;
-    private Long couponId;
-    private Long addressId;
-    private BigDecimal price;
-    private Long exp;
+public class BuyNowDto {
+    Long salesBiddingId;
+    Long addressId;
+    Long couponId;
+    BigDecimal Price;
 }

@@ -74,7 +74,7 @@ public class OrdersService {
             .orderDate(order.getCreateDate())
             .product(new OrderProductDto().fromEntity(order.getProduct()))
             .address(new AddressDto().fromEntity(order.getAddress()))
-            .biddingBidding(new BuyingBiddingDto())
+            .biddingBidding(new BuyingBiddingDto().fromEntity(order.getBuyingBidding()))
             .build();
         return orderDto;
     }
