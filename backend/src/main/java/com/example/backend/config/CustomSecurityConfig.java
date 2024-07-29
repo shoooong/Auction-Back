@@ -118,10 +118,10 @@ public class CustomSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // TODO: 추후 도메인 변경
-//        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com"));
-        configuration.addAllowedOrigin("http://175.45.200.47");
-        configuration.addAllowedOrigin("http://175.45.200.196:3000");
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com"));
+//        configuration.addAllowedOrigin("http://175.45.200.47");
+//        configuration.addAllowedOrigin("http://175.45.200.196:3000");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
 //        configuration.addExposedHeader("Set-Cookie");
