@@ -118,7 +118,8 @@ public class CustomSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // TODO: 추후 도메인 변경
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://*.sho0ong.com", "https://api.sho0ong.com", "https://sho0ong.com","https://www.sho0ong.com", "http://175.45.200.47:8080"));
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://175.45.200.196:3000", "https://175.45.200.47:8080", "https://www.sho0ong.com", "https://sho0ong.com", "https://api.sho0ong.com"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com","https://www.sho0ong.com", "http://175.45.200.196:3000"));
 //        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
 //        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com"));
 //        configuration.addAllowedOriginPatterns("http://175.45.200.196:3000");
