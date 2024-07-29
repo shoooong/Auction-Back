@@ -1,5 +1,6 @@
 package com.example.backend.dto.orders;
 
+import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import java.math.BigDecimal;
@@ -28,4 +29,14 @@ public class SalesBiddingDto {
 
     private SalesStatus salesStatus;
 
+    public static SalesBiddingDto fromEntity(SalesBidding salesBidding) {
+        return SalesBiddingDto.builder()
+            .salesBiddingId(salesBidding.getSalesBiddingId())
+            .product(OrderProductDto.fromEntity(salesBidding.getProduct()))
+            .salesBiddingPrice(salesBidding.getSalesBiddingPrice())
+            .salesQuantity(salesBidding.getSalesQuantity())
+            .salesBiddingTime(salesBidding.getSalesBiddingTime())
+            .salesStatus(salesBidding.getSalesStatus())
+            .build();
+    }
 }

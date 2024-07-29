@@ -26,6 +26,7 @@ public class OrderDto {
     private Long userId;
     private OrderProductDto product;
     private BuyingBiddingDto biddingBidding;
+    private SalesBiddingDto salesBidding;
     private AddressDto address;
     private OrderStatus orderStatus;
     private BigDecimal orderPrice;
