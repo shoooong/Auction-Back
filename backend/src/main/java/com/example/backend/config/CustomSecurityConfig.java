@@ -126,7 +126,7 @@ public class CustomSecurityConfig {
 //        configuration.addAllowedOriginPatterns("https://api.sho0ong.com");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "text/event-stream"));
-//        configuration.addExposedHeader("Set-Cookie");
+        configuration.addExposedHeader("Set-Cookie");
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
