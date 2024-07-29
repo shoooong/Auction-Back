@@ -127,7 +127,7 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.min().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
@@ -135,14 +135,13 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
                         .and(product.mainDepartment.eq(mainDepartment))
-                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS)))
-                .orderBy(buying.buyingBiddingTime.desc())
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .orderBy(sales.salesBiddingTime.asc())
                 .groupBy(product.modelNum)
                 .fetch();
     }
 
-    // 판매 입찰이니까 가장 높은거 + 가장 최신에 입찰이 들어온 순서
-    // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
+    // 등록 역순 -> 인기 없는 상품인데 판다고 상술
     @Override
     public List<ProductResponseDto> searchAllProductNewSelling(String mainDepartment) {
         return queryFactory
