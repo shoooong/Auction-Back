@@ -124,7 +124,7 @@ public class CustomSecurityConfig {
 //        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com"));
 //        configuration.addAllowedOriginPatterns("http://175.45.200.196:3000");
 //        configuration.addAllowedOriginPatterns("https://api.sho0ong.com");
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "text/event-stream"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 //        configuration.addExposedHeader("Set-Cookie");
