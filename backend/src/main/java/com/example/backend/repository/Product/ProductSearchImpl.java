@@ -55,13 +55,14 @@ public class ProductSearchImpl implements ProductSearch {
                                 product.productImg,
                                 product.mainDepartment,
                                 Expressions.numberTemplate(BigDecimal.class, "coalesce({0}, {1})",
-                                        buying.buyingBiddingPrice.min(),
+                                        sales.salesBiddingPrice.max(),
                                         product.originalPrice).as("buyingBiddingPrice")
                         )
                 )
                 .from(product)
-                .leftJoin(buying).on(buying.product.modelNum.eq(product.modelNum))
-                .where(eqMainDepartment.and(productCondition))
+                .leftJoin(sales).on(sales.product.modelNum.eq(product.modelNum))
+                .where(eqMainDepartment.and(productCondition)
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .groupBy(product.modelNum)
                 .fetch();
     }
@@ -76,14 +77,15 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"),  // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.modelNum.eq(buying.product.modelNum))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(product.mainDepartment.eq(mainDepartment)))
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .orderBy(product.createDate.desc())
                 .groupBy(product.modelNum)
                 .fetch();
@@ -99,18 +101,20 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"), // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.modelNum.eq(buying.product.modelNum))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(product.mainDepartment.eq(mainDepartment)))
-                .orderBy(buying.count().desc())
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .orderBy(sales.count().desc()) // 여전히 구매 입찰 수로 정렬
                 .groupBy(product.modelNum)
                 .fetch();
     }
+
 
     // 가장 낮은 구매가격 + 가장 최신에 입찰이 들어온 순서
     // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
@@ -128,9 +132,10 @@ public class ProductSearchImpl implements ProductSearch {
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.modelNum.eq(buying.product.modelNum))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(product.mainDepartment.eq(mainDepartment)))
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS)))
                 .orderBy(buying.buyingBiddingTime.desc())
                 .groupBy(product.modelNum)
                 .fetch();
@@ -171,14 +176,15 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.modelNum.eq(buying.product.modelNum))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(product.subDepartment.eq(subDepartment)))
+                        .and(product.subDepartment.eq(subDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .groupBy(product.modelNum)
                 .orderBy(product.createDate.desc())
                 .offset(pageable.getOffset())
