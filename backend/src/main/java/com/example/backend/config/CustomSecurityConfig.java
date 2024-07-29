@@ -119,14 +119,15 @@ public class CustomSecurityConfig {
 
         // TODO: 추후 도메인 변경
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://175.45.200.196:3000", "https://175.45.200.47:8080", "https://www.sho0ong.com", "https://sho0ong.com", "https://api.sho0ong.com"));
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com","https://www.sho0ong.com", "http://175.45.200.196:3000"));
-//        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com","https://www.sho0ong.com", "http://175.45.200.196:3000"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
 //        configuration.setAllowedOriginPatterns(Arrays.asList("https://sho0ong.com"));
 //        configuration.addAllowedOriginPatterns("http://175.45.200.196:3000");
 //        configuration.addAllowedOriginPatterns("https://api.sho0ong.com");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "text/event-stream"));
-        configuration.addExposedHeader("Set-Cookie");
+//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "text/event-stream"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        configuration.addExposedHeader("Set-Cookie");
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
