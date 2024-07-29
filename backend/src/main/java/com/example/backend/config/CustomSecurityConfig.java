@@ -123,7 +123,7 @@ public class CustomSecurityConfig {
 //        configuration.addAllowedOrigin("http://175.45.200.47");
 //        configuration.addAllowedOrigin("http://175.45.200.196:3000");
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "text/event-stream"));
 //        configuration.addExposedHeader("Set-Cookie");
         configuration.setAllowCredentials(true);
 
