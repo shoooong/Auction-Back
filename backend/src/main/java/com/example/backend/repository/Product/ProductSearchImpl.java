@@ -55,7 +55,7 @@ public class ProductSearchImpl implements ProductSearch {
                                 product.productImg,
                                 product.mainDepartment,
                                 Expressions.numberTemplate(BigDecimal.class, "coalesce({0}, {1})",
-                                        sales.salesBiddingPrice.max(),
+                                        sales.salesBiddingPrice.min(),
                                         product.originalPrice).as("buyingBiddingPrice")
                         )
                 )
@@ -77,7 +77,7 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        sales.salesBiddingPrice.max().as("biddingPrice"),  // 여기서 판매의 가장 비싼 가격을 가져옵니다.
+                        sales.salesBiddingPrice.min().as("biddingPrice"),  // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
@@ -101,7 +101,7 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        sales.salesBiddingPrice.max().as("biddingPrice"), // 여기서 판매의 가장 비싼 가격을 가져옵니다.
+                        sales.salesBiddingPrice.min().as("biddingPrice"), // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
@@ -151,14 +151,15 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        sales.salesBiddingPrice.max().as("biddingPrice"),
+                        sales.salesBiddingPrice.min().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
                 .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(product.mainDepartment.eq(mainDepartment)))
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .orderBy(sales.salesBiddingTime.desc())
                 .groupBy(product.modelNum)
                 .fetch();
@@ -175,7 +176,7 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        sales.salesBiddingPrice.max().as("biddingPrice"),
+                        sales.salesBiddingPrice.min().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
@@ -206,13 +207,13 @@ public class ProductSearchImpl implements ProductSearch {
     public ProductDetailDto searchProductPrice(String modelNum) {
 
         log.info("ModelNum : {}", modelNum);
-        JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.min().castToNum(Long.class))
+        JPAQuery<Long> lowPriceQuery = queryFactory.select(buying.buyingBiddingPrice.max().castToNum(Long.class))
                 .from(buying)
                 .where(buying.biddingStatus.eq(BiddingStatus.PROCESS)
                         .and(buying.product.modelNum.eq(modelNum))
                         .and(product.productStatus.eq(ProductStatus.REGISTERED)));
 
-        JPAQuery<Long> topPriceQuery = queryFactory.select(sales.salesBiddingPrice.max().castToNum(Long.class))
+        JPAQuery<Long> topPriceQuery = queryFactory.select(sales.salesBiddingPrice.min().castToNum(Long.class))
                 .from(sales)
                 .where(sales.salesStatus.eq(SalesStatus.PROCESS)
                         .and(sales.product.modelNum.eq(modelNum))
