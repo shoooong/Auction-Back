@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import static com.example.backend.entity.enumData.SalesStatus.COMPLETE;
 import static com.example.backend.entity.enumData.SalesStatus.INSPECTION;
 
 import com.example.backend.dto.mypage.saleHistory.SaleDetailsDto;
@@ -9,22 +10,28 @@ import com.example.backend.dto.orders.BiddingRequestDto;
 import com.example.backend.dto.orders.SaleOrderDto;
 import com.example.backend.dto.orders.SalesBiddingDto;
 import com.example.backend.dto.orders.OrderProductDto;
+import com.example.backend.dto.orders.SalesNowDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.Address;
+import com.example.backend.entity.BuyingBidding;
 import com.example.backend.entity.Coupon;
+import com.example.backend.entity.CouponIssue;
 import com.example.backend.entity.Orders;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.Product;
 import com.example.backend.entity.SalesBidding;
 import com.example.backend.entity.Users;
+import com.example.backend.entity.enumData.BiddingStatus;
 import com.example.backend.entity.enumData.OrderStatus;
 import com.example.backend.entity.enumData.SalesStatus;
+import com.example.backend.repository.Bidding.BuyingBiddingRepository;
 import com.example.backend.repository.Bidding.SalesBiddingRepository;
 import com.example.backend.repository.Orders.OrdersRepository;
 import com.example.backend.repository.Product.ProductRepository;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.repository.mypage.AddressRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -35,13 +42,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SalesBiddingService {
+public class    SalesBiddingService {
 
     private final SalesBiddingRepository salesBiddingRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final OrdersRepository ordersRepository;
+    private final BuyingBiddingRepository buyingBiddingRepository;
+
     /**
      * 판매 입찰 등록
      */
@@ -72,6 +81,8 @@ public class SalesBiddingService {
 
         Users user = userRepository.findById(userDTO.getUserId())
             .orElseThrow(() -> new RuntimeException("User not valid"));
+
+
 
         SalesBidding salesBidding = SalesBidding.builder()
             .salesBiddingPrice(saleOrderDto.getPrice())
@@ -109,6 +120,58 @@ public class SalesBiddingService {
 
         return ordersRepository.save(order).getOrderId();
 
+    }
+
+    @Transactional
+    public Long applySaleNow(UserDTO userDTO, SalesNowDto salesNowDto ) {
+        BuyingBidding buyingBidding = buyingBiddingRepository.findById(salesNowDto.getBuyingBiddingId()) // 판매입찰 데이터 가져오기
+            .orElseThrow(() -> new RuntimeException("buyingBidding not valid"));
+        Users user = userRepository.findById(userDTO.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not valid"));
+
+        Orders youOrder = ordersRepository.findByBuyingBiddingId(salesNowDto.getBuyingBiddingId()).orElseThrow(()->new RuntimeException("Order not found"));
+
+        SalesBidding salesBidding = SalesBidding.builder() // 즉시구매 데이터 생성
+            .user(user)
+            .product(buyingBidding.getProduct())
+            .salesBiddingPrice(buyingBidding.getBuyingBiddingPrice())
+            .salesQuantity(buyingBidding.getBuyingQuantity())
+            .salesBiddingTime(LocalDateTime.now())
+            .salesStatus(SalesStatus.COMPLETE)
+            .build();
+
+        buyingBidding.changeBiddingStatus(BiddingStatus.COMPLETE); // 해당 판매입찰건 완료
+
+        salesBiddingRepository.save(salesBidding);
+
+        Address address = addressRepository.findById(salesNowDto.getAddressId()).orElseThrow(()->new RuntimeException("Address not found"));
+
+        BigDecimal totalAmount = buyingBidding.getBuyingBiddingPrice(); // 입찰 가격 가져옴
+        Coupon coupon = null;
+
+
+        if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            totalAmount = BigDecimal.ZERO;
+        }
+
+        Orders order = Orders.builder() // order 데이터 생성 후 저장
+            .user(user)
+            .product(buyingBidding.getProduct())
+            .salesBidding(salesBidding)
+            .coupon(coupon)
+            .orderStatus((salesBidding.getSalesStatus() == SalesStatus.COMPLETE)
+                ? OrderStatus.COMPLETE
+                : OrderStatus.WAITING)
+            .orderPrice(totalAmount)
+            .address((address))
+            .build();
+
+        youOrder.changeOrderStatus(OrderStatus.COMPLETE);
+
+
+        Long orderId = ordersRepository.save(order).getOrderId();
+
+        return orderId;
     }
 
     /**

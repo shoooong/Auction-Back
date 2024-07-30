@@ -12,6 +12,7 @@ public class FeedBookmarkDto {
     private Long feedId;
     private String feedImage;
     private String feedTitle;
+    private String nickName;
 
     public FeedBookmarkDto(Long feedBookmarkId, Long userId, Long feedId) {
     }

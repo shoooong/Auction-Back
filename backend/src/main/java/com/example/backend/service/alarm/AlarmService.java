@@ -32,9 +32,8 @@ public class AlarmService {
     private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
-    private final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-
     public SseEmitter subscribe(Long userId){
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 //        String emitterId = userId+"_"+System.currentTimeMillis();
         userEmitters.put(userId, emitter);
 
@@ -58,17 +57,18 @@ public class AlarmService {
         return emitter;
     }
 
-    @Scheduled(fixedRate = 45 * 1000)
+    @Scheduled(fixedRate = 40 * 1000)
     public void sendHeartBeat() {
-        List<Long> userEmitterKeys = new ArrayList<>(userEmitters.keySet());
         List<Long> failedEmitters = new ArrayList<>();
+        SseEmitter emitter = null;
 
-        for (Long userId : userEmitterKeys) {
+        for (Long userId : userEmitters.keySet()) {
             try {
-                SseEmitter emitter = userEmitters.get(userId);
+                emitter = userEmitters.get(userId);
 
                 if (emitter == null) {
-                    failedEmitters.add(userId);
+                    userEmitters.remove(userId);
+                    emitter.complete();
                     continue;
                 }
 
@@ -76,8 +76,9 @@ public class AlarmService {
                         .id(String.valueOf(userId))
                         .name("beat")
                         .data("alarm beat"));
-            } catch (IOException e) {
-                failedEmitters.add(userId);
+
+            } catch (Exception e) {
+                e.printStackTrace();
                 emitter.complete();
             }
         }
@@ -86,7 +87,6 @@ public class AlarmService {
 
     // 알림들 가져오기
     @Async
-    @Transactional
     public void sendAlarmNotification(Long userId) {
         List<ResponseAlarmDto> list = alarmRepository.findByUsersUserId(userId).stream().map(ResponseAlarmDto::fromEntity).collect(toList());
         SseEmitter emitter = userEmitters.get(userId);

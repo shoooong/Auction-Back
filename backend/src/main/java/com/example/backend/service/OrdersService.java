@@ -7,6 +7,7 @@ import com.example.backend.dto.orders.BuyingBiddingDto;
 import com.example.backend.dto.orders.OrderDto;
 import com.example.backend.dto.orders.OrderProductDto;
 import com.example.backend.dto.orders.SaleOrderDto;
+import com.example.backend.dto.orders.SalesBiddingDto;
 import com.example.backend.dto.user.UserDTO;
 import com.example.backend.entity.Address;
 import com.example.backend.entity.BuyingBidding;
@@ -30,6 +31,7 @@ import com.example.backend.repository.mypage.AddressRepository;
 import com.example.backend.service.coupon.CouponService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -65,19 +67,33 @@ public class OrdersService {
             .build();
     }
 
-    public OrderDto getOrderOne(Long orderId){
-        Orders order = ordersRepository.findByOrderId(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        OrderDto orderDto = OrderDto.builder()
+
+    public OrderDto getOrderOne(Long orderId) {
+        Orders order = ordersRepository.findByOrderId(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderDto.OrderDtoBuilder orderDtoBuilder = OrderDto.builder()
             .orderId(order.getOrderId())
             .orderPrice(order.getOrderPrice())
             .orderStatus(order.getOrderStatus())
             .orderDate(order.getCreateDate())
             .product(new OrderProductDto().fromEntity(order.getProduct()))
-            .address(new AddressDto().fromEntity(order.getAddress()))
-            .biddingBidding(new BuyingBiddingDto())
-            .build();
-        return orderDto;
+            .address(new AddressDto().fromEntity(order.getAddress()));
+
+        orderDtoBuilder.biddingBidding(
+            Optional.ofNullable(order.getBuyingBidding())
+                .map(buyingBidding -> new BuyingBiddingDto().fromEntity(buyingBidding))
+                .orElse(new BuyingBiddingDto())
+        );
+
+        orderDtoBuilder.salesBidding(
+            Optional.ofNullable(order.getSalesBidding())
+                .map(salesBidding -> new SalesBiddingDto().fromEntity(salesBidding))
+                .orElse(new SalesBiddingDto())
+        );
+        return orderDtoBuilder.build();
     }
+
 
     /**
      * BuyingBidding order 생성

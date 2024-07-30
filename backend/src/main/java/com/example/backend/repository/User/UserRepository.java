@@ -9,12 +9,13 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
+//    @Cacheable(value = CacheLogin.USER, key = "#p0")
     Optional<Users> findByEmail(String email);
 
-    boolean existsByEmail(String email);
+    @Query("SELECT u.email FROM Users u WHERE u.nickname = :nickname AND u.phoneNum = :phoneNum")
+    String findEmail(String nickname, String phoneNum);
 
-    @Query("SELECT u.password From Users u WHERE u.email = :email")
-    String findPasswordByUserId(String email);
+    boolean existsByEmail(String email);
 
     boolean existsByUserId(Long userId);
 

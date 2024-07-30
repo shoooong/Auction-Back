@@ -24,6 +24,8 @@ public interface BookmarkProductRepository extends JpaRepository<BookmarkProduct
     @Query("SELECT COUNT(bp) FROM BookmarkProduct bp WHERE bp.product.modelNum = :modelNum")
     long countByModelNum(@Param("modelNum") String modelNum);
 
+    boolean existsByUser_UserIdAndProduct_ModelNum(Long userId, String modelNum);
+
     // 회원 관심상품과 같은 모델번호를 가진 전체 상품Id 조회
 //    @Query("SELECT p.productId FROM Users u " +
 //            "JOIN BookmarkProduct bp ON bp.user.userId = :userId " +

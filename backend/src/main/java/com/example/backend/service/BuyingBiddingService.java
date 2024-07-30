@@ -6,6 +6,7 @@ import static com.example.backend.entity.enumData.SalesStatus.COMPLETE;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsDto;
 import com.example.backend.dto.mypage.buyHistory.BuyDetailsProcessDto;
 import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
+import com.example.backend.dto.orders.BuyNowDto;
 import com.example.backend.dto.orders.BuyOrderDto;
 import com.example.backend.dto.orders.BuyingBiddingDto;
 import com.example.backend.dto.orders.OrderProductDto;
@@ -89,6 +90,8 @@ public class BuyingBiddingService {
         Users user = userRepository.findById(userDTO.getUserId())
             .orElseThrow(() -> new RuntimeException("User not valid"));
 
+
+
         BuyingBidding buyingBidding = BuyingBidding.builder()
             .buyingBiddingPrice(buyOrderDto.getPrice())
             .product(product)
@@ -147,11 +150,13 @@ public class BuyingBiddingService {
      * 즉시구매시 판매입찰 데이터로 구매입찰 생성(COMPLETE)
      */
     @Transactional
-    public void applyBuyNow(Long salesBiddingId, UserDTO userDTO) {
-        SalesBidding salesBidding = salesBiddingRepository.findById(salesBiddingId) // 판매입찰 데이터 가져오기
+    public Long applyBuyNow(UserDTO userDTO, BuyNowDto buyNowDto) {
+        SalesBidding salesBidding = salesBiddingRepository.findById(buyNowDto.getSalesBiddingId()) // 판매입찰 데이터 가져오기
             .orElseThrow(() -> new RuntimeException("SalesBidding not valid"));
         Users user = userRepository.findById(userDTO.getUserId())
             .orElseThrow(() -> new RuntimeException("User not valid"));
+        Orders youOrder = ordersRepository.findBySalesBiddingId(buyNowDto.getSalesBiddingId())
+            .orElseThrow(() -> new RuntimeException("Order not valid"));
 
         BuyingBidding buyingBidding = BuyingBidding.builder() // 즉시구매 데이터 생성
             .user(user)
@@ -165,6 +170,49 @@ public class BuyingBiddingService {
         salesBidding.changeSalesStatus(COMPLETE); // 해당 판매입찰건 완료
 
         buyingBiddingRepository.save(buyingBidding);
+
+        Address address = addressRepository.findById(buyNowDto.getAddressId()).orElseThrow(()->new RuntimeException("Address not found"));
+
+        BigDecimal totalAmount = buyingBidding.getBuyingBiddingPrice(); // 입찰 가격 가져옴
+        Coupon coupon = null;
+
+        if (buyNowDto.getCouponId() != null) { // 쿠폰 사용 확인, 적용
+            coupon = couponRepository.findById(buyNowDto.getCouponId())
+                .orElseThrow(() -> new RuntimeException("Coupon not found"));
+            CouponIssue userCoupon = couponIssueRepository.findByUsersAndCouponAndUseStatusFalse(
+                    user, coupon)
+                .orElseThrow(() -> new RuntimeException("Coupon not valid"));
+            totalAmount = couponService.applyCoupon(user, coupon, totalAmount)
+                .setScale(2, RoundingMode.HALF_UP);
+
+            userCoupon.useCoupon(true);
+            userCoupon.useDate();
+            couponIssueRepository.save(userCoupon);
+        }
+
+
+        if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            totalAmount = BigDecimal.ZERO;
+        }
+
+        Orders order = Orders.builder() // order 데이터 생성 후 저장
+            .user(user)
+            .product(buyingBidding.getProduct())
+            .buyingBidding(buyingBidding)
+            .coupon(coupon)
+            .orderStatus((buyingBidding.getBiddingStatus() == BiddingStatus.COMPLETE)
+                ? OrderStatus.COMPLETE
+                : OrderStatus.WAITING)
+            .orderPrice(totalAmount)
+            .address((address))
+            .build();
+
+        buyingBidding.changeBiddingStatus(BiddingStatus.COMPLETE);
+        youOrder.changeOrderStatus(OrderStatus.COMPLETE);
+
+        Long orderId = ordersRepository.save(order).getOrderId();
+
+        return orderId;
 
     }
 

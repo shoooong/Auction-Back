@@ -4,14 +4,10 @@ import com.example.backend.dto.mypage.buyHistory.BuyHistoryAllDto;
 import com.example.backend.dto.mypage.main.MypageMainDto;
 import com.example.backend.dto.mypage.main.ProfileDto;
 import com.example.backend.dto.mypage.saleHistory.SaleHistoryDto;
-import com.example.backend.dto.user.UserDTO;
-import com.example.backend.dto.user.UserModifyReqDto;
-import com.example.backend.dto.user.UserModifyResDto;
-import com.example.backend.dto.user.UserRegisterDTO;
+import com.example.backend.dto.user.*;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.User.UserRepository;
 import com.example.backend.service.BuyingBiddingService;
-import com.example.backend.service.OrdersService;
 import com.example.backend.service.SalesBiddingService;
 import com.example.backend.service.UserCouponService;
 import com.example.backend.service.mypage.BookmarkProductService;
@@ -63,10 +59,25 @@ public class UserService {
               user.isRole());
    }
 
+   /**
+    * 이메일 찾기
+    */
+   public UserFindEmailResDto findEmail(String nickname, String phoneNum) {
+      String email = userRepository.findEmail(nickname, phoneNum);
+
+      return new UserFindEmailResDto(email);
+   }
+
+   /**
+    * 회원가입
+    * @param userRegisterDTO 이메일, 비밀번호, 닉네임, 핸드폰번호
+    * @param file 기본 프로필 사진
+    * @param isAdmin 회원유형 구분
+    */
    @Transactional
    public void registerUser(UserRegisterDTO userRegisterDTO, MultipartFile file, boolean isAdmin) {
       if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
-         throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+         throw new IllegalArgumentException("이미 회원가입되어 있는 이메일입니다.");
       }
 
       String imageUrl = "";
@@ -277,7 +288,7 @@ public class UserService {
    public void unregisterUser(Long userId) {
       Users user = validateUserId(userId);
 
-      user.unregisterUser(true);
+      user.unregisterUser( true);
 
       userRepository.save(user);
    }

@@ -1,15 +1,19 @@
 package com.example.backend.dto.user;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.*;
-
 @Getter
 @Setter
+@Builder(builderClassName = "CustomUserDTOBuilder", builderMethodName = "customBuilder")
 @ToString
 public class UserDTO extends User {
 
@@ -22,6 +26,8 @@ public class UserDTO extends User {
     private String profileImg;
     private boolean role;
     private boolean social;
+
+
 
     public UserDTO(Long userId, String email, String password, int grade, String nickname, String phoneNum, String profileImg, boolean role, boolean social) {
 

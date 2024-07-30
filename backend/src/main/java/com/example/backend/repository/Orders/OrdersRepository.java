@@ -27,4 +27,10 @@ public interface OrdersRepository extends JpaRepository<Orders, Long>,OrdersCust
 
     Optional<Orders> findByOrderId(Long orderId);
 
+    @Query("SELECT o FROM Orders o WHERE o.salesBidding.salesBiddingId = :salesBiddingId")
+    Optional<Orders> findBySalesBiddingId(Long salesBiddingId);
+
+    @Query("SELECT o FROM Orders o WHERE o.buyingBidding.buyingBiddingId = :buyingBiddingId")
+    Optional<Orders> findByBuyingBiddingId(Long buyingBiddingId);
+
 }

@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,13 +65,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, AdminPr
     // 최근 체결 상품의 최근 체결 가격 저장
     @Modifying
     @Transactional
-    @Query("UPDATE Product p SET p.latestPrice = :latestPrice WHERE p.productId = :productId")
-    void updateLatestPrice(@Param("productId") Long productId, @Param("latestPrice") BigDecimal latestPrice);
+    @Query("UPDATE Product p SET p.latestPrice = :latestPrice, p.latestDate = :latestDate WHERE p.productId = :productId")
+    void updateLatestPriceAndDate(@Param("productId") Long productId, @Param("latestPrice") BigDecimal latestPrice, @Param("latestDate") LocalDateTime latestDate);
 
+    // 최근 체결 상품의 차이 저장
     @Modifying
     @Transactional
     @Query("UPDATE Product p SET p.differenceContract = :differenceContract WHERE p.productId = :productId")
     void updateDifferenceContract(@Param("productId") Long productId, @Param("differenceContract") Long differenceContract);
+
 
     // TODO: QueryDSL로 변경
     // 회원의 관심상품 productIdList 로 상품 상세 정보 조회

@@ -9,6 +9,8 @@ import com.example.backend.entity.enumData.ProductStatus;
 import com.example.backend.entity.enumData.SalesStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.DateTimeTemplate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,41 +41,29 @@ public class ProductSearchImpl implements ProductSearch {
     private final QBuyingBidding buying = QBuyingBidding.buyingBidding;
     private final QSalesBidding sales = QSalesBidding.salesBidding;
 
-    //판매 상품 대분류 조회
+    // 판매 상품 대분류 조회
     @Override
     public List<ProductRespDto> findProductsByDepartment(String mainDepartment) {
-
-        BooleanExpression buyingCondition = buying.biddingStatus.eq(BiddingStatus.PROCESS);
         BooleanExpression eqMainDepartment = product.mainDepartment.eq(mainDepartment);
         BooleanExpression productCondition = product.productStatus.eq(ProductStatus.REGISTERED);
 
-        // 쿼리 실행 및 결과를 DTO로 매핑
         return queryFactory.select(
                         Projections.constructor(ProductRespDto.class,
-                                product.productBrand,  // 상품 브랜드
-                                product.productName,  // 상품 이름
-                                product.modelNum,  // 모델명
-                                product.productImg,  // 상품 이미지
-                                product.mainDepartment,  // 대분류
-                                // coalesce 함수 사용 부분
-                                Expressions.numberTemplate(BigDecimal.class, "coalesce({0}, {1})", // coalesce 함수 사용, BigDecimal 타입으로 반환
-                                                buying.buyingBiddingPrice.min(), // 첫 번째 인자: 최소 입찰 가격
-                                                product.originalPrice) // 두 번째 인자: 원래 가격
-                                        .as("buyingBiddingPrice") // 결과를 "최저가"로 이름 붙임
+                                product.productBrand,
+                                product.productName,
+                                product.modelNum,
+                                product.productImg,
+                                product.mainDepartment,
+                                Expressions.numberTemplate(BigDecimal.class, "coalesce({0}, {1})",
+                                        sales.salesBiddingPrice.max(),
+                                        product.originalPrice).as("buyingBiddingPrice")
                         )
                 )
                 .from(product)
-                // salesBidding 테이블과 LEFT JOIN
-                .leftJoin(buying)
-                .on(buying.product.modelNum.eq(product.modelNum)
-                        .and(buyingCondition))  // LEFT JOIN의 ON 절에 조건 추가
-                // 조건 결합
-                .where(eqMainDepartment.and(productCondition))
-                // 모델명을 기준으로 그룹화
-                .groupBy(
-                        product.modelNum
-                )
-                // 결과를 리스트로 반환
+                .leftJoin(sales).on(sales.product.modelNum.eq(product.modelNum))
+                .where(eqMainDepartment.and(productCondition)
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .groupBy(product.modelNum)
                 .fetch();
     }
 
@@ -86,15 +77,15 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"),  // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.mainDepartment.eq(mainDepartment)))
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .orderBy(product.createDate.desc())
                 .groupBy(product.modelNum)
                 .fetch();
@@ -110,19 +101,20 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"), // 여기서 판매의 가장 비싼 가격을 가져옵니다.
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.mainDepartment.eq(mainDepartment)))
-                .orderBy(buying.count().desc())
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .orderBy(sales.count().desc()) // 여전히 구매 입찰 수로 정렬
                 .groupBy(product.modelNum)
                 .fetch();
     }
+
 
     // 가장 낮은 구매가격 + 가장 최신에 입찰이 들어온 순서
     // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
@@ -135,22 +127,21 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.min().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.mainDepartment.eq(mainDepartment)))
-                .orderBy(buying.buyingBiddingTime.desc())
+                        .and(product.mainDepartment.eq(mainDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
+                .orderBy(sales.salesBiddingTime.asc())
                 .groupBy(product.modelNum)
                 .fetch();
     }
 
-    // 판매 입찰이니까 가장 높은거 + 가장 최신에 입찰이 들어온 순서
-    // Dto 생성하기 애매해서 createDate를 받아오지만 실제 체결시간 기준으로 잘불러와지니까 신경쓰지 않아도됌
+    // 등록 역순 -> 인기 없는 상품인데 판다고 상술
     @Override
     public List<ProductResponseDto> searchAllProductNewSelling(String mainDepartment) {
         return queryFactory
@@ -165,9 +156,8 @@ public class ProductSearchImpl implements ProductSearch {
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(sales).on(product.productId.eq(sales.product.productId))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(sales.salesStatus.eq(SalesStatus.PROCESS))
                         .and(product.mainDepartment.eq(mainDepartment)))
                 .orderBy(sales.salesBiddingTime.desc())
                 .groupBy(product.modelNum)
@@ -185,15 +175,15 @@ public class ProductSearchImpl implements ProductSearch {
                         product.productBrand,
                         product.productName,
                         product.modelNum,
-                        buying.buyingBiddingPrice.min().as("biddingPrice"),
+                        sales.salesBiddingPrice.max().as("biddingPrice"),
                         product.createDate.as("registerDate"),
                         product.originalPrice
                 ))
                 .from(product)
-                .leftJoin(buying).on(product.productId.eq(buying.product.productId))
+                .leftJoin(sales).on(product.modelNum.eq(sales.product.modelNum))
                 .where(product.productStatus.eq(ProductStatus.REGISTERED)
-                        .and(buying.biddingStatus.eq(BiddingStatus.PROCESS))
-                        .and(product.subDepartment.eq(subDepartment)))
+                        .and(product.subDepartment.eq(subDepartment))
+                        .and(sales.salesStatus.eq(SalesStatus.PROCESS)))
                 .groupBy(product.modelNum)
                 .orderBy(product.createDate.desc())
                 .offset(pageable.getOffset())
@@ -248,12 +238,17 @@ public class ProductSearchImpl implements ProductSearch {
         return priceValue;
     }
 
-
+    // 체결가 계산
     @Override
     public List<SalesBiddingDto> recentlyTransaction(String modelNum) {
         QProduct product = QProduct.product;
         QSalesBidding sales = QSalesBidding.salesBidding;
         QBuyingBidding buying = QBuyingBidding.buyingBidding;
+
+        DateTimeTemplate<String> salesTimeString = Expressions.dateTimeTemplate(
+                String.class, "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", sales.salesBiddingTime);
+        DateTimeTemplate<String> buyingTimeString = Expressions.dateTimeTemplate(
+                String.class, "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", buying.buyingBiddingTime);
 
         return queryFactory.select(Projections.bean(SalesBiddingDto.class,
                         product.productId,
@@ -270,10 +265,18 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(buying).on(buying.product.eq(product).and(buying.biddingStatus.eq(BiddingStatus.COMPLETE)))
                 .where(product.modelNum.eq(modelNum)
                         .and(product.productStatus.eq(ProductStatus.REGISTERED))
+                        .and(salesTimeString.eq(buyingTimeString))
+                        .and(sales.salesBiddingPrice.eq(buying.buyingBiddingPrice))
                         .and(sales.salesBiddingTime.isNotNull()))
                 .orderBy(sales.salesBiddingTime.desc())
                 .distinct()
                 .fetch();
+    }
+
+
+
+    private BooleanExpression contractPermitOneSecond(DateTimePath<LocalDateTime> salesTime, DateTimePath<LocalDateTime> buyingTime) {
+        return Expressions.numberTemplate(Long.class, "timestampdiff(SECOND, {0}, {1})", salesTime, buyingTime).loe(1);
     }
 
     @Override
@@ -423,9 +426,7 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(buying).on(buying.product.eq(product))
                 .where(sales.salesBiddingTime.between(startDate, endDate)
                         .and(product.modelNum.eq(modelNum))
-                        .and(product.productStatus.eq(ProductStatus.REGISTERED))
-                        .and(buying.biddingStatus.eq(BiddingStatus.COMPLETE))
-                        .and(sales.salesStatus.eq(SalesStatus.COMPLETE)))
+                        .and(product.productStatus.eq(ProductStatus.REGISTERED)))
                 .fetch();
 
         log.info("Query Result: " + averagePriceDto.toString());
